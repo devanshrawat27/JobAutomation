@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "jobautomation form assistant (prototype)",
+  "version": "0.1.0",
+  "description": "Fills supported employer forms from your confirmed profile facts. It never submits.",
+  "action": {
+    "default_title": "jobautomation",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["http://localhost:3001/*"],
+  "optional_host_permissions": ["https://*/*"]
+}

@@ -1,0 +1,290 @@
+// Data model for the product foundation.
+//
+// Conventions:
+// - Every user-owned row carries `userId`; the data-access layer must always
+//   filter by it. There is no global profile or global settings row.
+// - Profile facts keep their provenance: the resume excerpt, the confidence the
+//   extractor reported, and the review status the user chose. A fact is never
+//   written here as confirmed without an explicit user action.
+// - Auth models follow Better Auth's expected shape (User/Session/Account/
+//   Verification) so per-user isolation is real rather than assumed.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  /// Lets the browser extension save the job the candidate is viewing.
+  captureToken String?  @unique
+  id            String   @id
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions     Session[]
+  accounts     Account[]
+  profileFacts ProfileFact[]
+  documents    Document[]
+  applications Application[]
+  jobDecisions JobDecision[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+enum FactStatus {
+  SUGGESTED
+  CONFIRMED
+  EDITED
+  SKIPPED
+  NOT_APPLICABLE
+}
+
+enum DocumentKind {
+  COVER_LETTER
+  RESUME
+  RESUME_SUMMARY
+}
+
+enum ApplicationStatus {
+  PREPARED
+  FILLED
+  SUBMIT_ATTEMPTED
+  RECEIPT_CONFIRMED
+  INTERVIEW
+  OFFER
+  REJECTED
+  WITHDRAWN
+}
+
+enum JobDecisionStatus {
+  SAVED
+  DISMISSED
+}
+
+/// One reviewed (or still suggested) profile fact for one user.
+/// `key` is a stable semantic key such as "contact.email"; `sourceText` is the
+/// resume excerpt the proposal came from and is shown next to the value.
+model ProfileFact {
+  id         String     @id @default(cuid())
+  userId     String
+  key        String
+  groupId    String
+  label      String
+  value      String
+  sourceText String
+  confidence String
+  status     FactStatus @default(SUGGESTED)
+  hint       String?
+  /** Preserves the order the extractor proposed, so the profile reads naturally. */
+  position   Int        @default(0)
+  reviewedAt DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([userId, status])
+}
+
+/// A job-specific draft. The content is stored with the fact keys it cites so
+/// every claim can be traced back, even after the profile changes.
+model Document {
+  id            String       @id @default(cuid())
+  userId        String
+  kind          DocumentKind @default(COVER_LETTER)
+  postingId     String
+  postingUrl    String
+  postingTitle  String
+  company       String
+  content       String
+  factKeys      String[]
+  /// Structured payload for documents that are not plain text (currently the tailored resume).
+  data          Json?
+  /// Reviewer notes from the second pass over generated text.
+  review        Json?
+  /// The document this one was rebuilt from, if any.
+  previousId    String?
+  model         String?
+  editedAt      DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications Application[]
+  previous     Document?     @relation("DocumentVersions", fields: [previousId], references: [id], onDelete: SetNull)
+  rebuilts     Document[]    @relation("DocumentVersions")
+
+  @@index([userId, createdAt])
+  @@index([postingId])
+  @@index([previousId])
+}
+
+/// One application the candidate is tracking. `status` is deliberately narrow:
+/// filled, submit attempted and receipt confirmed are different states, and an
+/// uncertain submit never becomes "confirmed" on its own.
+model Application {
+  id               String            @id @default(cuid())
+  userId           String
+  postingId        String
+  postingUrl       String
+  postingTitle     String
+  company          String
+  documentId       String?
+  status           ApplicationStatus @default(PREPARED)
+  profileFactCount Int               @default(0)
+  /// Snapshot: hash of the confirmed facts at the moment tracking started.
+  profileHash      String?
+  /// Snapshot: the confirmed facts themselves, so a later diff is possible.
+  profileSnapshot  Json?
+  /// Snapshot: when the linked document was last edited at that moment.
+  documentEditedAt DateTime?
+  note             String?
+  /// 0 = unrated, 1-5 = how much this role matters to the candidate.
+  priority         Int               @default(0)
+  statusChangedAt  DateTime          @default(now())
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  document  Document?          @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  events    ApplicationEvent[]
+
+  @@unique([userId, postingId])
+  @@index([userId, createdAt])
+}
+
+model ApplicationEvent {
+  id            String            @id @default(cuid())
+  applicationId String
+  status        ApplicationStatus
+  note          String?
+  createdAt     DateTime          @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId, createdAt])
+}
+
+/// A decision the candidate made about a posting: keep it, or hide it.
+/// Discovery never applies to anything by itself.
+model JobDecision {
+  id        String            @id @default(cuid())
+  userId    String
+  postingId String
+  board     String
+  title     String
+  company   String
+  location  String?
+  url       String
+  status    JobDecisionStatus
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postingId])
+  @@index([userId, status])
+}
+
+/// One posting read from an employer's public board. Rows are kept between
+/// scans so the product can work from a local corpus instead of re-fetching on
+/// every page view, and so a posting that disappears from a board is recorded
+/// as closed rather than silently vanishing.
+model JobPosting {
+  id          String    @id @default(cuid())
+  source      String
+  board       String
+  externalId  String
+  company     String
+  title       String
+  location    String?
+  department  String?
+  url         String
+  /// Plain text of the posting body, scrubbed of hidden nodes and invisible characters.
+  description String    @default("")
+  /// Canonical skills the body asks for, extracted with the local vocabulary.
+  skills      String[]  @default([])
+  seniority   String?
+  yearsMin    Int?
+  remote      Boolean   @default(false)
+  postedAt    DateTime?
+  /// Changes when the title, location or body changes, so a scan can skip work.
+  hash        String
+  firstSeenAt DateTime  @default(now())
+  lastSeenAt  DateTime  @default(now())
+  closedAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([source, board, externalId])
+  @@index([closedAt])
+  @@index([company])
+  @@index([lastSeenAt])
+}
+
+/// One scan of every configured board, so the interface can honestly say when
+/// it last looked and what changed.
+model JobScan {
+  id        String   @id @default(cuid())
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
+  boards    Int      @default(0)
+  seen      Int      @default(0)
+  created   Int      @default(0)
+  updated   Int      @default(0)
+  closed    Int      @default(0)
+  errors    String   @default("")
+}

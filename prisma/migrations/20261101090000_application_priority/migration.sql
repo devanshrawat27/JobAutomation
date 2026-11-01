@@ -1,0 +1,1 @@
+ALTER TABLE "Application" ADD COLUMN "priority" INTEGER NOT NULL DEFAULT 0;
