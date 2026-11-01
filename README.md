@@ -21,6 +21,7 @@ The interface follows `BRAND.md` at the workspace root (BRAND.md spec 0.3.0): In
 - Tailored resumes are built from the same facts, with any unsupported line removed and listed
 - Every document downloads as a real PDF and can be rebuilt from the current profile without overwriting the original; rebuilds form a version chain you can compare line by line
 - Cover letters and resumes both get a second reviewer pass, and its notes are kept with the document; medium/high notes can drive a one-click regeneration
+- `/digest` is the in-app daily summary: new matches from the last two days, shortlisted postings about to leave the 14-day window, applications that have waited a week, and profile areas still empty — computed from your own records, no bot token needed
 - `/applications` tracks prepared → form filled → submit attempted → receipt confirmed → outcome, with a timestamped history, a pinned profile snapshot and a diff of what changed since
 - `/jobs/[board]/[id]/answers` lists the fields employer forms ask for, ready to copy, with the facts that answer them and the ones that need you
 - `extension/` holds a Manifest V3 prototype that fills supported forms from those answers, requests one site's permission at a time, and never submits (not yet verified in Chrome)

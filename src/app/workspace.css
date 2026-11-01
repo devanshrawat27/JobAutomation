@@ -1984,3 +1984,42 @@
 .job-eligibility.is-check { border-color: var(--warn-line); background: var(--warn-soft); }
 .job-eligibility.is-check h2 { color: var(--warn); }
 .job-eligibility p { margin: 8px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+
+
+/* Digest ------------------------------------------------------------------ */
+.digest-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+.digest-card {
+  padding: 16px 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(11 21 36 / 4%);
+}
+.digest-card .fact-group-head h2 {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 520;
+  letter-spacing: -0.01em;
+}
+.digest-card .fact-group-head span {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--muted-soft);
+}
+.digest-list { display: grid; gap: 8px; margin: 10px 0 0; padding: 0; list-style: none; }
+.digest-list li { display: grid; gap: 1px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.digest-list li:last-child { border-bottom: 0; padding-bottom: 0; }
+.digest-list a { color: var(--ink); font-size: 12.5px; font-weight: 600; }
+.digest-list a:hover { color: var(--accent-strong); }
+.digest-list span { color: var(--muted); font-size: 10.5px; }
+.digest-empty { margin: 10px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.55; }
+.digest-card .intake-secondary { margin-top: 10px; }
+
+@media (max-width: 860px) {
+  .digest-grid { grid-template-columns: 1fr; }
+}

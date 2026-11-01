@@ -4,13 +4,14 @@ import { prisma } from "@/lib/db";
 import { buildCandidate } from "@/lib/jobs/match";
 import { getCurrentSession } from "@/lib/session";
 
-type Active = "profile" | "jobs" | "documents" | "applications";
+type Active = "profile" | "jobs" | "documents" | "applications" | "digest";
 
 const LINKS: Array<{ key: Active; href: string; label: string; hint: string }> = [
   { key: "profile", href: "/profile", label: "Profile", hint: "The facts every answer cites" },
   { key: "jobs", href: "/jobs", label: "Jobs", hint: "Live roles, ranked for you" },
   { key: "documents", href: "/documents", label: "Documents", hint: "Resumes and letters" },
   { key: "applications", href: "/applications", label: "Applications", hint: "What you sent, when" },
+  { key: "digest", href: "/digest", label: "Digest", hint: "What changed since last time" },
 ];
 
 function initials(name: string): string {
@@ -65,6 +66,7 @@ export default async function AppShell({
   const completeness = Math.round((filled.length / AREAS.length) * 100);
 
   const counts: Record<Active, number | null> = {
+    digest: null,
     profile: facts.length || null,
     jobs: liveJobs,
     documents: documents || null,
