@@ -1937,3 +1937,50 @@
   .jobs-import { grid-template-columns: 1fr; }
   .jobs-import-submit { width: 100%; justify-content: center; }
 }
+
+
+/* Eligibility and trust chips -------------------------------------------- */
+.job-tag.is-warn {
+  border-color: var(--warn-line);
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+.job-tag.is-danger {
+  border-color: var(--danger-line);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+
+/* Eligibility and trust panels ------------------------------------------- */
+.job-trust-panel,
+.job-eligibility {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.job-trust-panel.is-high { border-color: var(--danger-line); background: var(--danger-soft); }
+.job-trust-panel.is-medium { border-color: var(--warn-line); background: var(--warn-soft); }
+.job-trust-panel h2,
+.job-eligibility h2 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 660;
+  letter-spacing: -0.01em;
+}
+.job-trust-panel h2 { color: var(--danger); }
+.job-trust-panel.is-medium h2 { color: var(--warn); }
+.job-trust-panel ul,
+.job-eligibility ul { margin: 0; padding-left: 18px; display: grid; gap: 5px; }
+.job-trust-panel li,
+.job-eligibility li { color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
+.job-trust-panel strong { color: var(--ink); font-weight: 640; }
+.job-eligibility.is-eligible { border-color: var(--ok-line); background: var(--ok-soft); }
+.job-eligibility.is-eligible h2 { color: var(--ok); }
+.job-eligibility.is-not-eligible { border-color: var(--danger-line); background: var(--danger-soft); }
+.job-eligibility.is-not-eligible h2 { color: var(--danger); }
+.job-eligibility.is-check { border-color: var(--warn-line); background: var(--warn-soft); }
+.job-eligibility.is-check h2 { color: var(--warn); }
+.job-eligibility p { margin: 8px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }

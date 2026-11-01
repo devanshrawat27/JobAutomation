@@ -11,7 +11,9 @@ import { BOARDS } from "@/lib/jobs/boards";
 import { searchJobs } from "@/lib/jobs";
 import { lastScan } from "@/lib/jobs/ingest";
 import { buildCandidate, entryFriendly, matchPosting, roleFamily, seniorityOf } from "@/lib/jobs/match";
+import { checkEligibility, parseEligibility, type EligibilityProfile } from "@/lib/jobs/eligibility";
 import { parseReach } from "@/lib/jobs/place";
+import { assessPosting } from "@/lib/jobs/trust";
 import { prisma } from "@/lib/db";
 import { getCurrentSession } from "@/lib/session";
 
@@ -271,6 +273,19 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
     }
   }
 
+  // The numbers an Indian posting actually gates on.
+  const gradeFact = facts.find((fact) => /grade|cgpa|gpa|percentage|marks/i.test(fact.label));
+  const gradeText = gradeFact?.value ?? "";
+  const cgpaMatch = gradeText.match(/([0-9]{1,2}(?:\.[0-9]{1,2})?)\s*(?:\/\s*([0-9]{1,3}))?/);
+  const percentageMatch = gradeText.match(/([0-9]{2}(?:\.[0-9])?)\s*%/);
+  const eligibilityProfile: EligibilityProfile = {
+    cgpa: cgpaMatch && !percentageMatch ? Number(cgpaMatch[1]) : null,
+    cgpaScale: cgpaMatch?.[2] ? Number(cgpaMatch[2]) : cgpaMatch ? 10 : null,
+    percentage: percentageMatch ? Number(percentageMatch[1]) : null,
+    graduationYear: candidate.graduationYear,
+    degree: facts.find((fact) => /degree|discipline|course/i.test(fact.label))?.value ?? null,
+  };
+
   const scan = await lastScan();
   const scanErrors = (scan?.errors ?? "")
     .split("; ")
@@ -347,7 +362,14 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
           : effectiveView === "dismissed"
             ? "Postings you hid. Undo puts one back."
             : "Everything from the last 14 days, newest first. Older postings are retired automatically.";
-  const visible = ordered.slice(0, 60);
+  const visible = ordered.slice(0, 60).map((entry) => {
+    const rules = parseEligibility(entry.posting.description);
+    return {
+      ...entry,
+      eligible: forYouAvailable && rules.length > 0 ? checkEligibility(rules, eligibilityProfile) : null,
+      trust: assessPosting(entry.posting),
+    };
+  });
   const activeBoards = BOARDS.filter((board) => (scan?.errors ?? "").indexOf(board.token) === -1);
 
   return (
@@ -654,7 +676,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
           </div>
         ) : (
           <ul className="jobs-list">
-            {ordered.map(({ posting, fit, alternates }) => {
+            {visible.map(({ posting, fit, alternates, eligible, trust }) => {
               const decision = byPosting.get(posting.id);
               const entry = entryFriendly(posting);
               return (
@@ -676,6 +698,10 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                         {posting.seniority && !(entry && posting.seniority === "intern") ? (
                           <span className="job-tag">{posting.seniority}</span>
                         ) : null}
+                        {eligible && eligible.verdict === "not-eligible" ? (
+                          <span className="job-tag is-warn">Not eligible: {eligible.reasons[0]?.slice(0, 48)}</span>
+                        ) : null}
+                        {trust.risk === "high" ? <span className="job-tag is-danger">Check before applying</span> : null}
                         {communityLabel(posting.board) ? (
                           <span className="job-tag is-direct">{communityLabel(posting.board)}</span>
                         ) : null}
