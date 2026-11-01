@@ -4,6 +4,7 @@ import Link from "next/link";
 import AppShell from "@/components/app-shell";
 
 import { addHiringPost } from "@/app/actions/hiring-post";
+import { importJob } from "@/app/actions/import-job";
 import SavedFilters from "@/components/saved-filters";
 import { scanNow, setJobDecision } from "@/app/actions/jobs";
 import { BOARDS } from "@/lib/jobs/boards";
@@ -43,6 +44,7 @@ type JobsSearchParams = {
   where?: string | string[];
   source?: string | string[];
   error?: string | string[];
+  imported?: string | string[];
 };
 
 function pick(value: string | string[] | undefined): string {
@@ -141,7 +143,7 @@ function updatedLabel(iso: string | null): string | null {
 }
 
 export default async function JobsPage({ searchParams }: { searchParams: Promise<JobsSearchParams> }) {
-  const { q, board, view, family, level, where, source, error } = await searchParams;
+  const { q, board, view, family, level, where, source, error, imported } = await searchParams;
   const query = pick(q).slice(0, 80);
   const boardToken = pick(board);
   const familyFilter = FAMILIES.some(([value]) => value === pick(family)) ? pick(family) : "";
@@ -149,6 +151,8 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
   const whereFilter = PLACES.some(([value]) => value === pick(where)) ? pick(where) : "";
   const sourceFilter = SOURCES.some(([value]) => value === pick(source)) ? pick(source) : "";
   const activeFilters = [familyFilter, levelFilter, whereFilter, sourceFilter].filter(Boolean).length;
+  const errorText = pick(error);
+  const importedRef = pick(imported);
   const requestedView = pick(view);
   const selectedView = ["for-you", "fresher", "all", "saved", "dismissed"].includes(requestedView) ? requestedView : "";
 
@@ -403,6 +407,42 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
             </div>
           </dl>
         </div>
+
+        <form action={importJob} className="jobs-import">
+          <label className="jobs-field jobs-import-field">
+            <span>Paste a job link</span>
+            <input
+              name="url"
+              placeholder="jobs.lever.co/… · boards.greenhouse.io/… · jobs.ashbyhq.com/… · apply.workable.com/…"
+              required
+              type="url"
+            />
+          </label>
+          <button className="onboarding-submit jobs-import-submit" type="submit">
+            Import this job <span aria-hidden="true">→</span>
+          </button>
+        </form>
+        <p className="jobs-import-hint">
+          Greenhouse, Lever, Ashby and Workable links open in one click. LinkedIn and X cannot be read automatically — use
+          the extension or paste the post below.
+        </p>
+
+        {importedRef ? (
+          <p className="doc-banner is-ok" role="status">
+            Imported {decodeURIComponent(importedRef)}. It is scored like any other posting.
+          </p>
+        ) : null}
+        {errorText.startsWith("import") ? (
+          <p className="auth-error" role="alert">
+            {errorText === "import-unsupported"
+              ? "That link is not a Greenhouse, Lever, Ashby or Workable posting. Paste the post text instead."
+              : errorText === "import-not-found"
+                ? "The posting was not found on that board — it may have been closed."
+                : errorText === "import-format"
+                  ? "That does not look like a full link. Paste the whole URL."
+                  : "The board did not answer. Try again, or paste the post text below."}
+          </p>
+        ) : null}
 
         <form className="jobs-filters" method="get">
           <input name="view" type="hidden" value={effectiveView} />

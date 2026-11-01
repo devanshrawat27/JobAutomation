@@ -1910,3 +1910,30 @@
   background: #fdf5e3;
   color: #b47a12;
 }
+
+
+/* Paste a link ------------------------------------------------------------ */
+.jobs-import {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin: 20px 0 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--accent-line);
+  border-radius: 13px;
+  background: linear-gradient(180deg, var(--accent-soft), var(--surface));
+}
+.jobs-import-field span { color: var(--accent-strong); }
+.jobs-import-submit { padding: 11px 18px; white-space: nowrap; }
+.jobs-import-hint {
+  margin: 0 0 16px;
+  color: var(--muted-soft);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  .jobs-import { grid-template-columns: 1fr; }
+  .jobs-import-submit { width: 100%; justify-content: center; }
+}
