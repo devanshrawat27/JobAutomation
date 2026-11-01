@@ -1,10 +1,13 @@
 const API_ORIGIN = "http://localhost:3001";
 
 const PATTERNS = {
+  "contact.firstName": [/first\s*name|given\s*name/i],
+  "contact.lastName": [/last\s*name|surname|family\s*name/i],
   "contact.fullName": [/full\s*name/i, /^name$/i, /\byour name\b/i],
   "contact.email": [/e-?mail/i],
   "contact.phone": [/phone|mobile|contact number/i],
   "contact.location": [/current location|location|city|based in/i],
+  "contact.country": [/^country$|country of residence/i],
   "contact.linkedin": [/linkedin/i],
   "contact.website": [/portfolio|website|github|personal site/i],
   "education.institution": [/institution|university|college|school/i],
@@ -95,6 +98,56 @@ function fillForm(answers) {
     filled.push({ label: answer.label });
   }
 
+  // Custom questions, answered only from confirmed facts.
+  const skills = answers.find((answer) => answer.id === "skills")?.value ?? "";
+  const skillList = skills.toLowerCase().split(/[,;·|]/).map((item) => item.trim()).filter(Boolean);
+  const years = answers.find((answer) => answer.id === "experience.years")?.value ?? "";
+  const usedLabels = new Set(filled.map((item) => item.label));
+
+  const labelOf = (element) => [
+    element.id ? document.querySelector(`label[for="${CSS.escape(element.id)}"]`)?.textContent : "",
+    element.closest("label")?.textContent,
+    element.getAttribute("aria-label"),
+    element.parentElement?.textContent?.slice(0, 120),
+  ].filter(Boolean).join(" ").replace(/\s+/g, " ").trim();
+
+  for (const element of document.querySelectorAll("input, textarea, select")) {
+    if (used.has(element) || element.disabled || element.readOnly) continue;
+    if (element.value && element.value.trim()) continue;
+
+    const label = labelOf(element);
+    if (!label || label.length < 6) continue;
+
+    let value = null;
+
+    if (/years of experience|total experience|experience in years/i.test(label) && years) {
+      value = String(years);
+    } else {
+      const skillQuestion = label.match(/(?:experience|familiar|worked|proficien\w*)\s+(?:with|in)\s+([a-z0-9+#.\s]{2,40})/i);
+      if (skillQuestion) {
+        const asked = skillQuestion[1].toLowerCase().trim();
+        const owned = skillList.some((skill) => asked.includes(skill) || skill.includes(asked));
+        if (owned) value = /\b(yes|no)\b/i.test(label) || element.tagName === "SELECT" ? "Yes" : "Yes";
+      }
+    }
+
+    if (!value) continue;
+
+    if (element.tagName === "SELECT") {
+      const option = [...element.options].find((entry) => entry.textContent.trim().toLowerCase() === value.toLowerCase());
+      if (!option) continue;
+      element.value = option.value;
+    } else {
+      element.value = value;
+    }
+
+    element.dispatchEvent(new Event("input", { bubbles: true }));
+    element.dispatchEvent(new Event("change", { bubbles: true }));
+    used.add(element);
+    filled.push({ label: label.slice(0, 60) + " (from your facts)" });
+    usedLabels.add(label);
+  }
+
   return {
     filled,
     skipped,
@@ -155,6 +208,14 @@ document.getElementById("fill").addEventListener("click", async () => {
   } catch {
     status("Could not reach jobautomation. Is the app running on localhost:3001?", true);
     return;
+  }
+
+  // Some ATS forms ask for first and last name separately.
+  const fullName = answers["contact.fullName"];
+  if (typeof fullName === "string" && fullName.trim()) {
+    const parts = fullName.trim().split(/\s+/);
+    answers["contact.firstName"] = parts[0];
+    answers["contact.lastName"] = parts.slice(1).join(" ");
   }
 
   const [result] = await chrome.scripting.executeScript({
@@ -223,7 +284,27 @@ function collectJob() {
     text(document.querySelector("main")) ||
     text(document.body).slice(0, 8000);
 
-  return { url: location.href, title, company, location: place, text: body, site };
+  // An application page carries the form, not the posting. The server knows how
+  // to fetch the posting from the ATS URL, so send that instead of form text.
+  const isFormPage =
+    /indicate a required field|first name\s*\*|last name\s*\*|resume\/cv\s*\*|submit application/i.test(
+      body.slice(0, 800),
+    );
+
+  const canonical =
+    document.querySelector("link[rel='canonical']")?.getAttribute("href") ||
+    document.querySelector("meta[property='og:url']")?.getAttribute("content") ||
+    location.href;
+
+  return {
+    url: canonical,
+    title,
+    company: company.replace(/\s+careers?$/i, "").trim(),
+    location: place,
+    text: isFormPage ? "" : body,
+    site,
+    isFormPage,
+  };
 }
 
 const scanButton = document.getElementById("scan");
@@ -375,7 +456,7 @@ if (saveButton) {
           title: job.title.slice(0, 200),
           company: job.company.slice(0, 120),
           location: job.location.slice(0, 160),
-          text: job.text.slice(0, 13000),
+          text: (job.text ?? "").slice(0, 13000),
         }),
       });
       const payload = await response.json();

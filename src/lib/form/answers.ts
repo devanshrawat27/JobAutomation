@@ -1,3 +1,5 @@
+import { parseDateRange, totalMonths } from "@/lib/match/experience";
+
 export type AnswerGroup = "contact" | "education" | "experience" | "eligibility" | "preferences";
 export type ApplicationAnswer = {
   id: string;
@@ -48,6 +50,7 @@ const SLOTS: Slot[] = [
   { id: "experience.role", label: "Current role", group: "experience", patterns: [/\brole\b|job title|designation/i] },
   { id: "experience.dates", label: "Dates", group: "experience", patterns: [/\bdates?\b|duration|period/i] },
   { id: "skills", label: "Skills", group: "experience", patterns: [/skills?/i] },
+  { id: "experience.years", label: "Total years of experience", group: "experience", patterns: [/years of experience|total experience/i], note: "Computed from your dated roles, with overlapping months counted once." },
 
   {
     id: "eligibility.authorization",
@@ -114,6 +117,15 @@ function parseExperienceCard(facts: Fact[]): { company: string; role: string; da
 export function buildAnswers(facts: Fact[]): ApplicationAnswer[] {
   const mergedCard = facts.find((fact) => /^experience$/i.test(fact.label) && fact.value.includes("\n"));
   const parsed = mergedCard ? parseExperienceCard(facts) : null;
+  const datesSource = facts.find((fact) => /date|experience/i.test(fact.label))?.label ?? "your dated roles";
+
+  // Years come from the dates themselves, never from a guess.
+  const datedRanges = facts
+    .flatMap((fact) => fact.value.split("\n"))
+    .map((line) => parseDateRange(line))
+    .filter((range): range is NonNullable<typeof range> => Boolean(range));
+  const months = totalMonths(datedRanges);
+  const yearsValue = months > 0 ? (Math.round((months / 12) * 10) / 10).toFixed(1) : null;
 
   return SLOTS.map((slot) => {
     // A merged experience card is the source for company/role/dates, even though
@@ -133,6 +145,18 @@ export function buildAnswers(facts: Fact[]): ApplicationAnswer[] {
         value: value || null,
         factKey: mergedCard.key,
         sourceLabel: mergedCard.label,
+        ...(slot.note ? { note: slot.note } : {}),
+      };
+    }
+
+    if (slot.id === "experience.years") {
+      return {
+        id: slot.id,
+        label: slot.label,
+        group: slot.group,
+        value: yearsValue,
+        factKey: null,
+        sourceLabel: datesSource,
         ...(slot.note ? { note: slot.note } : {}),
       };
     }
