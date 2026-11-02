@@ -74,6 +74,7 @@ export async function addHiringPost(formData: FormData): Promise<void> {
       source: "manual",
       board: "pasted",
       externalId,
+      ownerUserId: session.user.id,
       company,
       title,
       location,

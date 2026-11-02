@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/db";
-import { BOARDS } from "@/lib/jobs/boards";
-import { getGreenhouseJob } from "@/lib/jobs/greenhouse-detail";
+import { getJobDetail } from "@/lib/jobs/detail";
 import { createCoverLetter, createResume } from "@/app/actions/documents";
 import { getCurrentSession } from "@/lib/session";
 
@@ -19,13 +18,11 @@ export default async function PreparePage({
   const { board: boardToken, id } = await params;
   const { error } = await searchParams;
   const failure = Array.isArray(error) ? error[0] : error;
-  const board = BOARDS.find((entry) => entry.token === boardToken);
-  if (!board) notFound();
-
-  const detail = await getGreenhouseJob(board, id).catch(() => null);
-  if (!detail) notFound();
 
   const session = await getCurrentSession();
+  const detail = await getJobDetail(boardToken, id, session?.user?.id ?? null).catch(() => null);
+  if (!detail) notFound();
+
   const facts = session?.user
     ? await prisma.profileFact.findMany({
         where: { userId: session.user.id, status: { in: ["CONFIRMED", "EDITED"] } },

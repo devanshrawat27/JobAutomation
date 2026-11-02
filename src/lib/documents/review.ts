@@ -13,9 +13,12 @@ export type ReviewIssue = {
 };
 
 export type DocumentReview = {
-  verdict: "ok" | "needs-work";
+  /** `unavailable` is written when the reviewer itself failed — never "ok". */
+  status: "checked" | "unavailable";
+  verdict: "ok" | "needs-work" | "unavailable";
   issues: ReviewIssue[];
   checkedAt: string;
+  reason?: string;
 };
 
 const responseSchema = {
@@ -112,8 +115,25 @@ Report problems with the exact sentence each one is about. Leave issues empty wh
   const hasHigh = issues.some((issue) => issue.severity === "high");
 
   return {
+    status: "checked",
     verdict: hasHigh || issues.length >= 4 ? "needs-work" : parsed.data.issues.length === 0 ? "ok" : "needs-work",
     issues,
     checkedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * The review that is recorded when the reviewer could not run.
+ *
+ * A failed second pass must never look like a clean one, so this is stored on
+ * the document and rendered as its own warning.
+ */
+export function unavailableReview(reason: string): DocumentReview {
+  return {
+    status: "unavailable",
+    verdict: "unavailable",
+    issues: [],
+    checkedAt: new Date().toISOString(),
+    reason,
   };
 }

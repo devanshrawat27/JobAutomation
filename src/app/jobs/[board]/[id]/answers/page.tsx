@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/db";
 import { answerGroupLabels, buildAnswers, type AnswerGroup } from "@/lib/form/answers";
-import { BOARDS } from "@/lib/jobs/boards";
-import { getGreenhouseJob } from "@/lib/jobs/greenhouse-detail";
+import { getJobDetail } from "@/lib/jobs/detail";
 import { getCurrentSession } from "@/lib/session";
 import CopyAnswer from "./copy-answer";
 
@@ -18,13 +17,11 @@ export default async function AnswersPage({
   params: Promise<{ board: string; id: string }>;
 }) {
   const { board: boardToken, id } = await params;
-  const board = BOARDS.find((entry) => entry.token === boardToken);
-  if (!board) notFound();
-
-  const detail = await getGreenhouseJob(board, id).catch(() => null);
-  if (!detail) notFound();
 
   const session = await getCurrentSession();
+  const detail = await getJobDetail(boardToken, id, session?.user?.id ?? null).catch(() => null);
+  if (!detail) notFound();
+
   const facts = session?.user
     ? await prisma.profileFact.findMany({
         where: { userId: session.user.id, status: { in: ["CONFIRMED", "EDITED"] } },

@@ -83,11 +83,15 @@ export async function POST(request: Request) {
   }
 
   const description = text.slice(0, 14_000);
-  const hash = `captured-${Buffer.from(url).toString("base64url").slice(0, 24)}`;
+  // The id is per account as well, so two candidates saving the same URL keep
+  // separate private rows instead of colliding on the corpus unique key.
+  const hash = `captured-${Buffer.from(url).toString("base64url").slice(0, 24)}-${user.id.slice(0, 8)}`;
   const postedAt = new Date();
 
   const existing = await prisma.jobPosting.findFirst({
-    where: { board: "captured", url },
+    // Duplicate detection is per account: a capture is that candidate's own
+    // material, so another user's saved copy must never answer for it.
+    where: { board: "captured", url, ownerUserId: user.id },
     select: { id: true },
   });
 
@@ -100,6 +104,7 @@ export async function POST(request: Request) {
       source: "captured",
       board: "captured",
       externalId: hash,
+      ownerUserId: user.id,
       company: company?.slice(0, 120) || "Saved from browser",
       title: title.slice(0, 200),
       location: location?.slice(0, 160) || null,

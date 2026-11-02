@@ -16,7 +16,13 @@ const schema = z.object({
   location: z.string().max(160).optional(),
   url: z.string().url().max(2000),
   decision: z.enum(["saved", "dismissed", "clear"]),
+  returnTo: z.string().max(200).optional(),
 });
+
+/** Only same-site paths, so a crafted form cannot use this as an open redirect. */
+function safeReturn(value: string | undefined, fallback: string): string {
+  return value && value.startsWith("/") && !value.startsWith("//") ? value : fallback;
+}
 
 /**
  * Save, dismiss, or clear a decision about one posting. Discovery never applies
@@ -34,9 +40,14 @@ export async function setJobDecision(formData: FormData): Promise<void> {
     location: formData.get("location") || undefined,
     url: formData.get("url"),
     decision: formData.get("decision"),
+    returnTo: formData.get("returnTo") || undefined,
   });
 
-  if (!parsed.success) redirect("/jobs?error=decision");
+  const backTo = safeReturn(
+    parsed.success ? parsed.data.returnTo : undefined,
+    "/jobs",
+  );
+  if (!parsed.success) redirect(`${backTo}?error=decision`);
 
   const { postingId, board, title, company, location, url, decision } = parsed.data;
 
@@ -60,17 +71,35 @@ export async function setJobDecision(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/jobs");
-  redirect("/jobs");
+  revalidatePath("/dashboard");
+  redirect(backTo);
 }
 
 /**
- * Scan every public board now, then reload the list.
+ * Manual scan, for a signed-in user who wants the corpus refreshed now.
  *
- * The background worker does this on a timer; this is the manual version for
- * whoever wants the corpus refreshed immediately.
+ * The scheduled worker uses the secret-protected endpoint instead. Two guards
+ * here: only a real session may trigger external work, and one account cannot
+ * ask more than once every two minutes. A scan already in progress is reported
+ * rather than queued.
  */
+const recentManualScans = new Map<string, number>();
+const MANUAL_SCAN_COOLDOWN_MS = 2 * 60 * 1000;
+
 export async function scanNow(): Promise<void> {
-  await scanBoards();
+  const session = await getCurrentSession();
+  if (!session?.user) redirect("/sign-in?next=%2Fjobs");
+
+  const last = recentManualScans.get(session.user.id) ?? 0;
+  if (Date.now() - last < MANUAL_SCAN_COOLDOWN_MS) {
+    redirect("/jobs?error=scan-wait");
+  }
+
+  const summary = await scanBoards("manual");
+  if (!summary) redirect("/jobs?error=scan-busy");
+
+  recentManualScans.set(session.user.id, Date.now());
   revalidatePath("/jobs");
+  revalidatePath("/dashboard");
   redirect("/jobs");
 }

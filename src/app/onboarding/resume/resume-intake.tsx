@@ -401,9 +401,14 @@ export default function ResumeIntake({
                   {mergeMode ? "Upload another version" : "Review these details again"} <span aria-hidden="true">↺</span>
                 </button>
                 {signedIn ? (
-                  <Link className="intake-secondary" href="/profile">
-                    View saved profile
-                  </Link>
+                  <>
+                    <Link className="onboarding-submit" href="/dashboard">
+                      Go to your overview <span aria-hidden="true">→</span>
+                    </Link>
+                    <Link className="intake-secondary" href="/profile">
+                      View saved profile
+                    </Link>
+                  </>
                 ) : (
                   <Link className="intake-secondary" href="/onboarding">
                     Change career path
@@ -413,8 +418,8 @@ export default function ResumeIntake({
             </div>
           </div>
           <p className="intake-privacy">
-            Saved to your account. Nothing is shared with an employer or an AI provider yet — job discovery and document
-            preparation are not implemented.
+            Saved to your account. Job matching, document drafts and form answers all read these confirmed facts — nothing
+            reaches an employer until you submit it yourself.
           </p>
         </section>
         <StepFooter path={path} />

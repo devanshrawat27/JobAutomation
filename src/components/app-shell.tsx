@@ -1,17 +1,20 @@
 import Link from "next/link";
 
 import { prisma } from "@/lib/db";
+import { visiblePostings } from "@/lib/jobs/detail";
 import { buildCandidate } from "@/lib/jobs/match";
+import { listingWindowWhere } from "@/lib/jobs/window";
 import { getCurrentSession } from "@/lib/session";
 
-type Active = "profile" | "jobs" | "documents" | "applications" | "digest";
+type Active = "dashboard" | "profile" | "jobs" | "documents" | "applications" | "digest";
 
 const LINKS: Array<{ key: Active; href: string; label: string; hint: string }> = [
-  { key: "profile", href: "/profile", label: "Profile", hint: "The facts every answer cites" },
-  { key: "jobs", href: "/jobs", label: "Jobs", hint: "Live roles, ranked for you" },
-  { key: "documents", href: "/documents", label: "Documents", hint: "Resumes and letters" },
+  { key: "dashboard", href: "/dashboard", label: "Overview", hint: "What needs you today" },
+  { key: "jobs", href: "/jobs", label: "Discover jobs", hint: "Live roles, ranked for you" },
   { key: "applications", href: "/applications", label: "Applications", hint: "What you sent, when" },
-  { key: "digest", href: "/digest", label: "Digest", hint: "What changed since last time" },
+  { key: "documents", href: "/documents", label: "Documents", hint: "Resumes and letters" },
+  { key: "profile", href: "/profile", label: "My profile", hint: "The facts every answer cites" },
+  { key: "digest", href: "/digest", label: "Daily digest", hint: "What changed since last time" },
 ];
 
 function initials(name: string): string {
@@ -39,7 +42,12 @@ export default async function AppShell({
           select: { label: true, value: true, groupId: true },
         })
       : Promise.resolve([]),
-    prisma.jobPosting.count({ where: { closedAt: null } }),
+    prisma.jobPosting.count({
+      where: {
+        closedAt: null,
+        AND: [visiblePostings(session?.user?.id ?? null), listingWindowWhere()],
+      },
+    }),
     session?.user ? prisma.document.count({ where: { userId: session.user.id } }) : Promise.resolve(0),
     session?.user ? prisma.application.count({ where: { userId: session.user.id } }) : Promise.resolve(0),
   ]);
@@ -66,6 +74,7 @@ export default async function AppShell({
   const completeness = Math.round((filled.length / AREAS.length) * 100);
 
   const counts: Record<Active, number | null> = {
+    dashboard: null,
     digest: null,
     profile: facts.length || null,
     jobs: liveJobs,

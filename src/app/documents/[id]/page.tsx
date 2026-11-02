@@ -83,7 +83,12 @@ export default async function DocumentPage({
   const nextId = versionNumber < chain.length ? chain[versionNumber] : null;
 
   const review = document.review as
-    | { verdict?: string; issues?: Array<{ severity: string; quote: string; problem: string; fix: string }> }
+    | {
+        status?: string;
+        verdict?: string;
+        reason?: string;
+        issues?: Array<{ severity: string; quote: string; problem: string; fix: string }>;
+      }
     | null;
 
   return (
@@ -224,11 +229,24 @@ export default async function DocumentPage({
           <section className="doc-review" aria-labelledby="review-title">
             <div className="doc-review-head">
               <h2 id="review-title">Reviewer notes</h2>
-              <span className={`review-verdict is-${review.verdict === "ok" ? "ok" : "warn"}`}>
-                {review.verdict === "ok" ? "No problems found" : "Needs a look"}
+              <span
+                className={`review-verdict is-${
+                  review.verdict === "ok" ? "ok" : review.verdict === "unavailable" ? "warn" : "warn"
+                }`}
+              >
+                {review.verdict === "ok"
+                  ? "No problems found"
+                  : review.verdict === "unavailable"
+                    ? "Reviewer did not run"
+                    : "Needs a look"}
               </span>
             </div>
-            {review.issues && review.issues.length > 0 ? (
+            {review.verdict === "unavailable" ? (
+              <p className="auth-error" role="alert">
+                {review.reason ?? "The second pass could not run, so this draft has only the number check."} A missing
+                review is not a clean review.
+              </p>
+            ) : review.issues && review.issues.length > 0 ? (
               <ul>
                 {review.issues.map((issue, index) => (
                   <li key={`${issue.quote}-${index}`} className={`review-issue severity-${issue.severity}`}>

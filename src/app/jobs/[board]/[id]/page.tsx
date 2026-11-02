@@ -2,10 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/db";
-import { BOARDS } from "@/lib/jobs/boards";
 import { checkEligibility, parseEligibility } from "@/lib/jobs/eligibility";
-import { getGreenhouseJob, type JobDetail } from "@/lib/jobs/greenhouse-detail";
-import { findLookalikeWords } from "@/lib/jobs/html";
+import { getJobDetail, type ResolvedJob } from "@/lib/jobs/detail";
 import { assessPosting } from "@/lib/jobs/trust";
 import { matchJob } from "@/lib/match";
 import { statusLabels, type FactForMatch, type RequirementStatus } from "@/lib/match/types";
@@ -28,74 +26,40 @@ function updatedLabel(iso: string | null): string | null {
 
 const statusOrder: RequirementStatus[] = ["match", "partial", "gap", "unknown"];
 
+/** Who published this posting, said plainly. */
+const SOURCE_LABEL: Record<string, string> = {
+  greenhouse: "employer board",
+  lever: "employer board",
+  ashby: "employer board",
+  smartrecruiters: "employer board",
+  workable: "employer board",
+  hn: "Hacker News post",
+  mastodon: "Mastodon post",
+  manual: "post you added",
+  captured: "saved from your browser",
+};
+
 export default async function JobDetailPage({
   params,
 }: {
   params: Promise<{ board: string; id: string }>;
 }) {
   const { board: boardToken, id } = await params;
-  // A captured or pasted posting is not on a configured board, but it still has
-  // a page. Known boards keep their company name; unknown ones fall back to the
-  // token, and the live fetch below only runs for Greenhouse.
-  const known = BOARDS.find((entry) => entry.token === boardToken);
-  const board = known ?? { source: "greenhouse" as const, token: boardToken, company: boardToken };
+  const session = await getCurrentSession();
 
-  let detail: JobDetail | null = null;
+  let detail: ResolvedJob | null = null;
   let loadError: string | null = null;
 
-  // Every scanned or imported posting lives in the corpus, whichever ATS it came
-  // from. Only ask the board itself when the row is missing.
-  const stored = await prisma.jobPosting.findFirst({
-    where: { board: boardToken, externalId: id },
-    select: {
-      id: true,
-      source: true,
-      board: true,
-      externalId: true,
-      company: true,
-      title: true,
-      location: true,
-      department: true,
-      url: true,
-      description: true,
-      postedAt: true,
-      updatedAt: true,
-    },
-  });
-
-  if (stored) {
-    detail = {
-      posting: {
-        id: `${stored.source}:${stored.board}:${stored.externalId}`,
-        externalId: stored.externalId,
-        source: stored.source as JobDetail["posting"]["source"],
-        board: stored.board,
-        company: stored.company,
-        title: stored.title,
-        location: stored.location,
-        department: stored.department,
-        url: stored.url,
-        updatedAt: (stored.postedAt ?? stored.updatedAt).toISOString(),
-      },
-      description: stored.description,
-      companyName: stored.company,
-      warnings: findLookalikeWords(stored.description.slice(0, 4000)).length
-        ? ["This posting contains mixed-script lookalike characters."]
-        : [],
-    };
-  } else if (known?.source === "greenhouse") {
-    try {
-      detail = await getGreenhouseJob(board, id);
-    } catch (error) {
-      loadError = error instanceof Error ? error.message : "Could not load this posting.";
-    }
-  } else {
-    notFound();
+  // One resolver for every source: the stored corpus first, the board only when
+  // the row is missing. It also enforces ownership of private postings.
+  try {
+    detail = await getJobDetail(boardToken, id, session?.user?.id ?? null);
+  } catch (error) {
+    loadError = error instanceof Error ? error.message : "Could not load this posting.";
   }
 
   if (!detail && !loadError) notFound();
 
-  const session = await getCurrentSession();
   const path = `/jobs/${boardToken}/${id}`;
 
   const facts = session?.user
@@ -182,14 +146,19 @@ export default async function JobDetailPage({
           </div>
         ) : detail ? (
           <>
-            <p className="section-kicker">{detail.posting.company} · public board</p>
+            <p className="section-kicker">
+              {detail.posting.company} · {SOURCE_LABEL[detail.posting.source] ?? "public posting"}
+            </p>
             <h1 id="job-title">{detail.posting.title}</h1>
             <p className="job-detail-meta">
               {detail.posting.location ? <span>{detail.posting.location}</span> : null}
               {detail.posting.department ? <span>{detail.posting.department}</span> : null}
-              {updatedLabel(detail.posting.updatedAt) ? (
-                <span>Updated {updatedLabel(detail.posting.updatedAt)}</span>
+              {detail.postedAt ? (
+                <span>Posting updated {updatedLabel(detail.postedAt)}</span>
+              ) : detail.firstSeenAt ? (
+                <span>First seen {updatedLabel(detail.firstSeenAt)}</span>
               ) : null}
+              <span>Read from {detail.origin === "corpus" ? "the stored corpus" : "the employer's board"}</span>
               <a href={detail.posting.url} rel="noreferrer noopener" target="_blank">
                 View original posting ↗
               </a>

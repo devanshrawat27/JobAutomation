@@ -12,15 +12,17 @@ The interface follows `BRAND.md` at the workspace root (BRAND.md spec 0.3.0): In
 - Onboarding step 1: New Grad/Fresher and Experienced path selection
 - Onboarding step 2: upload a PDF or DOCX (signed-in accounts only) and review each proposed fact. Text-layer PDFs and DOCX read directly; scanned PDFs fall back to English OCR (up to three pages; Tesseract downloads its language data into the OS temp cache on first use) and say so on screen. Extraction uses Google Gemini with a source-quote guard and a local rules fallback. One card per company (“Company — Role”, dates, bullets) and one card per project (name, stack, bullets); editing uses labelled fields
 - Accounts with Better Auth (email + password), PostgreSQL and Prisma; reviewed facts are saved per user and listed on `/profile`. Once a profile exists, onboarding shows the saved profile instead of the upload box, facts can be edited in place on `/profile`, and a second resume is an explicit "add a newer version" action: it merges — new cards are added, recognised cards are refreshed with their saved value shown, already-saved cards are pre-confirmed, and nothing is deleted
-- **Paste a job link** on `/jobs`: a Greenhouse, Lever, Ashby or Workable posting URL is recognised, fetched from that ATS's own public endpoint and stored like a scanned one, so it gets the same score and card. LinkedIn and X links are refused with a plain explanation rather than scraped
-- `/jobs` reads verified public boards with the employer's own apply links. Postings are stored in Postgres by a background scanner (`npm run jobs:worker`, every 15 minutes, or `npm run jobs:scan` for a one-off) and closed when they disappear from a board. It opens on “For you”, ranked by a five-part score — named skills (45), title against your roles (20), the years asked for versus your dated experience (15), location (10) and freshness (5) — with the matched skills, the gaps and a plain reason on each card. All/Saved/Dismissed tabs; save or dismiss any posting per account. Discovery only, no auto-apply
+- **`/dashboard` is the signed-in Overview** and the first page after onboarding: four real counts (new matches, shortlisted, applications in progress, follow-ups due), the strongest four matches with score, matched skills, gaps, eligibility and posting-trust state, the application pipeline with submit-attempted and receipt-confirmed kept apart, profile readiness, a truthful scanner-health panel and a recent-activity list. Every number comes from the session user's own rows; an account with no confirmed fact is sent back to onboarding. Save/dismiss works from the dashboard. Sidebar order: Overview, Discover jobs, Applications, Documents, My profile, Daily digest
+- **Paste a job link** on `/jobs`: a Greenhouse, Lever, Ashby or Workable posting URL is recognised, fetched from that ATS's own public endpoint and stored like a scanned one, so it gets the same score and card. LinkedIn and X links are refused with a plain explanation rather than scraped. An imported or captured posting is owned by the account that supplied it and is invisible to every other account, including by guessing its URL
+- `/jobs` reads verified public boards with the employer's own apply links. Postings are stored in Postgres by a background scanner (`npm run jobs:worker`, every 15 minutes, or `npm run jobs:scan` for a one-off) and closed only when they disappear from a board. The list itself shows the last 14 days; age is a listing rule, not a closure. It opens on “For you”, ranked by a five-part score — named skills (45), title against your roles (20), the years asked for versus your dated experience (15), location (10) and freshness (5) — with the matched skills, the gaps and a plain reason on each card. All/Saved/Dismissed tabs; save or dismiss any posting per account. Discovery only, no auto-apply
+- **One resolver serves every source.** Detail, prepare, answers and `/api/answers` all read the stored corpus row first (Greenhouse, Lever, Ashby, SmartRecruiters, Workable import, HN, Mastodon, pasted, captured) and only call a board when the row is missing. No page hardcodes a numeric id or assumes Greenhouse
 - Every posting page also answers two India-specific questions: **do you meet the stated criteria** (CGPA floor, batch year, degree, percentage — compared with your education facts) and **is this posting safe** (fee requests, data-entry patterns, chat-only contact, shortened links, implausible pay, lookalike characters), each with the sentence that triggered it. The same two signals appear as chips on the cards
 - `/jobs/[board]/[id]` shows how your confirmed facts answer each requirement, with the exact quote from both sides. “N+ years” is computed from your dated experience, never guessed. Postings with mixed-script lookalike words are flagged
 - Cover letters are drafted from confirmed facts only, saved to `/documents`, and each paragraph is checked: unsupported numbers are removed before you see the draft
 - Letters are editable; saving re-checks numbers against the cited facts and refuses anything unsupported
 - Tailored resumes are built from the same facts, with any unsupported line removed and listed
 - Every document downloads as a real PDF and can be rebuilt from the current profile without overwriting the original; rebuilds form a version chain you can compare line by line
-- Cover letters and resumes both get a second reviewer pass, and its notes are kept with the document; medium/high notes can drive a one-click regeneration
+- Cover letters and resumes both get a second reviewer pass, and its notes are kept with the document; medium/high notes can drive a one-click regeneration. If the reviewer itself fails, the document says **“Reviewer did not run”** — a missing pass is never shown as a clean one
 - `/digest` is the in-app daily summary: new matches from the last two days, shortlisted postings about to leave the 14-day window, applications that have waited a week, and profile areas still empty — computed from your own records, no bot token needed
 - `/applications` tracks prepared → form filled → submit attempted → receipt confirmed → outcome, with a timestamped history, a pinned profile snapshot and a diff of what changed since
 - `/jobs/[board]/[id]/answers` lists the fields employer forms ask for, ready to copy, with the facts that answer them and the ones that need you
@@ -34,7 +36,15 @@ The interface follows `BRAND.md` at the workspace root (BRAND.md spec 0.3.0): In
 
 ## Local development
 
-Copy `.env.example` to `.env` first. It holds `DATABASE_URL`, `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL`; no real credentials belong in the repository.
+Copy `.env.example` to `.env` first. It holds `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` and `JOBS_WORKER_SECRET`; no real credentials belong in the repository.
+
+`POST /api/jobs/sync` fails closed: it answers 401 unless the caller sends `x-worker-secret` matching `JOBS_WORKER_SECRET`, so a public URL cannot start scans. The worker reads the same variable:
+
+```bash
+JOBS_WORKER_SECRET=… npm run jobs:worker
+```
+
+Scanning manually from `/jobs` needs a signed-in session and is limited to one scan per account every two minutes; an in-progress scan is reported instead of queued.
 
 ```bash
 npm install

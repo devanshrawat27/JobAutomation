@@ -32,6 +32,14 @@ export async function importJob(formData: FormData): Promise<void> {
   const { job } = result;
   const hash = `link-${job.source}-${job.externalId}`;
 
+  // A link import belongs to the candidate who added it — unless the scanner
+  // already stores the same public board row, in which case the row stays shared
+  // and nobody has to see a second copy.
+  const existing = await prisma.jobPosting.findUnique({
+    where: { source_board_externalId: { source: job.source, board: job.board, externalId: job.externalId } },
+    select: { id: true, ownerUserId: true },
+  });
+
   await prisma.jobPosting.upsert({
     where: {
       source_board_externalId: {
@@ -44,6 +52,7 @@ export async function importJob(formData: FormData): Promise<void> {
       source: job.source,
       board: job.board,
       externalId: job.externalId,
+      ownerUserId: session.user.id,
       company: job.company,
       title: job.title,
       location: job.location,
@@ -71,6 +80,9 @@ export async function importJob(formData: FormData): Promise<void> {
       hash,
       lastSeenAt: new Date(),
       closedAt: null,
+      // The body is read from the employer's public board, so a row someone else
+      // imported becomes shared rather than staying private to the first account.
+      ...(existing?.ownerUserId && existing.ownerUserId !== session.user.id ? { ownerUserId: null } : {}),
     },
   });
 

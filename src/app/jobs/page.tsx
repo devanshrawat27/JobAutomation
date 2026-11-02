@@ -10,6 +10,8 @@ import { scanNow, setJobDecision } from "@/app/actions/jobs";
 import { BOARDS } from "@/lib/jobs/boards";
 import { searchJobs } from "@/lib/jobs";
 import { lastScan } from "@/lib/jobs/ingest";
+import { visiblePostings } from "@/lib/jobs/detail";
+import { listingWindowWhere } from "@/lib/jobs/window";
 import { buildCandidate, entryFriendly, matchPosting, roleFamily, seniorityOf } from "@/lib/jobs/match";
 import { checkEligibility, parseEligibility, type EligibilityProfile } from "@/lib/jobs/eligibility";
 import { parseReach } from "@/lib/jobs/place";
@@ -188,17 +190,25 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
   const stored = await prisma.jobPosting.findMany({
     where: {
       closedAt: null,
-      ...(boardToken ? { board: boardToken } : {}),
-      ...(query
-        ? {
-            OR: [
-              { title: { contains: query, mode: "insensitive" as const } },
-              { company: { contains: query, mode: "insensitive" as const } },
-              { location: { contains: query, mode: "insensitive" as const } },
-              { department: { contains: query, mode: "insensitive" as const } },
-            ],
-          }
-        : {}),
+      AND: [
+        // Private rows belong to the account that supplied them; public board
+        // rows are shared. Age is applied here, not written as closure.
+        visiblePostings(session?.user?.id ?? null),
+        listingWindowWhere(),
+        ...(boardToken ? [{ board: boardToken }] : []),
+        ...(query
+          ? [
+              {
+                OR: [
+                  { title: { contains: query, mode: "insensitive" as const } },
+                  { company: { contains: query, mode: "insensitive" as const } },
+                  { location: { contains: query, mode: "insensitive" as const } },
+                  { department: { contains: query, mode: "insensitive" as const } },
+                ],
+              },
+            ]
+          : []),
+      ],
     },
     orderBy: [{ postedAt: "desc" }, { firstSeenAt: "desc" }],
     // Match over the whole open corpus; the list itself is capped later.
@@ -291,7 +301,12 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
     .split("; ")
     .filter((line) => line && BOARDS.some((entry) => line.startsWith(`${entry.token}:`)))
     .join("; ");
-  const allOpen = await prisma.jobPosting.count({ where: { closedAt: null } });
+  const allOpen = await prisma.jobPosting.count({
+    where: {
+      closedAt: null,
+      AND: [visiblePostings(session?.user?.id ?? null), listingWindowWhere()],
+    },
+  });
 
   const scored = rows.map((posting) => ({
     posting,
@@ -361,7 +376,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
           ? "Postings you kept. Nothing here has been applied to."
           : effectiveView === "dismissed"
             ? "Postings you hid. Undo puts one back."
-            : "Everything from the last 14 days, newest first. Older postings are retired automatically.";
+            : "Everything from the last 14 days, newest first. Older postings stay stored but leave the list — they are not marked closed.";
   const visible = ordered.slice(0, 60).map((entry) => {
     const rules = parseEligibility(entry.posting.description);
     return {
@@ -430,7 +445,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
           </dl>
         </div>
 
-        <form action={importJob} className="jobs-import">
+        <form action={importJob} className="jobs-import" id="import">
           <label className="jobs-field jobs-import-field">
             <span>Paste a job link</span>
             <input
@@ -647,6 +662,12 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
 
         {error === "decision" ? (
           <p className="auth-error" role="alert">That decision could not be saved. Try again.</p>
+        ) : null}
+        {error === "scan-wait" ? (
+          <p className="auth-error" role="alert">A scan was started moments ago. Give it two minutes before asking again.</p>
+        ) : null}
+        {error === "scan-busy" ? (
+          <p className="auth-error" role="alert">A scan is already running. The list will update when it finishes.</p>
         ) : null}
         {scanErrors ? <p className="jobs-scan-error">Some boards failed: {scanErrors}</p> : null}
 

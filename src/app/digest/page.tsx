@@ -3,7 +3,9 @@ import { redirect } from "next/navigation";
 
 import AppShell from "@/components/app-shell";
 import { prisma } from "@/lib/db";
+import { visiblePostings } from "@/lib/jobs/detail";
 import { buildCandidate, entryFriendly, matchPosting } from "@/lib/jobs/match";
+import { listingWindowWhere } from "@/lib/jobs/window";
 import { getCurrentSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -40,7 +42,10 @@ export default async function DigestPage() {
       select: { label: true, value: true, groupId: true },
     }),
     prisma.jobPosting.findMany({
-      where: { closedAt: null },
+      where: {
+        closedAt: null,
+        AND: [visiblePostings(session.user.id), listingWindowWhere()],
+      },
       select: {
         id: true,
         board: true,
@@ -73,7 +78,7 @@ export default async function DigestPage() {
     fit: matchPosting(
       {
         ...posting,
-        updatedAt: posting.postedAt ? posting.postedAt.toISOString() : null,
+        updatedAt: (posting.postedAt ?? posting.firstSeenAt).toISOString(),
         source: posting.board === "whoishiring" ? "hn" : posting.board === "pasted" ? "manual" : "greenhouse",
       },
       candidate,

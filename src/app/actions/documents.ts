@@ -8,9 +8,8 @@ import { prisma } from "@/lib/db";
 import { writeCoverLetter } from "@/lib/documents/cover-letter";
 import { unsupportedNumbers } from "@/lib/documents/guard";
 import { buildResume } from "@/lib/documents/resume";
-import { reviewDocument } from "@/lib/documents/review";
-import { BOARDS } from "@/lib/jobs/boards";
-import { getGreenhouseJob } from "@/lib/jobs/greenhouse-detail";
+import { reviewDocument, unavailableReview } from "@/lib/documents/review";
+import { getJobDetail } from "@/lib/jobs/detail";
 import { getCurrentSession } from "@/lib/session";
 
 type Prepared = {
@@ -33,10 +32,7 @@ async function prepareContext(formData: FormData): Promise<Prepared> {
   const session = await getCurrentSession();
   if (!session?.user) redirect(`/sign-in?next=${encodeURIComponent(backTo)}`);
 
-  const board = BOARDS.find((entry) => entry.token === boardToken);
-  if (!board) redirect("/jobs");
-
-  const detail = await getGreenhouseJob(board, postingId).catch(() => null);
+  const detail = await getJobDetail(boardToken, postingId, session.user.id).catch(() => null);
   if (!detail) redirect("/jobs");
 
   const facts = await prisma.profileFact.findMany({
@@ -96,7 +92,7 @@ export async function createCoverLetter(formData: FormData): Promise<void> {
     redirect(`${backTo}?error=generate`);
   }
 
-  let review = null;
+  let review = unavailableReview("The second-pass reviewer did not run for this draft.");
   try {
     review = await reviewDocument(
       letter.content,
@@ -105,6 +101,7 @@ export async function createCoverLetter(formData: FormData): Promise<void> {
     );
   } catch (error) {
     console.error("Cover letter review failed", error instanceof Error ? error.message : error);
+    review = unavailableReview("The second-pass reviewer could not run just now. Read the draft yourself before sending it.");
   }
 
   const document = await prisma.document.create({
@@ -147,7 +144,7 @@ export async function createResume(formData: FormData): Promise<void> {
     redirect(`${backTo}?error=resume`);
   }
 
-  let review = null;
+  let review = unavailableReview("The second-pass reviewer did not run for this draft.");
   try {
     review = await reviewDocument(
       resume.plainText,
@@ -157,6 +154,7 @@ export async function createResume(formData: FormData): Promise<void> {
     );
   } catch (error) {
     console.error("Resume review failed", error instanceof Error ? error.message : error);
+    review = unavailableReview("The second-pass reviewer could not run just now. Read the resume yourself before sending it.");
   }
 
   const document = await prisma.document.create({

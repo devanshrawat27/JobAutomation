@@ -14,6 +14,7 @@ import { mastodonAdapter } from "@/lib/jobs/mastodon";
 import { seniorityOf } from "@/lib/jobs/match";
 import { extractSkills } from "@/lib/jobs/skills";
 import type { BoardRef } from "@/lib/jobs/types";
+import { LISTING_WINDOW_DAYS } from "@/lib/jobs/window";
 import { requiredYears } from "@/lib/match/experience";
 
 /**
@@ -41,7 +42,7 @@ const BASE = "https://boards-api.greenhouse.io/v1/boards";
 const MAX_DESCRIPTION = 12_000;
 
 /** Nothing older than this is stored or kept: the product only lists live roles. */
-export const MAX_AGE_DAYS = 14;
+export const MAX_AGE_DAYS = LISTING_WINDOW_DAYS;
 
 type RawPosting = {
   externalId: string;
@@ -66,6 +67,7 @@ export type ScanBoardResult = {
 
 export type ScanSummary = {
   scanId: string;
+  trigger: "worker" | "manual";
   startedAt: string;
   endedAt: string;
   boards: ScanBoardResult[];
@@ -152,8 +154,27 @@ async function rawPostings(board: BoardRef): Promise<RawPosting[]> {
   return greenhousePostings(board);
 }
 
-export async function scanBoards(): Promise<ScanSummary> {
-  const scan = await prisma.jobScan.create({ data: { boards: BOARDS.length } });
+export async function scanBoards(trigger: "worker" | "manual" = "manual"): Promise<ScanSummary | null> {
+  // One scan at a time. A worker that dies without finishing would otherwise
+  // block every later scan, so a lease older than fifteen minutes is retired.
+  const lease = new Date(Date.now() - 15 * 60 * 1000);
+  const scan = await prisma
+    .$transaction(
+      async (tx) => {
+        await tx.jobScan.updateMany({
+          where: { endedAt: null, startedAt: { lt: lease } },
+          data: { endedAt: new Date(), errors: "abandoned: the previous scan stopped without finishing" },
+        });
+        const running = await tx.jobScan.findFirst({ where: { endedAt: null }, select: { id: true } });
+        if (running) return null;
+        return tx.jobScan.create({ data: { boards: BOARDS.length } });
+      },
+      { isolationLevel: "Serializable" },
+    )
+    .catch(() => null);
+
+  if (!scan) return null;
+
   const startedAt = scan.startedAt;
   const cutoff = new Date(startedAt.getTime() - MAX_AGE_DAYS * 86_400_000);
 
@@ -305,17 +326,9 @@ export async function scanBoards(): Promise<ScanSummary> {
     results.push(boardResult);
   }
 
-  // Age sweep: a posting past the window leaves the platform even if the board
-  // still lists it, because a month-old role is noise to someone applying now.
-  const aged = await prisma.jobPosting.updateMany({
-    where: {
-      closedAt: null,
-      OR: [{ postedAt: { lt: cutoff } }, { postedAt: null, firstSeenAt: { lt: cutoff } }],
-    },
-    data: { closedAt: new Date() },
-  });
-  closed += aged.count;
-
+  // Age is a listing rule, not a closure rule. A role the board still carries
+  // stays open here even past the window; the list pages filter by date.
+  // (Rows closed by the old age sweep are left as they are — no rewrite.)
   const endedAt = new Date();
   const touchedErrors = results.filter((result) => result.error);
   await prisma.jobScan.update({
@@ -332,6 +345,7 @@ export async function scanBoards(): Promise<ScanSummary> {
 
   return {
     scanId: scan.id,
+    trigger,
     startedAt: startedAt.toISOString(),
     endedAt: endedAt.toISOString(),
     boards: results,

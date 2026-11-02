@@ -13,7 +13,7 @@ export async function getCurrentSession() {
  * Only allow same-site redirect targets so `?next=` cannot be used as an open
  * redirect.
  */
-export function safeNextPath(value: string | string[] | undefined, fallback = "/profile"): string {
+export function safeNextPath(value: string | string[] | undefined, fallback = "/dashboard"): string {
   const candidate = Array.isArray(value) ? value[0] : value;
   if (!candidate || !candidate.startsWith("/") || candidate.startsWith("//")) return fallback;
   return candidate;
