@@ -213,22 +213,116 @@
   font-family: var(--font-mono);
   font-size: 9.5px;
 }
-.lp2-shot-body { display: grid; grid-template-columns: 168px minmax(0, 1fr); }
+.lp2-shot-body { display: grid; grid-template-columns: 190px minmax(0, 1fr); }
 .lp2-shot-side {
   display: grid;
-  gap: 2px;
+  gap: 14px;
   align-content: start;
-  padding: 16px 10px;
+  padding: 14px 12px;
   border-right: 1px solid var(--line);
   background: var(--surface-soft);
 }
-.lp2-shot-side span {
-  padding: 7px 10px;
-  border-radius: 8px;
-  color: var(--muted);
+.lp2-shot-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 4px 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
   font-size: 11px;
+  font-weight: 640;
+  letter-spacing: -0.02em;
 }
-.lp2-shot-side span.is-active { background: var(--accent-soft); color: var(--accent-strong); font-weight: 600; }
+.lp2-shot-mark {
+  width: 15px;
+  height: 15px;
+  border-radius: 5px;
+  background: var(--accent);
+}
+.lp2-shot-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.lp2-shot-avatar {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 7px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 650;
+}
+.lp2-shot-user-body { display: grid; gap: 1px; min-width: 0; }
+.lp2-shot-user-body strong {
+  color: var(--ink);
+  font-size: 10.5px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lp2-shot-user-body small {
+  color: var(--muted-soft);
+  font-size: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lp2-shot-nav { display: grid; gap: 2px; }
+.lp2-shot-nav span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+.lp2-shot-nav b {
+  color: var(--muted-soft);
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 600;
+}
+.lp2-shot-nav span.is-active {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 620;
+}
+.lp2-shot-nav span.is-active b { color: var(--accent-strong); }
+.lp2-shot-meter { display: grid; gap: 5px; padding: 0 4px; }
+.lp2-shot-meter small {
+  color: var(--muted-soft);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.lp2-shot-track {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.lp2-shot-track i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3d7df7, #1d4ed8);
+}
 .lp2-shot-main { padding: 16px 18px 20px; display: grid; gap: 8px; }
 .lp2-shot-head {
   display: flex;
@@ -252,6 +346,25 @@
   border-radius: 999px;
   color: var(--muted);
   font-size: 10px;
+}
+.lp2-shot-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 6px;
+}
+.lp2-shot-filters span {
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 9.5px;
+}
+.lp2-shot-filters span.is-on {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 620;
 }
 .lp2-shot-card {
   display: flex;
@@ -417,6 +530,7 @@
   .lp2-header-inner { gap: 14px; }
   .lp2-nav { display: none; }
   .lp2-hero, .lp2-demo, .lp2-section, .lp2-closing, .lp2-footer { width: calc(100% - 32px); }
+  .lp2-float { display: none; }
   .lp2-hero h1 { letter-spacing: -0.035em; }
 }
 
@@ -542,8 +656,8 @@
   transform: translateZ(60px);
   animation: lp2-drift 7s ease-in-out infinite;
 }
-.lp2-float--a { top: -16px; left: 6px; }
-.lp2-float--b { right: -20px; bottom: 84px; animation-delay: -3.2s; }
+.lp2-float--a { top: -24px; left: 34px; }
+.lp2-float--b { top: -24px; right: 44px; animation-delay: -3.2s; }
 @keyframes lp2-drift {
   0%, 100% { margin-top: 0; }
   50% { margin-top: -9px; }

@@ -162,11 +162,31 @@ export default function Home() {
           </div>
           <div className="lp2-shot-body">
             <aside className="lp2-shot-side" aria-hidden="true">
-              <span className="is-active">Jobs</span>
-              <span>Profile</span>
-              <span>Documents</span>
-              <span>Applications</span>
-              <span>Digest</span>
+              <div className="lp2-shot-brand">
+                <span className="lp2-shot-mark" />
+                <span>jobautomation</span>
+              </div>
+
+              <div className="lp2-shot-user">
+                <span className="lp2-shot-avatar">DR</span>
+                <span className="lp2-shot-user-body">
+                  <strong>Devansh Rawat</strong>
+                  <small>Student · class of 2027</small>
+                </span>
+              </div>
+
+              <div className="lp2-shot-nav">
+                <span>Profile <b>24</b></span>
+                <span className="is-active">Jobs <b>1,293</b></span>
+                <span>Documents <b>3</b></span>
+                <span>Applications <b>2</b></span>
+                <span>Digest</span>
+              </div>
+
+              <div className="lp2-shot-meter">
+                <small>Profile · 5 of 5 areas</small>
+                <span className="lp2-shot-track"><i /></span>
+              </div>
             </aside>
             <div className="lp2-shot-main" aria-hidden="true">
               <div className="lp2-shot-head">
@@ -175,6 +195,12 @@ export default function Home() {
                   <strong>Shortlisted roles</strong>
                 </div>
                 <span className="lp2-pill">scanned 2 min ago</span>
+              </div>
+              <div className="lp2-shot-filters">
+                <span className="is-on">All roles</span>
+                <span>Fresher</span>
+                <span>Remote</span>
+                <span>Last 14 days</span>
               </div>
               {[
                 ["Software Development Engineer Intern", "HackerRank · Bengaluru", "82", "strong"],
