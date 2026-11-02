@@ -2,7 +2,7 @@
 
 An India-first job-search workspace for New Grad/Fresher and Experienced applicants, designed to support international use. The product direction prioritizes a verified candidate profile, source-aware job discovery, truthful application preparation, and user review before an application is submitted.
 
-The interface follows `BRAND.md` at the workspace root (BRAND.md spec 0.3.0): Ink `#0E1729` for text, Paper `#FBFCFE` for grounds, Signal Blue `#2563EB` as the single accent, Night `#0E1526` for dark surfaces. Manrope is the UI typeface and Fraunces is reserved for editorial headings, both self-hosted through `next/font` under the SIL Open Font License. Light is the default theme; a Light / Dark / Auto switch sits at the bottom-right of every page, and only Auto follows the operating system.
+The interface follows `BRAND.md` at the workspace root (BRAND.md spec 0.3.0): Ink `#0E1729` for text, Paper `#FBFCFE` for grounds, Signal Blue `#2563EB` as the single accent, Night `#0E1526` for dark surfaces. Inter is the single typeface — headings at weight 630–650 with tight tracking — self-hosted through `next/font` under the SIL Open Font License. Light is the default theme; a Light / Dark / Auto switch sits at the bottom-right of every page, and only Auto follows the operating system.
 
 ## Current foundation
 

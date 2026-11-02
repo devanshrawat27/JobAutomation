@@ -55,9 +55,9 @@
   --shadow-md: 0 12px 32px rgb(14 23 41 / 8%);
   --shadow-lg: 0 24px 60px rgb(14 23 41 / 10%);
 
-  --font-sans: var(--font-body), "Segoe UI", ui-sans-serif, system-ui, -apple-system,
+  --font-sans: var(--font-display), "SF Pro Text", "Segoe UI", ui-sans-serif, system-ui, -apple-system,
     "Helvetica Neue", Arial, sans-serif;
-  --font-serif: var(--font-display), "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --font-serif: var(--font-display), "SF Pro Display", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 

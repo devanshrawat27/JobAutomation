@@ -700,23 +700,22 @@
 .ld-closing h2 {
   font-family: var(--font-serif);
   font-weight: 500;
-  font-variation-settings: "SOFT" 40, "WONK" 1, "opsz" 120;
-  font-optical-sizing: auto;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.034em;
+  font-weight: 630;
   text-wrap: balance;
 }
 .ld-hero h1 {
-  font-size: clamp(42px, 5vw, 70px);
+  font-size: clamp(40px, 4.6vw, 62px);
+  font-weight: 640;
   line-height: 0.98;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.042em;
 }
 .ld-hero h1 em,
 .ld-section-head h2 em,
 .ld-band-copy h2 em,
 .ld-audience-copy h2 em,
 .ld-closing h2 em {
-  font-style: italic;
-  font-variation-settings: "SOFT" 60, "WONK" 1, "opsz" 120;
+  font-style: normal;
   background: linear-gradient(94deg, #1d4ed8 4%, #2563eb 46%, #1e57c9 96%);
   -webkit-background-clip: text;
   background-clip: text;
