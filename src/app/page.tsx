@@ -21,20 +21,50 @@ const steps = [
   },
 ];
 
+const icons = {
+  trace: (
+    <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.4" viewBox="0 0 16 16" width="16">
+      <path d="M2.6 7.9 6 11.3l6.4-7" />
+    </svg>
+  ),
+  filter: (
+    <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.4" viewBox="0 0 16 16" width="16">
+      <path d="M2.5 4h11M4.8 8h6.4M7 12h2" />
+    </svg>
+  ),
+  india: (
+    <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.4" viewBox="0 0 16 16" width="16">
+      <circle cx="8" cy="8" r="6" />
+      <path d="M8 4.6V8l2.4 1.6" />
+    </svg>
+  ),
+  community: (
+    <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.4" viewBox="0 0 16 16" width="16">
+      <circle cx="6" cy="5.6" r="2.2" />
+      <path d="M1.9 13c0-2.1 1.8-3.4 4.1-3.4s4.1 1.3 4.1 3.4" />
+      <path d="M11 4.1a2 2 0 0 1 0 3.9" />
+    </svg>
+  ),
+};
+
 const differentiators = [
   {
+    icon: "trace" as const,
     title: "Every line cites a fact",
     copy: "A document line exists only because a confirmed fact sits under it. Unsupported claims are removed, not softened.",
   },
   {
+    icon: "filter" as const,
     title: "A shortlist, not a feed",
     copy: "Postings are scored on named skills, your roles, the years asked, location and freshness — and only real matches are listed.",
   },
   {
+    icon: "india" as const,
     title: "Built for Indian hiring",
     copy: "CGPA floors, batch years, degree cut-offs and notice periods are read from the posting and compared with your profile.",
   },
   {
+    icon: "community" as const,
     title: "Community posts included",
     copy: "Founder and team posts from Hacker News and Mastodon, plus one-click import from Greenhouse, Lever, Ashby and Workable.",
   },
@@ -194,6 +224,7 @@ export default function Home() {
         <div className="lp2-grid">
           {differentiators.map((item) => (
             <article className="lp2-card" key={item.title}>
+              <span aria-hidden="true" className="lp2-card-icon">{icons[item.icon]}</span>
               <h3>{item.title}</h3>
               <p>{item.copy}</p>
             </article>

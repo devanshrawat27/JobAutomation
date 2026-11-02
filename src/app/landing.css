@@ -89,12 +89,19 @@
   text-align: center;
 }
 .lp2-eyebrow {
-  margin: 0 0 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 24px;
+  padding: 7px 13px;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
   color: var(--accent-strong);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 650;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 .lp2-hero h1,
@@ -105,8 +112,8 @@
   margin: 0;
   font-size: clamp(38px, 6.4vw, 84px);
   font-weight: 640;
-  line-height: 0.98;
-  letter-spacing: -0.045em;
+  line-height: 1.06;
+  letter-spacing: -0.038em;
   text-wrap: balance;
 }
 .lp2-hero h1 .is-muted,
@@ -163,9 +170,21 @@
 
 /* Product shot ------------------------------------------------------------ */
 .lp2-demo {
+  position: relative;
   width: min(var(--lp2-max), 100% - 48px);
   margin: clamp(44px, 6vw, 76px) auto 0;
   text-align: center;
+}
+/* A soft light under the shot, so it sits on the page rather than pasted on it. */
+.lp2-demo::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: auto 6% -60px 6%;
+  height: 220px;
+  background: radial-gradient(50% 60% at 50% 50%, rgb(37 99 235 / 22%), transparent 72%);
+  filter: blur(28px);
+  pointer-events: none;
 }
 .lp2-shot {
   border: 1px solid var(--line-strong);
@@ -271,7 +290,7 @@
   gap: 2px;
   margin: 0 auto;
   font-size: clamp(30px, 4vw, 52px);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.034em;
 }
 .lp2-steps {
   display: grid;
@@ -313,6 +332,17 @@
   transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 .lp2-card:hover { border-color: var(--accent-line); box-shadow: 0 18px 34px -22px rgb(29 78 216 / 45%); transform: translateY(-2px); }
+.lp2-card-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 14px;
+  border: 1px solid var(--accent-line);
+  border-radius: 9px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
 .lp2-card h3 { margin: 0 0 7px; font-size: 15px; font-weight: 640; letter-spacing: -0.02em; }
 .lp2-card p { margin: 0; color: var(--muted); font-size: 12.8px; line-height: 1.65; }
 
@@ -436,7 +466,11 @@
 
 /* The muted second line carries a gradient instead of flat grey. */
 .lp2-hero h1 .is-muted {
+  display: inline-block;
+  padding-bottom: 0.12em;
   background: linear-gradient(96deg, #1d4ed8 4%, #3d7df7 54%, #2563eb 96%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -444,6 +478,8 @@
 }
 .lp2-section h2 .is-muted,
 .lp2-closing h2 .is-muted {
+  display: inline-block;
+  padding-bottom: 0.06em;
   color: var(--ink-soft);
 }
 
