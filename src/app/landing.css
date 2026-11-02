@@ -116,7 +116,7 @@
 .lp2-sub {
   max-width: 560px;
   margin: 26px auto 0;
-  color: var(--muted);
+  color: color-mix(in srgb, var(--ink-soft) 74%, var(--muted));
   font-size: clamp(15px, 1.5vw, 17px);
   line-height: 1.62;
 }
@@ -157,7 +157,7 @@
 .lp2-ghost:hover { border-color: var(--accent-line); color: var(--accent-strong); background: var(--accent-soft); }
 .lp2-fineprint {
   margin: 18px 0 0;
-  color: var(--muted-soft);
+  color: var(--muted);
   font-size: 11.5px;
 }
 
@@ -435,14 +435,16 @@
 .lp2-line { display: block; }
 
 /* The muted second line carries a gradient instead of flat grey. */
-.lp2-hero h1 .is-muted,
-.lp2-section h2 .is-muted,
-.lp2-closing h2 .is-muted {
-  background: linear-gradient(180deg, var(--ink-soft) 0%, var(--muted-soft) 100%);
+.lp2-hero h1 .is-muted {
+  background: linear-gradient(96deg, #1d4ed8 4%, #3d7df7 54%, #2563eb 96%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+}
+.lp2-section h2 .is-muted,
+.lp2-closing h2 .is-muted {
+  color: var(--ink-soft);
 }
 
 /* Scroll reveal */
