@@ -123,6 +123,19 @@ export default async function JobDetailPage({
         })
       : null;
 
+  const tracked = detail && session?.user
+    ? await prisma.application.findFirst({
+        where: {
+          userId: session.user.id,
+          OR: [
+            { postingUrl: detail.posting.url },
+            { company: detail.posting.company, postingTitle: detail.posting.title },
+          ],
+        },
+        select: { id: true, status: true },
+      })
+    : null;
+
   const gradeFact = facts.find((fact) => /grade|cgpa|gpa|percentage|marks/i.test(fact.label));
   const gradeText = gradeFact?.value ?? "";
   const cgpaMatch = gradeText.match(/([0-9]{1,2}(?:\.[0-9]{1,2})?)\s*(?:\/\s*([0-9]{1,3}))?/);
@@ -181,6 +194,15 @@ export default async function JobDetailPage({
                 View original posting ↗
               </a>
             </p>
+
+            {tracked ? (
+              <p className="doc-banner is-ok" role="status">
+                <strong>Already in your tracker</strong> — this role was tracked before.{" "}
+                <Link className="text-button" href={`/applications/${tracked.id}`}>
+                  Open the application
+                </Link>
+              </p>
+            ) : null}
 
             <div className="profile-links">
               <Link className="intake-secondary" href={`/jobs/${boardToken}/${id}/prepare`}>

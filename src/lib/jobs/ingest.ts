@@ -9,6 +9,7 @@ import { htmlToText } from "@/lib/jobs/html";
 import { ashbyAdapter } from "@/lib/jobs/ashby";
 import { hnAdapter } from "@/lib/jobs/hn";
 import { leverAdapter } from "@/lib/jobs/lever";
+import { smartRecruitersPostings } from "@/lib/jobs/smartrecruiters";
 import { mastodonAdapter } from "@/lib/jobs/mastodon";
 import { seniorityOf } from "@/lib/jobs/match";
 import { extractSkills } from "@/lib/jobs/skills";
@@ -109,6 +110,20 @@ async function greenhousePostings(board: BoardRef): Promise<RawPosting[]> {
 }
 
 async function rawPostings(board: BoardRef): Promise<RawPosting[]> {
+  if (board.source === "smartrecruiters") {
+    const postings = await smartRecruitersPostings(board);
+    return postings.map((posting) => ({
+      externalId: posting.externalId,
+      company: posting.company,
+      title: posting.title,
+      location: posting.location,
+      department: posting.department,
+      url: posting.url,
+      content: posting.content ?? "",
+      postedAt: posting.updatedAt,
+    }));
+  }
+
   const adapter =
     board.source === "hn"
       ? hnAdapter

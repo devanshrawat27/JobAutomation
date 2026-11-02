@@ -5,6 +5,7 @@ import { greenhouseAdapter } from "@/lib/jobs/greenhouse";
 import { ashbyAdapter } from "@/lib/jobs/ashby";
 import { hnAdapter } from "@/lib/jobs/hn";
 import { leverAdapter } from "@/lib/jobs/lever";
+import { smartRecruitersPostings } from "@/lib/jobs/smartrecruiters";
 import { mastodonAdapter } from "@/lib/jobs/mastodon";
 import type { BoardRef, BoardResult, JobPosting } from "@/lib/jobs/types";
 
@@ -25,7 +26,9 @@ async function listBoard(board: BoardRef): Promise<BoardResult> {
     // Each source reads its own endpoint; the fallback used to ask Greenhouse
     // for the Hacker News board and fail.
     const postings =
-      board.source === "hn"
+      board.source === "smartrecruiters"
+        ? await smartRecruitersPostings(board)
+        : board.source === "hn"
         ? await hnAdapter.listPostings(board)
         : board.source === "mastodon"
           ? await mastodonAdapter.listPostings(board)

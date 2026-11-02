@@ -19,6 +19,8 @@ export const BOARDS: BoardRef[] = [
   { source: "lever", token: "zeta", company: "Zeta" },
   { source: "ashby", token: "linear", company: "Linear" },
   { source: "ashby", token: "supabase", company: "Supabase" },
+  { source: "smartrecruiters", token: "Freshworks", company: "Freshworks" },
+  { source: "smartrecruiters", token: "Swiggy", company: "Swiggy" },
   { source: "greenhouse", token: "groww", company: "Groww" },
   { source: "greenhouse", token: "hackerrank", company: "HackerRank" },
   { source: "greenhouse", token: "gitlab", company: "GitLab" },
