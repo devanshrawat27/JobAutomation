@@ -39,7 +39,9 @@ const SLOTS: Slot[] = [
   { id: "contact.phone", label: "Phone", group: "contact", patterns: [/phone|mobile|contact number/i] },
   { id: "contact.location", label: "Current location", group: "contact", patterns: [/location|city|based in/i] },
   { id: "contact.linkedin", label: "LinkedIn", group: "contact", patterns: [/linkedin/i] },
-  { id: "contact.website", label: "Portfolio or GitHub", group: "contact", patterns: [/portfolio|website|github/i] },
+  { id: "contact.website", label: "Portfolio or website", group: "contact", patterns: [/portfolio|personal (site|website)|other (website|url)/i] },
+  { id: "contact.github", label: "GitHub", group: "contact", patterns: [/github|stack\s*overflow/i] },
+  { id: "contact.country", label: "Country", group: "contact", patterns: [/^country|country of residence|located in/i] },
 
   { id: "education.institution", label: "Institution", group: "education", patterns: [/institution|university|college/i] },
   { id: "education.degree", label: "Degree and discipline", group: "education", patterns: [/degree|discipline|course|branch/i] },
@@ -53,6 +55,19 @@ const SLOTS: Slot[] = [
   { id: "experience.years", label: "Total years of experience", group: "experience", patterns: [/years of experience|total experience/i], note: "Computed from your dated roles, with overlapping months counted once." },
 
   {
+    id: "eligibility.sponsorship",
+    label: "Visa sponsorship needed",
+    group: "eligibility",
+    patterns: [/sponsor(ship)?|require.*visa|visa status/i],
+    note: "Asked by most US and EU forms; the product never infers it.",
+  },
+  {
+    id: "eligibility.relocation",
+    label: "Willing to relocate",
+    group: "eligibility",
+    patterns: [/relocat|willing to move|open to moving/i],
+  },
+  {
     id: "eligibility.authorization",
     label: "Work authorization",
     group: "eligibility",
@@ -65,6 +80,13 @@ const SLOTS: Slot[] = [
     group: "eligibility",
     patterns: [/notice period|earliest start|available to join|availability/i],
     note: "Asked by most employer forms; confirm before you send it.",
+  },
+  {
+    id: "preferences.currentCtc",
+    label: "Current compensation",
+    group: "preferences",
+    patterns: [/current (ctc|salary|compensation)|present salary/i],
+    note: "Optional. Many Indian forms ask; you can leave it blank.",
   },
   {
     id: "preferences.salary",
@@ -117,10 +139,15 @@ function parseExperienceCard(facts: Fact[]): { company: string; role: string; da
 export function buildAnswers(facts: Fact[]): ApplicationAnswer[] {
   const mergedCard = facts.find((fact) => /^experience$/i.test(fact.label) && fact.value.includes("\n"));
   const parsed = mergedCard ? parseExperienceCard(facts) : null;
-  const datesSource = facts.find((fact) => /date|experience/i.test(fact.label))?.label ?? "your dated roles";
+
+  // Only dated roles count: an education range ("2023 - 2027") is not work.
+  const experienceFacts = facts.filter((fact) =>
+    /experience|company|role|employee|intern|work history|dates/i.test(fact.label),
+  );
+  const datesSource = experienceFacts.find((fact) => /date|experience/i.test(fact.label))?.label ?? "your dated roles";
 
   // Years come from the dates themselves, never from a guess.
-  const datedRanges = facts
+  const datedRanges = experienceFacts
     .flatMap((fact) => fact.value.split("\n"))
     .map((line) => parseDateRange(line))
     .filter((range): range is NonNullable<typeof range> => Boolean(range));
@@ -128,6 +155,18 @@ export function buildAnswers(facts: Fact[]): ApplicationAnswer[] {
   const yearsValue = months > 0 ? (Math.round((months / 12) * 10) / 10).toFixed(1) : null;
 
   return SLOTS.map((slot) => {
+    if (slot.id === "experience.years") {
+      return {
+        id: slot.id,
+        label: slot.label,
+        group: slot.group,
+        value: yearsValue,
+        factKey: null,
+        sourceLabel: datesSource,
+        ...(slot.note ? { note: slot.note } : {}),
+      };
+    }
+
     // A merged experience card is the source for company/role/dates, even though
     // its key still carries the name of the fact it started from.
     if (mergedCard && parsed && slot.id.startsWith("experience.")) {
@@ -145,18 +184,6 @@ export function buildAnswers(facts: Fact[]): ApplicationAnswer[] {
         value: value || null,
         factKey: mergedCard.key,
         sourceLabel: mergedCard.label,
-        ...(slot.note ? { note: slot.note } : {}),
-      };
-    }
-
-    if (slot.id === "experience.years") {
-      return {
-        id: slot.id,
-        label: slot.label,
-        group: slot.group,
-        value: yearsValue,
-        factKey: null,
-        sourceLabel: datesSource,
         ...(slot.note ? { note: slot.note } : {}),
       };
     }

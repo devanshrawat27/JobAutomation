@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 
 import { factGroups, type FactGroupId } from "@/lib/profile-facts";
 import { prisma } from "@/lib/db";
+import { saveFormDetail } from "@/app/actions/form-detail";
+import { buildAnswers } from "@/lib/form/answers";
 import { buildCandidate } from "@/lib/jobs/match";
 import { getCurrentSession } from "@/lib/session";
 import ProfileActions from "./profile-actions";
@@ -48,6 +50,11 @@ export default async function ProfilePage() {
     : candidate.years > 0
       ? `${candidate.years} years · ${candidate.family ?? "profile"}`
       : "No dated experience yet";
+
+  // The questions employer forms ask that a resume never answers.
+  const formAnswers = buildAnswers(
+    facts.map((fact) => ({ key: fact.key, label: fact.label, value: fact.value })),
+  ).filter((answer) => !answer.value);
 
   const groupIds = [...new Set(facts.map((fact) => fact.groupId))].sort(
     (left, right) => groupRank(left) - groupRank(right),
@@ -100,6 +107,32 @@ export default async function ProfilePage() {
             Applications <span aria-hidden="true">↗</span>
           </Link>
         </div>
+
+        {formAnswers.length > 0 ? (
+          <details className="profile-form-details" open={facts.length > 0}>
+            <summary>
+              Still needed for forms <span>{formAnswers.length}</span>
+            </summary>
+            <p>
+              Employer forms ask these more often than a resume states them. Fill what applies once; the extension and the
+              answer sheet reuse it, and nothing is guessed.
+            </p>
+            <div className="profile-form-list">
+              {formAnswers.slice(0, 8).map((answer) => (
+                <form action={saveFormDetail} className="profile-form-row" key={answer.id}>
+                  <input name="id" type="hidden" value={answer.id} />
+                  <input name="label" type="hidden" value={answer.label} />
+                  <input name="group" type="hidden" value={answer.group} />
+                  <label>
+                    <span>{answer.label}</span>
+                    <input maxLength={300} name="value" placeholder={answer.note ? "Not stated on your resume" : ""} required />
+                  </label>
+                  <button type="submit">Save</button>
+                </form>
+              ))}
+            </div>
+          </details>
+        ) : null}
 
         {facts.length === 0 ? (
           <div className="profile-empty">
