@@ -389,3 +389,197 @@
   .lp2-hero, .lp2-demo, .lp2-section, .lp2-closing, .lp2-footer { width: calc(100% - 32px); }
   .lp2-hero h1 { letter-spacing: -0.035em; }
 }
+
+
+/* =========================================================================
+   Motion, depth and colour
+   ========================================================================= */
+
+/* A richer field behind the hero: two lights, masked soft. */
+.lp2::before {
+  inset: -260px -10% auto -10%;
+  height: 860px;
+  background:
+    radial-gradient(48% 46% at 50% 34%, rgb(37 99 235 / 16%), transparent 72%),
+    radial-gradient(36% 40% at 74% 18%, rgb(124 92 255 / 10%), transparent 74%),
+    radial-gradient(30% 34% at 24% 26%, rgb(16 185 200 / 8%), transparent 76%);
+  filter: blur(2px);
+}
+
+/* A fine grid, barely there, to give the page a floor. */
+.lp2::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(14 23 41 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(14 23 41 / 4%) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(70% 46% at 50% 8%, #000 0%, transparent 82%);
+}
+.lp2-header,
+.lp2-hero,
+.lp2-demo,
+.lp2-section,
+.lp2-closing,
+.lp2-footer { position: relative; z-index: 1; }
+
+/* Hero entrance */
+@keyframes lp2-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.lp2-in { animation: lp2-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: var(--d, 0ms); }
+.lp2-line { display: block; }
+
+/* The muted second line carries a gradient instead of flat grey. */
+.lp2-hero h1 .is-muted,
+.lp2-section h2 .is-muted,
+.lp2-closing h2 .is-muted {
+  background: linear-gradient(180deg, var(--ink-soft) 0%, var(--muted-soft) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Scroll reveal */
+.lp2-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms),
+    transform 0.85s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms);
+}
+.lp2-reveal.is-in { opacity: 1; transform: none; }
+
+/* Section kicker */
+.lp2-kicker {
+  margin: 0 0 14px;
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* 3D product shot */
+.lp2-tilt {
+  position: relative;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+.lp2-tilt .lp2-shot {
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.lp2-tilt .lp2-shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    420px circle at var(--light-x, 50%) var(--light-y, 20%),
+    rgb(37 99 235 / 10%),
+    transparent 70%
+  );
+}
+.lp2-float {
+  position: absolute;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: 0 18px 34px -18px rgb(14 23 41 / 45%);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  transform: translateZ(60px);
+  animation: lp2-drift 7s ease-in-out infinite;
+}
+.lp2-float--a { top: -16px; left: 6px; }
+.lp2-float--b { right: -20px; bottom: 84px; animation-delay: -3.2s; }
+@keyframes lp2-drift {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -9px; }
+}
+
+/* Cards: a tinted top rule and a lift with a coloured shadow. */
+.lp2-step,
+.lp2-card {
+  position: relative;
+  overflow: hidden;
+}
+.lp2-step::before,
+.lp2-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-line), transparent);
+  opacity: 0.9;
+}
+.lp2-card:hover {
+  box-shadow: 0 26px 50px -30px rgb(37 99 235 / 55%);
+}
+.lp2-step:hover { border-color: var(--accent-line); }
+
+/* The step number becomes a small tile. */
+.lp2-step-num {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 14px;
+  border: 1px solid var(--accent-line);
+  border-radius: 9px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+/* The primary action sweeps a highlight across on hover. */
+.lp2-primary { position: relative; overflow: hidden; }
+.lp2-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgb(255 255 255 / 28%) 45%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lp2-primary:hover::after { transform: translateX(120%); }
+
+/* FAQ rows respond to the pointer. */
+.lp2-faq-item { transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+.lp2-faq-item:hover { border-color: var(--accent-line); box-shadow: 0 12px 26px -22px rgb(37 99 235 / 50%); }
+
+/* Sticky header gains a shadow once the page moves. */
+.lp2-header { transition: box-shadow 0.25s ease, background 0.25s ease; }
+@supports (animation-timeline: scroll()) {
+  .lp2-header {
+    animation: lp2-header-shadow linear both;
+    animation-timeline: scroll();
+    animation-range: 0 120px;
+  }
+  @keyframes lp2-header-shadow {
+    to { box-shadow: 0 12px 30px -24px rgb(14 23 41 / 60%); }
+  }
+}
+
+/* Reduced motion: everything still, nothing hidden. */
+@media (prefers-reduced-motion: reduce) {
+  .lp2-in,
+  .lp2-float { animation: none; }
+  .lp2-reveal { opacity: 1; transform: none; transition: none; }
+  .lp2-tilt .lp2-shot { transform: none; }
+  .lp2-primary::after { display: none; }
+}

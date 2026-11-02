@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+import Reveal from "@/components/landing/reveal";
+import Tilt from "@/components/landing/tilt";
+
 const steps = [
   {
     number: "01",
@@ -93,19 +96,19 @@ export default function Home() {
       </header>
 
       <section className="lp2-hero" aria-labelledby="hero-title">
-        <p className="lp2-eyebrow">India-first · new grad and experienced</p>
+        <p className="lp2-eyebrow lp2-in" style={{ "--d": "0ms" } as React.CSSProperties}>India-first · new grad and experienced</p>
 
         <h1 id="hero-title">
-          <span>Your resume in.</span>
-          <span className="is-muted">Right jobs out.</span>
+          <span className="lp2-line lp2-in" style={{ "--d": "90ms" } as React.CSSProperties}>Your resume in.</span>
+          <span className="lp2-line is-muted lp2-in" style={{ "--d": "180ms" } as React.CSSProperties}>Right jobs out.</span>
         </h1>
 
-        <p className="lp2-sub">
+        <p className="lp2-sub lp2-in" style={{ "--d": "280ms" } as React.CSSProperties}>
           A job-search workspace that reads your resume once, keeps a profile you confirmed, and prepares the resume, the
           letter and the form answers for each posting. You review everything. You press submit.
         </p>
 
-        <div className="lp2-cta-row">
+        <div className="lp2-cta-row lp2-in" style={{ "--d": "380ms" } as React.CSSProperties}>
           <Link className="lp2-primary" href="/onboarding">
             Start with your resume <span aria-hidden="true">→</span>
           </Link>
@@ -114,13 +117,14 @@ export default function Home() {
           </Link>
         </div>
 
-        <p className="lp2-fineprint">
+        <p className="lp2-fineprint lp2-in" style={{ "--d": "460ms" } as React.CSSProperties}>
           Free to start · no card · nothing is submitted for you
         </p>
       </section>
 
       <section aria-labelledby="demo-title" className="lp2-demo" id="demo">
         <h2 className="sr-only" id="demo-title">A look at the workspace</h2>
+        <Tilt>
         <div className="lp2-shot">
           <div className="lp2-shot-bar">
             <span className="lp2-dots" aria-hidden="true"><i /><i /><i /></span>
@@ -158,10 +162,14 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <span aria-hidden="true" className="lp2-float lp2-float--a">3 new today</span>
+        <span aria-hidden="true" className="lp2-float lp2-float--b">82 · strong fit</span>
+        </Tilt>
         <p className="lp2-fineprint">Illustrative workspace — figures are sample data.</p>
       </section>
 
-      <section aria-labelledby="how-title" className="lp2-section" id="how">
+      <Reveal as="section" className="lp2-section" id="how">
+        <p className="lp2-kicker">How it works</p>
         <h2 id="how-title">
           <span>Once from you.</span>
           <span className="is-muted">Every application after that.</span>
@@ -175,9 +183,10 @@ export default function Home() {
             </article>
           ))}
         </div>
-      </section>
+      </Reveal>
 
-      <section aria-labelledby="why-title" className="lp2-section">
+      <Reveal as="section" className="lp2-section">
+        <p className="lp2-kicker">Why it is different</p>
         <h2 id="why-title">
           <span>Facts you can trace.</span>
           <span className="is-muted">Nothing invented.</span>
@@ -190,9 +199,10 @@ export default function Home() {
             </article>
           ))}
         </div>
-      </section>
+      </Reveal>
 
-      <section aria-labelledby="questions-title" className="lp2-section lp2-faq" id="questions">
+      <Reveal as="section" className="lp2-section lp2-faq" id="questions">
+        <p className="lp2-kicker">Questions</p>
         <h2 id="questions-title">
           <span>Questions,</span>
           <span className="is-muted">answered plainly.</span>
@@ -205,9 +215,10 @@ export default function Home() {
             </details>
           ))}
         </div>
-      </section>
+      </Reveal>
 
-      <section className="lp2-closing" aria-labelledby="closing-title">
+      <Reveal className="lp2-closing">
+        <p className="lp2-kicker">Start here</p>
         <h2 id="closing-title">
           <span>Fewer applications.</span>
           <span className="is-muted">Better evidence.</span>
@@ -216,7 +227,7 @@ export default function Home() {
         <Link className="lp2-primary" href="/onboarding">
           Get started free <span aria-hidden="true">→</span>
         </Link>
-      </section>
+      </Reveal>
 
       <footer className="lp2-footer">
         <Link className="lp2-brand" href="/">
