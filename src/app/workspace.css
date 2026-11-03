@@ -1481,30 +1481,17 @@
 }
 .app-user-body small { display: block; color: var(--muted); font-size: 10.5px; }
 
-/* The signed-in card carries the address and the way out. */
-.app-user-card {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface);
-  overflow: hidden;
-  transition: border-color 0.16s ease;
-}
-.app-user-card:hover { border-color: var(--accent-line); }
-.app-user-card .app-user {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-.app-user-card .app-user:hover { box-shadow: none; border-color: transparent; }
-.app-user-meta {
+/* The address and the way out sit at the foot of the sidebar. */
+.app-side-foot {
+  margin-top: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 6px 8px 6px 10px;
+  padding-top: 10px;
   border-top: 1px solid var(--line);
-  background: var(--surface-soft);
 }
+.app-side-foot .app-side-cta { width: 100%; }
 .app-user-email {
   min-width: 0;
   overflow: hidden;
@@ -1568,7 +1555,6 @@
   color: #fff;
 }
 
-.app-side-foot { margin-top: auto; display: grid; gap: 8px; }
 .app-side-cta {
   display: inline-flex;
   justify-content: center;

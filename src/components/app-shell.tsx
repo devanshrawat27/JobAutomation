@@ -94,23 +94,15 @@ export default async function AppShell({
         </Link>
 
         {session?.user ? (
-          <div className="app-user-card">
-            <Link className="app-user" href="/profile">
-              <span aria-hidden="true" className="app-avatar">
-                {initials(name)}
-              </span>
-              <span className="app-user-body">
-                <strong>{name}</strong>
-                <small>{headline}</small>
-              </span>
-            </Link>
-            <div className="app-user-meta">
-              <span className="app-user-email" title={session.user.email}>
-                {session.user.email}
-              </span>
-              <SignOutButton />
-            </div>
-          </div>
+          <Link className="app-user" href="/profile">
+            <span aria-hidden="true" className="app-avatar">
+              {initials(name)}
+            </span>
+            <span className="app-user-body">
+              <strong>{name}</strong>
+              <small>{headline}</small>
+            </span>
+          </Link>
         ) : (
           <Link className="app-user" href="/sign-in?next=%2Fdashboard">
             <span aria-hidden="true" className="app-avatar">
@@ -157,13 +149,20 @@ export default async function AppShell({
           </div>
         ) : null}
 
-        {!session?.user ? (
-          <div className="app-side-foot">
+        <div className="app-side-foot">
+          {session?.user ? (
+            <>
+              <span className="app-user-email" title={session.user.email}>
+                {session.user.email}
+              </span>
+              <SignOutButton />
+            </>
+          ) : (
             <Link className="app-side-cta" href="/onboarding/resume?path=new-grad">
               Add your resume
             </Link>
-          </div>
-        ) : null}
+          )}
+        </div>
       </aside>
 
       <div className="app-main">
