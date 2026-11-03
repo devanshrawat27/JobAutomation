@@ -103,6 +103,7 @@ const PAYS = [
 ] as const;
 
 const FRESH = [
+  ["6h", "Last 6 hours"],
   ["24h", "Last 24 hours"],
   ["3d", "Last 3 days"],
   ["7d", "Last 7 days"],
@@ -366,25 +367,44 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
   // eslint-disable-next-line react-hooks/purity
   const nowMs = Date.now();
   const freshCutoff =
-    freshFilter === "24h"
-      ? nowMs - 86_400_000
-      : freshFilter === "3d"
-        ? nowMs - 3 * 86_400_000
-        : freshFilter === "7d"
-          ? nowMs - 7 * 86_400_000
-          : null;
+    freshFilter === "6h"
+      ? nowMs - 6 * 3_600_000
+      : freshFilter === "24h"
+        ? nowMs - 86_400_000
+        : freshFilter === "3d"
+          ? nowMs - 3 * 86_400_000
+          : freshFilter === "7d"
+            ? nowMs - 7 * 86_400_000
+            : null;
 
-  const filtered = candidates.filter(({ posting, fit }) => {
-    if (familyFilter && familyOf(posting) !== familyFilter) return false;
-    if (levelFilter && levelOf(posting) !== levelFilter) return false;
-    if (whereFilter && placeOf(posting) !== whereFilter) return false;
-    if (sourceFilter && sourceKindOf(posting) !== sourceFilter) return false;
-    if (payFilter && (posting.salaryMax ?? posting.salaryMin ?? 0) < Number(payFilter)) return false;
-    if (freshFilter) {
+  type Entry = (typeof candidates)[number];
+  type FilterState = { family: string; level: string; where: string; source: string; pay: string; fresh: string };
+
+  const activeState: FilterState = {
+    family: familyFilter,
+    level: levelFilter,
+    where: whereFilter,
+    source: sourceFilter,
+    pay: payFilter,
+    fresh: freshFilter,
+  };
+
+  function matchesFilters(entry: Entry, state: FilterState): boolean {
+    const { posting } = entry;
+    if (state.family && familyOf(posting) !== state.family) return false;
+    if (state.level && levelOf(posting) !== state.level) return false;
+    if (state.where && placeOf(posting) !== state.where) return false;
+    if (state.source && sourceKindOf(posting) !== state.source) return false;
+    if (state.pay && (posting.salaryMax ?? posting.salaryMin ?? 0) < Number(state.pay)) return false;
+    if (state.fresh) {
       const stamp = Date.parse(posting.postedAt ?? posting.firstSeenAt ?? "");
       if (!Number.isFinite(stamp) || stamp < (freshCutoff ?? 0)) return false;
     }
+    return true;
+  }
 
+  function matchesView(entry: Entry): boolean {
+    const { posting, fit } = entry;
     const decision = byPosting.get(posting.id);
     if (effectiveView === "saved") return decision === "SAVED";
     if (effectiveView === "dismissed") return decision === "DISMISSED";
@@ -396,7 +416,48 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
       return entryFriendly(posting) && (fit?.score ?? 0) >= 50;
     }
     return true;
-  });
+  }
+
+  const filtered = candidates.filter((entry) => matchesView(entry) && matchesFilters(entry, activeState));
+
+  // When the list is thin, name the single filter to relax and how many roles
+  // that would add. The count is real, computed against this corpus.
+  const filterLabels: Array<{ key: keyof FilterState; label: string }> = [
+    { key: "family", label: "any role type" },
+    { key: "level", label: "any experience" },
+    { key: "where", label: "any location" },
+    { key: "source", label: "any source" },
+    { key: "pay", label: "any pay" },
+    { key: "fresh", label: "any time" },
+  ];
+
+  const linkFor = (state: FilterState) => {
+    const params = new URLSearchParams();
+    if (effectiveView) params.set("view", effectiveView);
+    if (query) params.set("q", query);
+    if (boardToken) params.set("board", boardToken);
+    if (state.family) params.set("family", state.family);
+    if (state.level) params.set("level", state.level);
+    if (state.where) params.set("where", state.where);
+    if (state.source) params.set("source", state.source);
+    if (state.pay) params.set("pay", state.pay);
+    if (state.fresh) params.set("fresh", state.fresh);
+    return `/jobs?${params.toString()}`;
+  };
+
+  const widenSuggestions =
+    filtered.length < 12 && activeFilters > 0
+      ? filterLabels
+          .filter(({ key }) => activeState[key])
+          .map(({ key, label }) => {
+            const cleared = { ...activeState, [key]: "" };
+            const count = candidates.filter((entry) => matchesView(entry) && matchesFilters(entry, cleared)).length;
+            return { key, label, count: count - filtered.length, href: linkFor(cleared) };
+          })
+          .filter((suggestion) => suggestion.count > 0)
+          .sort((left, right) => right.count - left.count)
+          .slice(0, 3)
+      : [];
 
   const ordered =
     effectiveView === "for-you" || effectiveView === "fresher"
@@ -686,6 +747,17 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
         </div>
 
         <p className="jobs-view-note">{viewNote}</p>
+
+        {widenSuggestions.length > 0 ? (
+          <div className="jobs-widen">
+            <span>Thin list. Widening one filter adds:</span>
+            {widenSuggestions.map((suggestion) => (
+              <Link href={suggestion.href} key={suggestion.key}>
+                {suggestion.label} <b>+{suggestion.count}</b>
+              </Link>
+            ))}
+          </div>
+        ) : null}
 
         {forYouAvailable ? (
           <p className="jobs-read">

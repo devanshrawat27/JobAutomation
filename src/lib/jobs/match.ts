@@ -239,9 +239,28 @@ export function buildCandidate(facts: CandidateFacts[]): CandidateModel {
 }
 
 
+/**
+ * Skills the posting treats as mandatory, read from its own wording.
+ *
+ * A skill listed under "Requirements" is not the same signal as one buried in
+ * a paragraph. This keeps the matcher honest without a model: a must-have gets
+ * double weight, a nice-to-have keeps single weight.
+ */
+export function mustHaveSkills(description: string, skills: string[]): Set<string> {
+  const lines = description
+    .split(/\n|(?<=[.;])\s+/)
+    .map((line) => line.toLowerCase())
+    .filter(
+      (line) =>
+        /\b(must|required|requirements?|minimum|essential|should have|need to have)\b/.test(line) &&
+        !/\b(nice|plus|bonus|preferred|good to have)\b/.test(line),
+    );
+
+  return new Set(skills.filter((skill) => lines.some((line) => line.includes(skill.toLowerCase()))));
+}
+
 /** Internships, graduate programmes and 0-2 year roles: what a fresher can win. */
-export function entryFriendly(job: { title: string; description: string }): boolean {
-  const text = `${job.title} ${job.description.slice(0, 900)}`.toLowerCase();
+export function entryFriendly(job: { title: string; description: string }): boolean {  const text = `${job.title} ${job.description.slice(0, 900)}`.toLowerCase();
   return /\b(intern|internship|graduate programme|graduate program|new grad|fresher|entry[\s-]?level|trainee|campus|apprentice|campus hire|0\s*[-\u2013]\s*[12]\s*years?|no prior experience)\b/.test(
     text,
   );
@@ -319,6 +338,9 @@ function seniorityPart(job: JobSignals, candidate: CandidateModel): { points: nu
     points = candidate.years >= 3 ? 14 : 3;
     cap = candidate.years >= 3 ? 100 : 48;
     reason = candidate.years >= 3 ? "Senior-level match" : "Senior posting; you may be early for it";
+  } else if (jobLevel === null) {
+    points = candidate.seniority === "fresher" ? 12 : 10;
+    reason = "The posting does not state the years it wants — scored neutral";
   } else if (candidate.seniority === "fresher") {
     points = 12;
   }
@@ -364,17 +386,20 @@ export function matchPosting(job: JobSignals, candidate: CandidateModel): MatchB
 
   const matched: string[] = [];
   const missing: string[] = [];
+  const must = mustHaveSkills(job.description, job.skills);
   let weightTotal = 0;
   let weightHit = 0;
+  let mustMatched = 0;
 
   for (const skill of job.skills) {
     const key = skill.toLowerCase();
-    const weight = titleLower.includes(key) ? 3 : 1;
+    const weight = titleLower.includes(key) ? 3 : must.has(skill) ? 2 : 1;
     weightTotal += weight;
 
     if (candidateSet.has(key) || loose.has(normalizeSkill(skill))) {
       matched.push(skill);
       weightHit += weight;
+      if (must.has(skill)) mustMatched += 1;
     } else {
       missing.push(skill);
     }
@@ -467,6 +492,9 @@ export function matchPosting(job: JobSignals, candidate: CandidateModel): MatchB
   if (familyMismatch) {
     const familyLabel = jobFamily ?? "other";
     reasons.push(`${/^[aeiou]/i.test(familyLabel) ? "An" : "A"} ${familyLabel} role, not ${candidate.family}`);
+  }
+  if (mustMatched > 0) {
+    reasons.push(`Meets ${mustMatched} must-have skill${mustMatched === 1 ? "" : "s"} the posting names`);
   }
   if (matched.length > 0) {
     reasons.push(`Covers ${matched.length} of ${job.skills.length} named skills: ${matched.slice(0, 4).join(", ")}`);

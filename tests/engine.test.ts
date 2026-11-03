@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { checkEligibility, parseEligibility } from "../src/lib/jobs/eligibility.ts";
 import { assessPosting } from "../src/lib/jobs/trust.ts";
-import { matchPosting, buildCandidate, entryFriendly } from "../src/lib/jobs/match.ts";
+import { matchPosting, buildCandidate, entryFriendly, mustHaveSkills } from "../src/lib/jobs/match.ts";
 import { parseReach, scoreReach } from "../src/lib/jobs/place.ts";
 import { parseDateRange, requiredYears, totalMonths } from "../src/lib/match/experience.ts";
 import { extractSkills } from "../src/lib/jobs/skills.ts";
@@ -120,4 +120,16 @@ test("skills are canonical, not string-matched", () => {
   assert.ok(found.includes("Node.js"));
   assert.ok(found.includes("PostgreSQL"));
   assert.ok(found.includes("Kubernetes"));
+});
+
+test("must-have skills are read from the posting's own wording", () => {
+  const skills = ["React", "Node.js", "Java", "Figma"];
+  const must = mustHaveSkills(
+    "Requirements: strong React and Java. Node.js is a plus. Familiarity with Figma is nice to have.",
+    skills,
+  );
+  assert.ok(must.has("React"));
+  assert.ok(must.has("Java"));
+  assert.ok(!must.has("Node.js"));
+  assert.ok(!must.has("Figma"));
 });

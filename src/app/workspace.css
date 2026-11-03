@@ -2785,6 +2785,32 @@
 .doc-ats-checks p { margin: 1px 0 0; color: var(--muted); font-size: 10.5px; line-height: 1.45; }
 .doc-ats-points { padding-top: 2px; color: var(--muted-soft); font-family: var(--font-mono); font-size: 9.5px; }
 
+/* Thin-list suggestions: a named filter and a real count. */
+.jobs-widen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+}
+.jobs-widen a {
+  display: inline-flex;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.jobs-widen a:hover { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-strong); }
+.jobs-widen b { color: var(--ok); font-family: var(--font-mono); font-weight: 650; }
+
 /* Company pages, built from the public corpus only. */
 .company-list {
   display: grid;
