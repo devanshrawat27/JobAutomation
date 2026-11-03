@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import SignOutButton from "@/components/sign-out-button";
 import { prisma } from "@/lib/db";
 import { visiblePostings } from "@/lib/jobs/detail";
 import { buildCandidate } from "@/lib/jobs/match";
@@ -92,15 +93,35 @@ export default async function AppShell({
           <span>jobautomation</span>
         </Link>
 
-        <Link className="app-user" href="/profile">
-          <span aria-hidden="true" className="app-avatar">
-            {initials(name)}
-          </span>
-          <span className="app-user-body">
-            <strong>{name}</strong>
-            <small>{session?.user ? headline : "Sign in to save a profile"}</small>
-          </span>
-        </Link>
+        {session?.user ? (
+          <div className="app-user-card">
+            <Link className="app-user" href="/profile">
+              <span aria-hidden="true" className="app-avatar">
+                {initials(name)}
+              </span>
+              <span className="app-user-body">
+                <strong>{name}</strong>
+                <small>{headline}</small>
+              </span>
+            </Link>
+            <div className="app-user-meta">
+              <span className="app-user-email" title={session.user.email}>
+                {session.user.email}
+              </span>
+              <SignOutButton />
+            </div>
+          </div>
+        ) : (
+          <Link className="app-user" href="/sign-in?next=%2Fdashboard">
+            <span aria-hidden="true" className="app-avatar">
+              {initials(name)}
+            </span>
+            <span className="app-user-body">
+              <strong>{name}</strong>
+              <small>Sign in to save a profile</small>
+            </span>
+          </Link>
+        )}
 
         <nav aria-label="Workspace" className="app-nav">
           {LINKS.map((link) => (
@@ -136,18 +157,13 @@ export default async function AppShell({
           </div>
         ) : null}
 
-        <div className="app-side-foot">
-          {session?.user ? (
-            <p className="app-side-note">
-              Signed in as <strong>{session.user.email}</strong>
-            </p>
-          ) : (
+        {!session?.user ? (
+          <div className="app-side-foot">
             <Link className="app-side-cta" href="/onboarding/resume?path=new-grad">
               Add your resume
             </Link>
-          )}
-          <p className="app-side-note">Nothing is submitted for you.</p>
-        </div>
+          </div>
+        ) : null}
       </aside>
 
       <div className="app-main">
@@ -165,6 +181,7 @@ export default async function AppShell({
               </Link>
             ))}
           </nav>
+          {session?.user ? <SignOutButton /> : null}
         </header>
         {children}
       </div>
