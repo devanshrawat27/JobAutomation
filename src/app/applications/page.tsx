@@ -54,7 +54,7 @@ export default async function ApplicationsPage() {
 
       <section aria-labelledby="applications-title" className="onboarding-content onboarding-content-wide">
         <p className="section-kicker">Your applications</p>
-        <h1 id="applications-title">What you sent, and what you know.</h1>
+        <h1 id="applications-title">Applications</h1>
         <p className="onboarding-intro">
           “Filled”, “submit attempted” and “receipt confirmed” stay separate here. An uncertain submit never becomes a
           confirmed application by itself.

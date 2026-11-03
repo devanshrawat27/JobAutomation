@@ -2352,3 +2352,376 @@
   .dash-actions .intake-secondary { flex: 1 1 auto; justify-content: center; }
 }
 
+/* =========================================================================
+   Craft pass · 3 Nov 2026
+   One accent, hairline borders, no glow, no gradient text. Buttons are ink,
+   labels are written like sentences, and colour is a status signal rather
+   than decoration. Everything below intentionally comes last so it settles
+   the earlier layers instead of adding another voice.
+   ========================================================================= */
+
+:root {
+  --bg: #f4f5f7;
+  --bg-deep: #eceef2;
+  --surface-soft: #fafbfc;
+  --surface-muted: #f0f2f5;
+  --line: #e3e6eb;
+  --line-strong: #d3d8e0;
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 4%);
+  --shadow-md: 0 8px 24px rgb(16 24 40 / 6%);
+}
+:root[data-theme="dark"] {
+  --surface-soft: #121a2b;
+  --surface-muted: #1a2438;
+  --line: #223049;
+  --line-strong: #31415c;
+}
+
+/* Grounds: flat paper, no blue wash behind the content. */
+.onboarding-page,
+.app-shell,
+.jobs-page { background: var(--bg); }
+.app-side {
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+}
+
+/* A page header is a header, not a hero. */
+.jobs-shell { padding-top: 26px; }
+.jobs-hero {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 32px;
+  align-items: start;
+  padding-bottom: 18px;
+}
+.jobs-stats {
+  display: flex;
+  gap: 26px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  overflow: visible;
+}
+.jobs-stats > div { padding: 0; background: none; }
+.jobs-stats dt,
+.onboarding-page .jobs-stats dt {
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.jobs-stats dd,
+.onboarding-page .jobs-stats dd {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+}
+
+/* Labels read as sentences, not as generated micro-caps. */
+.section-kicker,
+.onboarding-page .section-kicker,
+.intake-lede .section-kicker,
+.dash-eyebrow,
+.jobs-read span:first-child,
+.app-progress-head span,
+.dash-metric-label {
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Headings: one weight, one rhythm. */
+.onboarding-page .onboarding-content h1,
+.review-topline h1,
+.jobs-hero-copy h1,
+.profile-head h1,
+.dash-head h1 {
+  font-family: var(--font-sans);
+  font-weight: 620;
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.onboarding-page .onboarding-content h1,
+.review-topline h1 { font-size: clamp(24px, 2.4vw, 30px); }
+.jobs-hero-copy h1 { font-size: clamp(24px, 2.4vw, 30px); }
+.profile-head h1 { font-size: clamp(24px, 2.6vw, 30px); }
+.dash-head h1 { font-size: clamp(24px, 2.6vw, 30px); letter-spacing: -0.035em; }
+
+/* The one emphasised phrase in a page heading is ink, not a gradient. */
+.jobs-hero-copy h1 em,
+.intake-lede h1 em {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--muted);
+  font-style: normal;
+}
+
+/* One control language. */
+.onboarding-page .onboarding-submit {
+  border: 1px solid var(--inverse-bg);
+  border-radius: 8px;
+  background: var(--inverse-bg);
+  box-shadow: none;
+  color: var(--inverse-fg);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.onboarding-page .onboarding-submit:not(:disabled):hover {
+  background: var(--inverse-bg-hover);
+  border-color: var(--inverse-bg-hover);
+  box-shadow: none;
+  transform: none;
+}
+.onboarding-page .intake-secondary {
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: none;
+  color: var(--ink-soft);
+  font-weight: 550;
+}
+.onboarding-page .intake-secondary:hover {
+  border-color: var(--ink-soft);
+  background: var(--surface);
+  color: var(--ink);
+}
+.onboarding-page .onboarding-step {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 550;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Tabs behave like tabs. */
+.onboarding-page .jobs-tabs { gap: 18px; }
+.onboarding-page .jobs-tabs a {
+  margin: 0;
+  padding: 6px 0 8px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted);
+  font-weight: 600;
+}
+.onboarding-page .jobs-tabs a:hover {
+  border-bottom-color: var(--line-strong);
+  background: transparent;
+  color: var(--ink);
+}
+.onboarding-page .jobs-tabs a.is-active {
+  border-bottom-color: var(--ink);
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+}
+.onboarding-page .jobs-tabs a.is-active span { color: var(--muted); }
+
+/* Surfaces: a border is enough. */
+.onboarding-page .job-card,
+.dash-panel,
+.digest-card,
+.app-column,
+.jobs-gate,
+.profile-form-details,
+.review-doc {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: none;
+}
+.onboarding-page .job-card { padding: 18px 20px 16px; }
+.onboarding-page .job-card::before { display: none; }
+.onboarding-page .job-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: none;
+  transform: none;
+}
+.dash-metric {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: none;
+}
+.job-match-body { border-radius: 8px; }
+
+/* Tags and chips: neutral by default, colour only for a warning. */
+.job-tag,
+.onboarding-page .job-tag {
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.job-tag.is-entry,
+.job-tag.is-direct {
+  border-color: var(--line);
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-soft);
+}
+.job-tag.is-warn { border-color: var(--warn-line); background: var(--warn-soft); color: var(--warn); }
+.job-tag.is-danger { border-color: var(--danger-line); background: var(--danger-soft); color: var(--danger); }
+.job-chip,
+.onboarding-page .job-chip {
+  padding: 2px 7px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+.job-chip span[aria-hidden] { color: var(--ok); }
+.job-chip.is-missing {
+  border-style: dashed;
+  background: transparent;
+  color: var(--muted);
+}
+
+/* Sidebar: selection is a rule, not a blue slab. */
+.app-avatar,
+.profile-avatar {
+  background: var(--inverse-bg);
+  color: var(--inverse-fg);
+}
+.app-avatar { border-radius: 8px; }
+.profile-avatar { border-radius: 12px; }
+.app-nav { gap: 1px; }
+.app-nav-link { border-radius: 6px; padding: 8px 10px; }
+.app-nav-link.is-active {
+  background: var(--surface-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+  color: var(--ink);
+}
+.app-nav-link.is-active .app-nav-hint { color: var(--muted); }
+.app-nav-link.is-active .app-nav-count {
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--ink-soft);
+}
+.app-nav-count { border-radius: 4px; font-size: 9px; }
+.app-brand { font-weight: 650; letter-spacing: -0.02em; }
+
+/* Small controls and status text. */
+.job-action,
+.jobs-scan-btn,
+.dash-action,
+.app-signout {
+  border-radius: 6px;
+  box-shadow: none;
+  font-weight: 600;
+}
+.profile-counts-line { margin: 0 0 18px; color: var(--muted); font-size: 11.5px; }
+.jobs-tabs a span,
+.app-nav-hint,
+.job-card-meta,
+.job-updated { letter-spacing: 0; }
+.dash-tag,
+.dash-status { border-radius: 4px; font-size: 9.5px; }
+
+/* The ring keeps its meaning but loses the sticker look. */
+.match-donut circle { stroke-width: 3; }
+.match-donut-body b { font-weight: 620; }
+
+/* Form fields share the same quiet edge. */
+.onboarding-page .jobs-field input,
+.onboarding-page .jobs-field select,
+.onboarding-page .jobs-field textarea,
+.onboarding-page .auth-field input,
+.profile-form-row input {
+  border-radius: 6px;
+}
+.onboarding-page .jobs-field input:focus-visible,
+.onboarding-page .jobs-field select:focus-visible,
+.onboarding-page .jobs-field textarea:focus-visible,
+.onboarding-page .auth-field input:focus-visible,
+.profile-form-row input:focus-visible {
+  outline: none;
+  border-color: var(--ink-soft);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 12%);
+}
+
+@media (max-width: 620px) {
+  .onboarding-page .job-card { padding: 16px; }
+}
+@media (max-width: 720px) {
+  .jobs-hero { grid-template-columns: 1fr; gap: 18px; }
+  .jobs-stats { flex-wrap: wrap; gap: 16px 22px; }
+}
+
+/* Dark and Auto keep the same quiet rules; the older dark layer used fills
+   and gradients, so settle those explicitly. */
+:root[data-theme="dark"] .onboarding-page .onboarding-submit {
+  border-color: var(--inverse-bg);
+  background: var(--inverse-bg);
+  color: var(--inverse-fg);
+  box-shadow: none;
+}
+:root[data-theme="dark"] .onboarding-page .jobs-tabs a.is-active {
+  border-bottom-color: var(--ink);
+  background: transparent;
+  color: var(--ink);
+  box-shadow: none;
+}
+:root[data-theme="dark"] .job-tag {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--muted);
+}
+:root[data-theme="dark"] .job-tag.is-entry,
+:root[data-theme="dark"] .job-tag.is-direct {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+}
+:root[data-theme="dark"] .job-chip {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+}
+:root[data-theme="dark"] .app-avatar,
+:root[data-theme="dark"] .profile-avatar {
+  background: var(--inverse-bg);
+  color: var(--inverse-fg);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] .onboarding-page .onboarding-submit {
+    border-color: var(--inverse-bg);
+    background: var(--inverse-bg);
+    color: var(--inverse-fg);
+    box-shadow: none;
+  }
+  :root[data-theme="auto"] .onboarding-page .jobs-tabs a.is-active {
+    border-bottom-color: var(--ink);
+    background: transparent;
+    color: var(--ink);
+    box-shadow: none;
+  }
+}
+
+

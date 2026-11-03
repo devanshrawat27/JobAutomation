@@ -154,7 +154,7 @@ export default function Home() {
 
       <section aria-labelledby="demo-title" className="lp2-demo" id="demo">
         <h2 className="sr-only" id="demo-title">A look at the workspace</h2>
-        <Tilt>
+        <Tilt max={2}>
         <div className="lp2-shot">
           <div className="lp2-shot-bar">
             <span className="lp2-dots" aria-hidden="true"><i /><i /><i /></span>
@@ -218,8 +218,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <span aria-hidden="true" className="lp2-float lp2-float--a">3 new today</span>
-        <span aria-hidden="true" className="lp2-float lp2-float--b">82 · strong fit</span>
         </Tilt>
         <p className="lp2-fineprint">Illustrative workspace — figures are sample data.</p>
       </section>

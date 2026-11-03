@@ -43,7 +43,7 @@ export default async function DocumentsPage() {
 
       <section aria-labelledby="documents-title" className="onboarding-content onboarding-content-wide">
         <p className="section-kicker">Saved drafts</p>
-        <h1 id="documents-title">Documents, tied to their evidence.</h1>
+        <h1 id="documents-title">Documents</h1>
         <p className="onboarding-intro">
           Every draft keeps the fact keys it was written from, so you can see later what it claimed and where that came from.
         </p>

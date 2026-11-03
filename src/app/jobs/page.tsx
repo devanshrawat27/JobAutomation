@@ -405,21 +405,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
         <div className="jobs-hero">
           <div className="jobs-hero-copy">
             <p className="section-kicker">Job discovery</p>
-            <h1 id="jobs-title">
-              {effectiveView === "fresher" ? (
-                <>
-                  Fresher roles,
-                  <br />
-                  <em>from real boards.</em>
-                </>
-              ) : (
-                <>
-                  Jobs you can
-                  <br />
-                  <em>actually apply to.</em>
-                </>
-              )}
-            </h1>
+            <h1 id="jobs-title">{effectiveView === "fresher" ? "Fresher roles" : "Jobs"}</h1>
             <p className="onboarding-intro">
               Every posting is published by the employer on their own job board, and every card says why it matched you.
               Saving or dismissing only changes what you see here — nothing is ever applied to.

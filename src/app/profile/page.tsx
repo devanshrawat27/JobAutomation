@@ -90,7 +90,7 @@ export default async function ProfilePage() {
               {locationFact ? ` · ${locationFact.value}` : ""}
             </p>
             <p className="profile-head-meta">
-              Signed in as <strong>{session.user.email}</strong> · {kept} confirmed facts
+              {kept} confirmed facts
               {candidate.skills.length > 0 ? ` · ${candidate.skills.length} skills` : ""}
             </p>
           </div>
@@ -143,20 +143,11 @@ export default async function ProfilePage() {
           </div>
         ) : (
           <>
-            <dl className="review-done-counts profile-counts">
-              <div>
-                <dt>Kept</dt>
-                <dd>{kept}</dd>
-              </div>
-              <div>
-                <dt>Skipped</dt>
-                <dd>{skipped}</dd>
-              </div>
-              <div>
-                <dt>Not applicable</dt>
-                <dd>{notApplicable}</dd>
-              </div>
-            </dl>
+            <p className="profile-counts-line">
+              {kept} kept
+              {skipped > 0 ? ` · ${skipped} skipped` : ""}
+              {notApplicable > 0 ? ` · ${notApplicable} not applicable` : ""}
+            </p>
 
             <div className="review-groups">
               {groupIds.map((groupId) => {

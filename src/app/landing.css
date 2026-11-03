@@ -735,3 +735,162 @@
   .lp2-tilt .lp2-shot { transform: none; }
   .lp2-primary::after { display: none; }
 }
+
+/* =========================================================================
+   Craft pass · 3 Nov 2026
+   The page should read like a printed product note: paper, ink, one accent.
+   No glow, no grid, no gradient text, no floating chips.
+   ========================================================================= */
+
+.lp2 { background: var(--bg); }
+.lp2::before,
+.lp2::after { display: none; }
+
+.lp2-header {
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+.lp2-brand { font-weight: 650; letter-spacing: -0.02em; }
+.lp2-mark { border-radius: 7px; background: var(--inverse-bg); color: var(--inverse-fg); }
+.lp2-nav { gap: 20px; font-size: 12px; }
+
+.lp2-install {
+  padding: 7px 13px;
+  border: 1px solid var(--inverse-bg);
+  border-radius: 7px;
+  background: var(--inverse-bg);
+  box-shadow: none;
+  color: var(--inverse-fg);
+  font-weight: 600;
+}
+.lp2-install:hover {
+  background: var(--inverse-bg-hover);
+  border-color: var(--inverse-bg-hover);
+  box-shadow: none;
+  transform: none;
+}
+
+.lp2-eyebrow {
+  display: inline;
+  margin: 0 0 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.lp2-hero h1,
+.lp2-section h2,
+.lp2-closing h2 {
+  font-weight: 620;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+}
+.lp2-hero h1 .is-muted,
+.lp2-section h2 .is-muted,
+.lp2-closing h2 .is-muted {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--muted);
+}
+
+.lp2-sub {
+  max-width: 540px;
+  color: var(--ink-soft);
+  font-size: clamp(14.5px, 1.4vw, 16px);
+  line-height: 1.65;
+}
+
+.lp2-primary {
+  padding: 11px 18px;
+  border: 1px solid var(--inverse-bg);
+  border-radius: 8px;
+  background: var(--inverse-bg);
+  box-shadow: none;
+  font-weight: 600;
+}
+.lp2-primary:hover {
+  background: var(--inverse-bg-hover);
+  border-color: var(--inverse-bg-hover);
+  box-shadow: none;
+  transform: none;
+}
+.lp2-primary::after { display: none; }
+.lp2-ghost {
+  padding: 11px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: transparent;
+  font-weight: 600;
+}
+.lp2-ghost:hover { border-color: var(--ink-soft); background: transparent; color: var(--ink); }
+.lp2-fineprint { color: var(--muted); font-size: 11px; }
+
+.lp2-demo::before { display: none; }
+.lp2-shot {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgb(16 24 41 / 5%), 0 30px 60px -48px rgb(16 24 41 / 40%);
+}
+.lp2-shot-bar { background: var(--surface-soft); }
+.lp2-shot-side { background: var(--surface-soft); }
+.lp2-float { display: none; }
+.lp2-pill { border-radius: 4px; }
+.lp2-shot-filters span { border-radius: 4px; }
+.lp2-shot-filters span.is-on {
+  border-color: var(--line-strong);
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+}
+.lp2-score { border-radius: 6px; }
+.lp2-score.is-strong { border: 1px solid var(--ok-line); background: var(--ok-soft); color: var(--ok); }
+.lp2-score.is-good { border: 1px solid var(--line); background: var(--surface-soft); color: var(--ink-soft); }
+
+.lp2-kicker {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.lp2-step,
+.lp2-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.lp2-step::before,
+.lp2-card::before { display: none; }
+.lp2-step:hover { border-color: var(--line-strong); }
+.lp2-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: none;
+  transform: none;
+}
+.lp2-step-num {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+}
+.lp2-card-icon {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+}
+.lp2-faq-item { border-radius: 10px; }
+.lp2-faq-item:hover { border-color: var(--line-strong); box-shadow: none; }
+
+.lp2-closing { border-top-color: var(--line); }
+.lp2-footer { border-top-color: var(--line); }
+

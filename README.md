@@ -4,6 +4,8 @@ An India-first job-search workspace for New Grad/Fresher and Experienced applica
 
 The interface follows `BRAND.md` at the workspace root (BRAND.md spec 0.3.0): Ink `#0E1729` for text, Paper `#FBFCFE` for grounds, Signal Blue `#2563EB` as the single accent, Night `#0E1526` for dark surfaces. Inter is the single typeface — headings at weight 630–650 with tight tracking — self-hosted through `next/font` under the SIL Open Font License. Light is the default theme; a Light / Dark / Auto switch sits at the bottom-right of every page, and only Auto follows the operating system.
 
+Surfaces stay flat and quiet: hairline borders instead of drop shadows, ink-filled primary buttons instead of gradient pills, sentence-case labels instead of tracked-out uppercase, and one accent used only for links, selection and status. No background glows, no gradient text, no floating chrome.
+
 ## Current foundation
 
 - Next.js App Router, React and TypeScript

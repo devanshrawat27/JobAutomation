@@ -110,7 +110,7 @@ export default async function DigestPage() {
       <main className="onboarding-page">
         <section aria-labelledby="digest-title" className="onboarding-content onboarding-content-wide">
           <p className="section-kicker">Since your last visit</p>
-          <h1 id="digest-title">Where your search stands.</h1>
+          <h1 id="digest-title">Digest</h1>
           <p className="onboarding-intro">
             Everything here is computed from your own records: new matches from the last two days, applications that have
             waited a week, and postings about to leave the board.
