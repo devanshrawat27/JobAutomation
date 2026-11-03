@@ -25,6 +25,9 @@ export type ResolvedJob = JobDetail & {
   firstSeenAt: string | null;
   lastSeenAt: string | null;
   ownerUserId: string | null;
+  /** Lakhs per annum, when the posting states pay. */
+  salaryMin: number | null;
+  salaryMax: number | null;
 };
 
 const SOURCE_IDS: ReadonlySet<string> = new Set<JobSourceId>([
@@ -74,6 +77,8 @@ export async function getJobDetail(
       postedAt: true,
       firstSeenAt: true,
       lastSeenAt: true,
+      salaryMin: true,
+      salaryMax: true,
     },
   });
 
@@ -103,6 +108,8 @@ export async function getJobDetail(
       firstSeenAt: stored.firstSeenAt.toISOString(),
       lastSeenAt: stored.lastSeenAt.toISOString(),
       ownerUserId: stored.ownerUserId,
+      salaryMin: stored.salaryMin,
+      salaryMax: stored.salaryMax,
     };
   }
 
@@ -121,6 +128,8 @@ export async function getJobDetail(
     firstSeenAt: null,
     lastSeenAt: null,
     ownerUserId: null,
+    salaryMin: null,
+    salaryMax: null,
   };
 }
 

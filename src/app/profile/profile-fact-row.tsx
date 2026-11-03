@@ -30,6 +30,7 @@ export default function ProfileFactRow({
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
+  const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(fact.value);
   const [pending, startTransition] = useTransition();
 
@@ -50,78 +51,95 @@ export default function ProfileFactRow({
   }
 
   const klass = statusClass[fact.status] ?? "suggested";
+  const settled = fact.status === "CONFIRMED" || fact.status === "EDITED";
 
   return (
-    <article className={`fact-card is-${klass}`}>
-      <div className="fact-head">
-        <span className="fact-label">{fact.label}</span>
-        <div className="fact-badges">
-          <span className={`fact-status status-${klass}`}>{statusLabels[fact.status] ?? fact.status}</span>
-        </div>
+    <article className={`fact-row is-${klass}`}>
+      <span className="fact-row-label">{fact.label}</span>
+
+      <div className="fact-row-content">
+        {editing ? (
+          <form action={save} className="fact-edit">
+            <input name="key" type="hidden" value={fact.key} />
+            <input name="status" type="hidden" value="confirmed" />
+            <label className="sr-only" htmlFor={`fact-${fact.key}`}>Edit {fact.label}</label>
+            {fact.value.includes("\n") ? (
+              <textarea
+                defaultValue={draft}
+                id={`fact-${fact.key}`}
+                name="value"
+                onChange={(event) => setDraft(event.target.value)}
+                rows={Math.min(8, draft.split("\n").length + 1)}
+              />
+            ) : (
+              <input
+                defaultValue={draft}
+                id={`fact-${fact.key}`}
+                name="value"
+                onChange={(event) => setDraft(event.target.value)}
+                type="text"
+              />
+            )}
+            <div className="fact-edit-actions">
+              <button className="fact-action is-primary" disabled={pending || !draft.trim()} type="submit">
+                {pending ? "Saving…" : "Save"}
+              </button>
+              <button
+                className="fact-action"
+                onClick={() => {
+                  setDraft(fact.value);
+                  setEditing(false);
+                }}
+                type="button"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <p className={`fact-value${!open && fact.value.split("\n").length > 3 ? " is-clamped" : ""}`}>
+              {fact.value}
+            </p>
+            {fact.value.split("\n").length > 3 ? (
+              <button className="fact-more" onClick={() => setOpen(!open)} type="button">
+                {open ? "Show less" : `Show all ${fact.value.split("\n").length} lines`}
+              </button>
+            ) : null}
+            {fact.sourceText ? (
+              <p className="fact-source" title={fact.sourceText}>
+                <span>Resume</span>
+                <q>{fact.sourceText}</q>
+              </p>
+            ) : null}
+          </>
+        )}
       </div>
 
-      {editing ? (
-        <form action={save} className="fact-edit">
-          <input name="key" type="hidden" value={fact.key} />
-          <input name="status" type="hidden" value="confirmed" />
-          <label className="sr-only" htmlFor={`fact-${fact.key}`}>Edit {fact.label}</label>
-          {fact.value.includes("\n") ? (
-            <textarea
-              defaultValue={draft}
-              id={`fact-${fact.key}`}
-              name="value"
-              onChange={(event) => setDraft(event.target.value)}
-              rows={Math.min(8, draft.split("\n").length + 1)}
-            />
-          ) : (
-            <input
-              defaultValue={draft}
-              id={`fact-${fact.key}`}
-              name="value"
-              onChange={(event) => setDraft(event.target.value)}
-              type="text"
-            />
-          )}
-          <div className="fact-edit-actions">
-            <button className="fact-action is-primary" disabled={pending || !draft.trim()} type="submit">
-              {pending ? "Saving…" : "Save"}
-            </button>
-            <button
-              className="fact-action"
-              onClick={() => {
-                setDraft(fact.value);
-                setEditing(false);
-              }}
-              type="button"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      ) : (
-        <p className="fact-value">{fact.value}</p>
-      )}
-
-      <p className="fact-source">
-        <span>From your resume</span>
-        <q>{fact.sourceText}</q>
-      </p>
-
       {!editing ? (
-        <div className="fact-actions">
-          <button className="fact-action" disabled={pending} onClick={() => setEditing(true)} type="button">
-            Edit
-          </button>
-          {fact.status !== "CONFIRMED" && fact.status !== "EDITED" ? (
-            <button className="fact-action is-primary" disabled={pending} onClick={() => setStatus("confirmed")} type="button">
+        <div className="fact-row-actions">
+          {settled ? (
+            <span className="fact-check" title={statusLabels[fact.status]}>✓</span>
+          ) : (
+            <span className={`fact-status status-${klass}`}>{statusLabels[fact.status]}</span>
+          )}
+          {!settled ? (
+            <button className="fact-action" disabled={pending} onClick={() => setStatus("confirmed")} type="button">
               Confirm
             </button>
           ) : null}
-          {fact.status !== "SKIPPED" ? (
+          <button className="fact-action" disabled={pending} onClick={() => setEditing(true)} type="button">
+            Edit
+          </button>
+          {fact.status === "SKIPPED" ? (
+            <button className="fact-action" disabled={pending} onClick={() => setStatus("confirmed")} type="button">
+              Restore
+            </button>
+          ) : (
             <button className="fact-action" disabled={pending} onClick={() => setStatus("skipped")} type="button">
               Skip
             </button>
-          ) : null}
+          )}
         </div>
       ) : null}
     </article>

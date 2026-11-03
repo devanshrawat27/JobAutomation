@@ -108,6 +108,16 @@ export default async function ProfilePage() {
           </Link>
         </div>
 
+        {groupIds.length > 2 ? (
+          <nav aria-label="Profile sections" className="profile-jump">
+            {groupIds.map((groupId) => (
+              <a href={`#saved-${groupId}`} key={groupId}>
+                {groupTitle(groupId)}
+              </a>
+            ))}
+          </nav>
+        ) : null}
+
         {formAnswers.length > 0 ? (
           <details className="profile-form-details" open={facts.length > 0}>
             <summary>
@@ -149,7 +159,7 @@ export default async function ProfilePage() {
               {notApplicable > 0 ? ` · ${notApplicable} not applicable` : ""}
             </p>
 
-            <div className="review-groups">
+            <div className="review-groups profile-groups">
               {groupIds.map((groupId) => {
                 const groupFacts = facts.filter((fact) => fact.groupId === groupId);
                 return (
@@ -158,7 +168,7 @@ export default async function ProfilePage() {
                       <h2 id={`saved-${groupId}`}>{groupTitle(groupId)}</h2>
                       <span>{groupFacts.length} saved</span>
                     </div>
-                    <div className="fact-list">
+                    <div className="fact-list profile-fact-rows">
                       {groupFacts.map((fact) => (
                         <ProfileFactRow
                           fact={{

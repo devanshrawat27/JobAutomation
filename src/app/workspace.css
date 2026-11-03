@@ -2721,6 +2721,188 @@
   .jobs-stats { flex-wrap: wrap; gap: 16px 22px; }
 }
 
+/* Referral kit: searches the candidate runs themselves, plus a grounded draft. */
+.job-referrals {
+  margin: 16px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.job-referrals-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.job-referrals h2 { margin: 0 0 4px; color: var(--ink); font-size: 14px; font-weight: 620; letter-spacing: -0.01em; }
+.job-referrals-head p { margin: 0; max-width: 560px; color: var(--muted); font-size: 11.5px; line-height: 1.55; }
+.referral-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.referral-links li { padding-top: 8px; border-top: 1px solid var(--line); }
+.referral-links a { color: var(--ink); font-size: 12px; font-weight: 600; }
+.referral-links a:hover { color: var(--accent-strong); }
+.referral-links p { margin: 3px 0 0; color: var(--muted); font-size: 10.5px; line-height: 1.45; }
+.referral-draft summary { color: var(--muted); font-size: 11.5px; font-weight: 600; cursor: pointer; }
+.referral-draft p {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--ink-soft);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.copy-text {
+  flex: none;
+  padding: 5px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.copy-text:hover { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-strong); }
+@media (max-width: 720px) {
+  .referral-links { grid-template-columns: 1fr; }
+  .job-referrals-head { flex-direction: column; }
+}
+
+/* Profile facts: one compact row per fact, so the page can be scanned. */
+.profile-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0 0 18px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11.5px;
+}
+.profile-jump a { color: var(--muted); font-weight: 550; }
+.profile-jump a:hover { color: var(--ink); }
+.profile-groups .fact-group { margin: 0 0 24px; }
+.profile-groups .fact-group-head { align-items: baseline; margin-bottom: 8px; }
+.profile-groups .fact-group-head h2 { scroll-margin-top: 80px; font-size: 13.5px; font-weight: 620; letter-spacing: -0.01em; }
+.profile-groups .fact-group-head h2::first-letter { text-transform: uppercase; }
+.profile-groups .fact-group-head span {
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.profile-fact-rows {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.fact-row {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+}
+.fact-row:first-child { border-top: 0; }
+.fact-row.is-skipped .fact-value { color: var(--muted-soft); text-decoration: line-through; }
+.fact-row-label { padding-top: 1px; color: var(--muted); font-size: 11px; font-weight: 550; }
+.fact-row-content { min-width: 0; }
+.fact-value { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+.fact-value.is-clamped {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.fact-more {
+  margin: 2px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-strong);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.fact-more:hover { text-decoration: underline; }
+.fact-row .fact-source {
+  margin: 2px 0 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  color: var(--muted-soft);
+  font-size: 10.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fact-row .fact-source span {
+  margin-right: 5px;
+  color: var(--muted-soft);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.fact-source q { display: inline; font-style: normal; white-space: nowrap; }
+.fact-row-actions { display: flex; align-items: center; gap: 2px; }
+.fact-check { display: grid; place-items: center; width: 18px; height: 18px; color: var(--ok); font-size: 11px; }
+.fact-status {
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 9.5px;
+}
+.fact-action {
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.fact-action:hover { background: var(--surface-soft); color: var(--ink); }
+.fact-action.is-primary { background: var(--inverse-bg); color: var(--inverse-fg); }
+.fact-action:disabled { opacity: 0.6; cursor: default; }
+.fact-edit { display: grid; gap: 6px; }
+.fact-edit input,
+.fact-edit textarea {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+}
+.fact-edit-actions { display: flex; gap: 6px; }
+
+@media (max-width: 720px) {
+  .fact-row { grid-template-columns: 1fr; gap: 3px; padding: 10px 12px; }
+  .fact-row-actions { justify-content: flex-start; margin-top: 4px; }
+  .fact-source { white-space: normal; }
+}
+
 /* Dark and Auto keep the same quiet rules; the older dark layer used fills
    and gradients, so settle those explicitly. */
 :root[data-theme="dark"] .onboarding-page .onboarding-submit {

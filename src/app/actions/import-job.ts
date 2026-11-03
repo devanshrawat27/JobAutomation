@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { prisma } from "@/lib/db";
 import { importJobLink } from "@/lib/jobs/import-link";
+import { parseSalary } from "@/lib/jobs/salary";
 import { getCurrentSession } from "@/lib/session";
 
 const schema = z.object({ url: z.string().trim().url().max(2000) });
@@ -31,6 +32,7 @@ export async function importJob(formData: FormData): Promise<void> {
 
   const { job } = result;
   const hash = `link-${job.source}-${job.externalId}`;
+  const salary = parseSalary(`${job.title}. ${job.content.slice(0, 6000)}`);
 
   // A link import belongs to the candidate who added it — unless the scanner
   // already stores the same public board row, in which case the row stays shared
@@ -62,6 +64,8 @@ export async function importJob(formData: FormData): Promise<void> {
       skills: job.skills,
       seniority: job.seniority,
       yearsMin: job.yearsMin,
+      salaryMin: salary?.min ?? null,
+      salaryMax: salary?.max ?? null,
       remote: job.remote,
       postedAt: job.postedAt ?? new Date(),
       hash,
@@ -76,6 +80,8 @@ export async function importJob(formData: FormData): Promise<void> {
       skills: job.skills,
       seniority: job.seniority,
       yearsMin: job.yearsMin,
+      salaryMin: salary?.min ?? null,
+      salaryMax: salary?.max ?? null,
       remote: job.remote,
       hash,
       lastSeenAt: new Date(),

@@ -53,6 +53,8 @@ export type DashboardMatch = {
   url: string;
   postedAt: Date | null;
   firstSeenAt: Date;
+  salaryMin: number | null;
+  salaryMax: number | null;
   score: number;
   verdict: MatchBreakdown["verdict"];
   matched: string[];
@@ -189,6 +191,8 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
         skills: true,
         seniority: true,
         yearsMin: true,
+        salaryMin: true,
+        salaryMax: true,
         remote: true,
         postedAt: true,
         firstSeenAt: true,
@@ -240,6 +244,8 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
             url: posting.url,
             postedAt: posting.postedAt,
             firstSeenAt: posting.firstSeenAt,
+            salaryMin: posting.salaryMin,
+            salaryMax: posting.salaryMax,
             score: fit.score,
             verdict: fit.verdict,
             matched: fit.matched.slice(0, 4),

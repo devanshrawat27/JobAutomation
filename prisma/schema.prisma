@@ -264,6 +264,10 @@ model JobPosting {
   skills      String[]  @default([])
   seniority   String?
   yearsMin    Int?
+  /// Pay as the posting states it, normalised to lakhs per annum. Null when the
+  /// text does not say, which is most postings.
+  salaryMin   Float?
+  salaryMax   Float?
   remote      Boolean   @default(false)
   postedAt    DateTime?
   /// Changes when the title, location or body changes, so a scan can skip work.

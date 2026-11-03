@@ -16,6 +16,7 @@ import { listingWindowWhere } from "@/lib/jobs/window";
 import { buildCandidate, entryFriendly, matchPosting, roleFamily, seniorityOf } from "@/lib/jobs/match";
 import { checkEligibility, parseEligibility, type EligibilityProfile } from "@/lib/jobs/eligibility";
 import { parseReach } from "@/lib/jobs/place";
+import { formatSalary, medianSalary } from "@/lib/jobs/salary";
 import { assessPosting } from "@/lib/jobs/trust";
 import { prisma } from "@/lib/db";
 import { getCurrentSession } from "@/lib/session";
@@ -30,10 +31,13 @@ type Row = {
   department: string | null;
   url: string;
   postedAt: string | null;
+  firstSeenAt: string | null;
   updatedAt: string | null;
   skills: string[];
   seniority: string | null;
   yearsMin: number | null;
+  salaryMin: number | null;
+  salaryMax: number | null;
   remote: boolean;
   description: string;
 };
@@ -48,6 +52,8 @@ type JobsSearchParams = {
   level?: string | string[];
   where?: string | string[];
   source?: string | string[];
+  pay?: string | string[];
+  fresh?: string | string[];
   error?: string | string[];
   imported?: string | string[];
 };
@@ -86,6 +92,19 @@ const PLACES = [
 const SOURCES = [
   ["direct", "Direct posts"],
   ["ats", "Company boards"],
+] as const;
+
+const PAYS = [
+  ["3", "₹3L+"],
+  ["6", "₹6L+"],
+  ["10", "₹10L+"],
+  ["20", "₹20L+"],
+] as const;
+
+const FRESH = [
+  ["24h", "Last 24 hours"],
+  ["3d", "Last 3 days"],
+  ["7d", "Last 7 days"],
 ] as const;
 
 function familyOf(row: { title: string; department: string | null; description: string }): string {
@@ -148,14 +167,16 @@ function updatedLabel(iso: string | null): string | null {
 }
 
 export default async function JobsPage({ searchParams }: { searchParams: Promise<JobsSearchParams> }) {
-  const { q, board, view, family, level, where, source, error, imported } = await searchParams;
+  const { q, board, view, family, level, where, source, pay, fresh, error, imported } = await searchParams;
   const query = pick(q).slice(0, 80);
   const boardToken = pick(board);
   const familyFilter = FAMILIES.some(([value]) => value === pick(family)) ? pick(family) : "";
   const levelFilter = LEVELS.some(([value]) => value === pick(level)) ? pick(level) : "";
   const whereFilter = PLACES.some(([value]) => value === pick(where)) ? pick(where) : "";
   const sourceFilter = SOURCES.some(([value]) => value === pick(source)) ? pick(source) : "";
-  const activeFilters = [familyFilter, levelFilter, whereFilter, sourceFilter].filter(Boolean).length;
+  const payFilter = PAYS.some(([value]) => value === pick(pay)) ? pick(pay) : "";
+  const freshFilter = FRESH.some(([value]) => value === pick(fresh)) ? pick(fresh) : "";
+  const activeFilters = [familyFilter, levelFilter, whereFilter, sourceFilter, payFilter, freshFilter].filter(Boolean).length;
   const errorText = pick(error);
   const importedRef = pick(imported);
   const requestedView = pick(view);
@@ -224,10 +245,13 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
       department: true,
       url: true,
       postedAt: true,
+      firstSeenAt: true,
       updatedAt: true,
       skills: true,
       seniority: true,
       yearsMin: true,
+      salaryMin: true,
+      salaryMax: true,
       remote: true,
       description: true,
     },
@@ -241,6 +265,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
       ? stored.map((row) => ({
           ...row,
           postedAt: row.postedAt ? row.postedAt.toISOString() : null,
+          firstSeenAt: row.firstSeenAt ? row.firstSeenAt.toISOString() : null,
           updatedAt: row.updatedAt ? row.updatedAt.toISOString() : null,
         }))
       : (liveFallback?.postings ?? []).map((posting) => ({
@@ -253,10 +278,13 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
           department: posting.department,
           url: posting.url,
           postedAt: posting.updatedAt,
+          firstSeenAt: null,
           updatedAt: posting.updatedAt,
           skills: [],
           seniority: null,
           yearsMin: null,
+          salaryMin: null,
+          salaryMax: null,
           remote: /remote/i.test(posting.location ?? ""),
           description: "",
         }));
@@ -333,11 +361,28 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
   }
   const candidates = [...unique.values()];
 
+  // The listing window is relative to this request; the clock is the subject.
+  // eslint-disable-next-line react-hooks/purity
+  const nowMs = Date.now();
+  const freshCutoff =
+    freshFilter === "24h"
+      ? nowMs - 86_400_000
+      : freshFilter === "3d"
+        ? nowMs - 3 * 86_400_000
+        : freshFilter === "7d"
+          ? nowMs - 7 * 86_400_000
+          : null;
+
   const filtered = candidates.filter(({ posting, fit }) => {
     if (familyFilter && familyOf(posting) !== familyFilter) return false;
     if (levelFilter && levelOf(posting) !== levelFilter) return false;
     if (whereFilter && placeOf(posting) !== whereFilter) return false;
     if (sourceFilter && sourceKindOf(posting) !== sourceFilter) return false;
+    if (payFilter && (posting.salaryMax ?? posting.salaryMin ?? 0) < Number(payFilter)) return false;
+    if (freshFilter) {
+      const stamp = Date.parse(posting.postedAt ?? posting.firstSeenAt ?? "");
+      if (!Number.isFinite(stamp) || stamp < (freshCutoff ?? 0)) return false;
+    }
 
     const decision = byPosting.get(posting.id);
     if (effectiveView === "saved") return decision === "SAVED";
@@ -386,6 +431,11 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
       trust: assessPosting(entry.posting),
     };
   });
+  const medianPay = medianSalary(
+    rows
+      .map((row) => row.salaryMax ?? row.salaryMin)
+      .filter((value): value is number => value !== null),
+  );
   const activeBoards = BOARDS.filter((board) => (scan?.errors ?? "").indexOf(board.token) === -1);
 
   return (
@@ -428,6 +478,10 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
             <div>
               <dt>Strong matches</dt>
               <dd>{forYouAvailable ? strongCount : "—"}</dd>
+            </div>
+            <div>
+              <dt>Median pay stated</dt>
+              <dd>{medianPay !== null ? `₹${medianPay} LPA` : "—"}</dd>
             </div>
           </dl>
         </div>
@@ -524,6 +578,24 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
             <select defaultValue={sourceFilter} name="source">
               <option value="">Any source</option>
               {SOURCES.map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="jobs-field">
+            <span>Pay</span>
+            <select defaultValue={payFilter} name="pay">
+              <option value="">Any pay</option>
+              {PAYS.map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="jobs-field">
+            <span>Posted</span>
+            <select defaultValue={freshFilter} name="fresh">
+              <option value="">Any time</option>
+              {FRESH.map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
             </select>
@@ -703,6 +775,9 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                         {entry ? <span className="job-tag is-entry">Internship / entry level</span> : null}
                         {posting.remote || /remote/i.test(posting.location ?? "") ? <span className="job-tag">Remote</span> : null}
                         {posting.yearsMin ? <span className="job-tag">{posting.yearsMin}+ years</span> : null}
+                        {formatSalary(posting.salaryMin, posting.salaryMax) ? (
+                          <span className="job-tag is-pay">{formatSalary(posting.salaryMin, posting.salaryMax)}</span>
+                        ) : null}
                         {posting.seniority && !(entry && posting.seniority === "intern") ? (
                           <span className="job-tag">{posting.seniority}</span>
                         ) : null}

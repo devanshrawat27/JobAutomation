@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { prisma } from "@/lib/db";
 import { seniorityOf } from "@/lib/jobs/match";
+import { parseSalary } from "@/lib/jobs/salary";
 import { extractSkills } from "@/lib/jobs/skills";
 import { requiredYears } from "@/lib/match/experience";
 import { getCurrentSession } from "@/lib/session";
@@ -84,6 +85,8 @@ export async function addHiringPost(formData: FormData): Promise<void> {
       skills: extractSkills(`${title} ${description}`, 20),
       seniority: seniorityOf(`${title} ${description.slice(0, 600)}`),
       yearsMin: requiredYears(`${title} ${description.slice(0, 1200)}`),
+      salaryMin: parseSalary(`${title}. ${description}`)?.min ?? null,
+      salaryMax: parseSalary(`${title}. ${description}`)?.max ?? null,
       remote: REMOTE.test(text),
       postedAt,
       hash,

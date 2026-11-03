@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { unsupportedNumbers } from "../src/lib/documents/guard.ts";
+import { formatSalary, medianSalary, parseSalary } from "../src/lib/jobs/salary.ts";
 import { isWithinListingWindow, listingCutoff, postingDate } from "../src/lib/jobs/window.ts";
 import { visiblePostings } from "../src/lib/jobs/visibility.ts";
 
@@ -32,4 +33,32 @@ test("a number that no cited fact contains is caught", () => {
   assert.deepEqual(unsupportedNumbers("Cut latency by 40% for 12 teams", ["Latency dropped 40%"]), ["12"]);
   assert.deepEqual(unsupportedNumbers("Cut latency by 40%", ["Latency dropped 40%"]), []);
   assert.deepEqual(unsupportedNumbers("No metrics here", ["anything"]), []);
+});
+
+test("pay is read from the posting in lakhs per annum", () => {
+  const range = parseSalary("Compensation: ₹15–25 LPA depending on experience.");
+  assert.deepEqual(range && { min: range.min, max: range.max }, { min: 15, max: 25 });
+
+  const compact = parseSalary("Salary ₹1.8–4.2L for this role");
+  assert.deepEqual(compact && { min: compact.min, max: compact.max }, { min: 1.8, max: 4.2 });
+
+  const monthly = parseSalary("Stipend ₹50,000 per month");
+  assert.deepEqual(monthly && { min: monthly.min, max: monthly.max }, { min: 6, max: null });
+
+  assert.equal(parseSalary("5–9 years of experience, 2024–2027 batch"), null);
+  assert.equal(parseSalary("We offer health insurance and learning budget"), null);
+  // Business volume is not pay.
+  assert.equal(
+    parseSalary("Build relationships with 70-80 partner accounts and generate 80-90 lacs Gross Merchandise Value."),
+    null,
+  );
+});
+
+test("salary formatting and median", () => {
+  assert.equal(formatSalary(15, 25), "₹15–25 LPA");
+  assert.equal(formatSalary(18, null), "₹18 LPA");
+  assert.equal(formatSalary(1.8, 4.2), "₹1.8–4.2 LPA");
+  assert.equal(medianSalary([10, 30, 20]), 20);
+  assert.equal(medianSalary([10, 20, 30, 40]), 25);
+  assert.equal(medianSalary([]), null);
 });

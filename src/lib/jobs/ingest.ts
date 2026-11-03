@@ -12,6 +12,7 @@ import { leverAdapter } from "@/lib/jobs/lever";
 import { smartRecruitersPostings } from "@/lib/jobs/smartrecruiters";
 import { mastodonAdapter } from "@/lib/jobs/mastodon";
 import { seniorityOf } from "@/lib/jobs/match";
+import { parseSalary } from "@/lib/jobs/salary";
 import { extractSkills } from "@/lib/jobs/skills";
 import type { BoardRef } from "@/lib/jobs/types";
 import { LISTING_WINDOW_DAYS } from "@/lib/jobs/window";
@@ -196,7 +197,16 @@ export async function scanBoards(trigger: "worker" | "manual" = "manual"): Promi
 
       const existing = await prisma.jobPosting.findMany({
         where: { board: board.token },
-        select: { id: true, externalId: true, hash: true, yearsMin: true, skills: true, seniority: true },
+        select: {
+          id: true,
+          externalId: true,
+          hash: true,
+          yearsMin: true,
+          skills: true,
+          seniority: true,
+          salaryMin: true,
+          salaryMax: true,
+        },
       });
       const byExternal = new Map(existing.map((row) => [row.externalId, row]));
 
@@ -213,6 +223,8 @@ export async function scanBoards(trigger: "worker" | "manual" = "manual"): Promi
         skills: string[];
         seniority: string | null;
         yearsMin: number | null;
+        salaryMin: number | null;
+        salaryMax: number | null;
         remote: boolean;
         postedAt: Date | null;
         hash: string;
@@ -233,6 +245,7 @@ export async function scanBoards(trigger: "worker" | "manual" = "manual"): Promi
         // More than twelve years on a single role is almost always a mis-read
         // (a salary, a headcount); treat it as unstated instead of a gate.
         const yearsMin = rawYears !== null && rawYears <= 12 ? rawYears : null;
+        const salary = parseSalary(`${title}. ${description.slice(0, 6000)}`);
         const remote = /\bremote\b|work from home|anywhere/i.test(`${job.location ?? ""} ${title}`);
         const postedAt =
           job.postedAt && !Number.isNaN(Date.parse(job.postedAt)) ? new Date(job.postedAt) : null;
@@ -257,6 +270,8 @@ export async function scanBoards(trigger: "worker" | "manual" = "manual"): Promi
             skills,
             seniority,
             yearsMin,
+            salaryMin: salary?.min ?? null,
+            salaryMax: salary?.max ?? null,
             remote,
             postedAt,
             hash,
@@ -271,6 +286,8 @@ export async function scanBoards(trigger: "worker" | "manual" = "manual"): Promi
         const derivedChanged =
           known.yearsMin !== yearsMin ||
           known.seniority !== seniority ||
+          known.salaryMin !== (salary?.min ?? null) ||
+          known.salaryMax !== (salary?.max ?? null) ||
           known.skills.length !== skills.length ||
           known.skills.some((skill, index) => skill !== skills[index]);
 
@@ -287,6 +304,8 @@ export async function scanBoards(trigger: "worker" | "manual" = "manual"): Promi
               skills,
               seniority,
               yearsMin,
+              salaryMin: salary?.min ?? null,
+              salaryMax: salary?.max ?? null,
               remote,
               postedAt,
               hash,

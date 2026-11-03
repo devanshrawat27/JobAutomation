@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import CopyText from "@/components/copy-text";
 import { prisma } from "@/lib/db";
 import { checkEligibility, parseEligibility } from "@/lib/jobs/eligibility";
 import { getJobDetail, type ResolvedJob } from "@/lib/jobs/detail";
 import { assessPosting } from "@/lib/jobs/trust";
+import { buildCandidate } from "@/lib/jobs/match";
+import { buildReferralKit } from "@/lib/referrals";
+import { formatSalary } from "@/lib/jobs/salary";
 import { matchJob } from "@/lib/match";
 import { statusLabels, type FactForMatch, type RequirementStatus } from "@/lib/match/types";
 import { getCurrentSession } from "@/lib/session";
@@ -87,6 +91,22 @@ export default async function JobDetailPage({
         })
       : null;
 
+  const referralCandidate = factInput.length > 0 ? buildCandidate(factInput) : null;
+  const referral =
+    detail && session?.user && referralCandidate
+      ? buildReferralKit({
+          company: detail.posting.company,
+          role: detail.posting.title,
+          name: facts.find((fact) => /full name|^name$/i.test(fact.label))?.value ?? null,
+          city: facts.find((fact) => /city|location|based/i.test(fact.label))?.value ?? null,
+          college: facts.find((fact) => /college|university|institute/i.test(fact.label))?.value ?? null,
+          skills: referralCandidate.skills,
+          years: referralCandidate.years,
+          student: referralCandidate.student,
+          graduationYear: referralCandidate.graduationYear,
+        })
+      : null;
+
   const tracked = detail && session?.user
     ? await prisma.application.findFirst({
         where: {
@@ -153,6 +173,9 @@ export default async function JobDetailPage({
             <p className="job-detail-meta">
               {detail.posting.location ? <span>{detail.posting.location}</span> : null}
               {detail.posting.department ? <span>{detail.posting.department}</span> : null}
+              {formatSalary(detail.salaryMin, detail.salaryMax) ? (
+                <span>{formatSalary(detail.salaryMin, detail.salaryMax)}</span>
+              ) : null}
               {detail.postedAt ? (
                 <span>Posting updated {updatedLabel(detail.postedAt)}</span>
               ) : detail.firstSeenAt ? (
@@ -287,6 +310,37 @@ export default async function JobDetailPage({
                   This is a reading aid, not a prediction. Nothing is scored, nothing is submitted, and applying still
                   happens on the employer’s site.
                 </p>
+              </section>
+            ) : null}
+
+            {referral ? (
+              <section aria-labelledby="referrals-title" className="job-referrals">
+                <div className="job-referrals-head">
+                  <div>
+                    <h2 id="referrals-title">People who could refer you</h2>
+                    <p>
+                      We do not read or store LinkedIn profiles. Each search opens in your own session, and the message is
+                      written only from facts you confirmed.
+                    </p>
+                  </div>
+                  <CopyText label="Copy message" text={referral.draft} />
+                </div>
+
+                <ul className="referral-links">
+                  {referral.searches.map((search) => (
+                    <li key={search.label}>
+                      <a href={search.href} rel="noreferrer noopener" target="_blank">
+                        {search.label} <span aria-hidden="true">↗</span>
+                      </a>
+                      <p>{search.detail}</p>
+                    </li>
+                  ))}
+                </ul>
+
+                <details className="referral-draft">
+                  <summary>Read the message</summary>
+                  <p>{referral.draft}</p>
+                </details>
               </section>
             ) : null}
 

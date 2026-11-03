@@ -6,6 +6,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { importJobLink } from "@/lib/jobs/import-link";
 import { seniorityOf } from "@/lib/jobs/match";
+import { parseSalary } from "@/lib/jobs/salary";
 import { extractSkills } from "@/lib/jobs/skills";
 import { requiredYears } from "@/lib/match/experience";
 
@@ -114,6 +115,8 @@ export async function POST(request: Request) {
       skills: extractSkills(`${title} ${description}`, 20),
       seniority: seniorityOf(`${title} ${description.slice(0, 600)}`),
       yearsMin: requiredYears(`${title} ${description.slice(0, 1200)}`),
+      salaryMin: parseSalary(`${title}. ${description}`)?.min ?? null,
+      salaryMax: parseSalary(`${title}. ${description}`)?.max ?? null,
       remote: /\bremote\b|work from home|anywhere/i.test(`${location ?? ""} ${title}`),
       postedAt,
       hash,

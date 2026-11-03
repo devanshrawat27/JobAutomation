@@ -5,6 +5,7 @@ import AppShell from "@/components/app-shell";
 import MatchDonut from "@/components/match-donut";
 import { setJobDecision } from "@/app/actions/jobs";
 import { FOLLOW_UP_DAYS, getDashboardData, NEW_MATCH_DAYS, SCAN_STALE_MINUTES } from "@/lib/dashboard/data";
+import { formatSalary } from "@/lib/jobs/salary";
 import { getCurrentSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
@@ -168,6 +169,9 @@ export default async function DashboardPage() {
                               <b>{match.company}</b>
                               {match.location ? <span>· {match.location}</span> : null}
                               {match.department ? <span>· {match.department}</span> : null}
+                              {formatSalary(match.salaryMin, match.salaryMax) ? (
+                                <span>· {formatSalary(match.salaryMin, match.salaryMax)}</span>
+                              ) : null}
                               <span>· posted {match.postedAt ? day.format(match.postedAt) : day.format(match.firstSeenAt)}</span>
                             </p>
                             <div className="dash-chips">
