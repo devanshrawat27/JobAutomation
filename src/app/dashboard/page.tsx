@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import AppShell from "@/components/app-shell";
+import MatchDonut from "@/components/match-donut";
 import { setJobDecision } from "@/app/actions/jobs";
 import { FOLLOW_UP_DAYS, getDashboardData, NEW_MATCH_DAYS, SCAN_STALE_MINUTES } from "@/lib/dashboard/data";
 import { getCurrentSession } from "@/lib/session";
@@ -192,28 +193,7 @@ export default async function DashboardPage() {
                           </div>
 
                             <div className="dash-match-side">
-                              <span
-                                aria-label={`Match score ${match.score} out of 100`}
-                                className={`dash-donut is-${match.verdict}`}
-                                role="img"
-                                style={{ "--p": match.score } as React.CSSProperties}
-                              >
-                                <svg aria-hidden="true" viewBox="0 0 36 36">
-                                  <circle className="dash-donut-track" cx="18" cy="18" r="15.5" />
-                                  <circle
-                                    className="dash-donut-value"
-                                    cx="18"
-                                    cy="18"
-                                    r="15.5"
-                                    strokeDasharray="97.4"
-                                    strokeDashoffset={97.4 * (1 - match.score / 100)}
-                                  />
-                                </svg>
-                                <span className="dash-donut-body">
-                                  <b>{match.score}</b>
-                                  <small>match</small>
-                                </span>
-                              </span>
+                              <MatchDonut score={match.score} verdict={match.verdict} />
                             <div className="dash-match-actions">
                               <Link className="dash-action" href={`/jobs/${match.board}/${match.externalId}`}>
                                 View match

@@ -500,35 +500,6 @@
 .jobs-scan-error { margin: 8px 0 0; color: var(--danger); font-size: 11.5px; }
 
 .job-match { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; margin-top: 14px; align-items: start; }
-.job-score {
-  display: grid;
-  place-items: center;
-  gap: 1px;
-  padding: 8px 4px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface-soft);
-  font-size: 19px;
-  font-weight: 680;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  color: var(--ink);
-}
-.job-score small {
-  font-family: var(--font-mono);
-  font-size: 7.5px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted-soft);
-}
-.job-score.is-strong { border-color: var(--ok-line); background: var(--ok-soft); color: var(--ok); }
-.job-score.is-strong small { color: var(--ok); }
-.job-score.is-good { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-strong); }
-.job-score.is-good small { color: var(--accent-strong); }
-.job-score.is-possible { border-color: var(--line-strong); }
-.job-score.is-weak { opacity: 0.6; }
-
 .job-match-body { min-width: 0; }
 .job-match .job-fit { margin: 0 0 3px; color: var(--ok); font-size: 12px; }
 .job-gap { margin: 0 0 3px; color: var(--muted); font-size: 11.5px; }
@@ -538,7 +509,6 @@
   .jobs-status .jobs-scan { width: 100%; }
   .job-match { grid-template-columns: 48px minmax(0, 1fr); gap: 10px; }
 }
-
 
 /* How the profile was read ------------------------------------------------- */
 .jobs-read {
@@ -573,7 +543,6 @@
   text-transform: uppercase;
   vertical-align: middle;
 }
-
 
 /* =========================================================================
    Jobs list: framing, views and cards
@@ -759,35 +728,6 @@
 }
 .job-tag.is-entry { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-strong); }
 
-.onboarding-page .job-score {
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  gap: 1px;
-  min-width: 58px;
-  padding: 8px 10px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface-soft);
-  font-size: 20px;
-  font-weight: 680;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.onboarding-page .job-score small {
-  font-family: var(--font-mono);
-  font-size: 7.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted-soft);
-}
-.onboarding-page .job-score.is-strong { border-color: var(--ok-line); background: var(--ok-soft); color: var(--ok); }
-.onboarding-page .job-score.is-strong small { color: var(--ok); }
-.onboarding-page .job-score.is-good { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-strong); }
-.onboarding-page .job-score.is-good small { color: var(--accent-strong); }
-.onboarding-page .job-score.is-possible { color: var(--ink-soft); }
-.onboarding-page .job-score.is-weak { opacity: 0.65; }
-
 .job-match-body {
   display: grid;
   gap: 3px;
@@ -840,7 +780,6 @@
   .onboarding-page .job-card { padding: 16px; }
 }
 
-
 .jobs-gate {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -869,7 +808,6 @@
 }
 
 .job-tag.is-direct { border-color: var(--info-line); background: var(--info-soft); color: var(--info); }
-
 
 /* =========================================================================
    Job cards: a real surface, not a pale box
@@ -934,32 +872,6 @@
 }
 
 /* Score: the first thing the eye should land on. */
-.onboarding-page .job-score {
-  min-width: 64px;
-  padding: 10px 12px 9px;
-  border-radius: 12px;
-  font-size: 24px;
-  font-weight: 720;
-  letter-spacing: -0.03em;
-  background: var(--surface-muted);
-  border-color: var(--line-strong);
-}
-.onboarding-page .job-score small {
-  font-size: 7.5px;
-  letter-spacing: 0.12em;
-  opacity: 0.75;
-}
-.onboarding-page .job-score.is-strong {
-  border-color: #b3e0c6;
-  background: linear-gradient(180deg, #e9f8ef, #d8f0e3);
-  color: #0d6640;
-}
-.onboarding-page .job-score.is-good {
-  border-color: #c9dbfa;
-  background: linear-gradient(180deg, #eaf2ff, #dbe8fd);
-  color: #1a4fc0;
-}
-.onboarding-page .job-score.is-possible { background: var(--surface-soft); color: var(--ink-soft); }
 
 .job-match-body {
   gap: 8px;
@@ -1021,9 +933,6 @@
 :root[data-theme="dark"] .job-tag.is-entry { border-color: #2b3d5e; background: #1a2740; color: #9dbcff; }
 :root[data-theme="dark"] .job-tag.is-direct { border-color: #274232; background: #16281f; color: #7cc79a; }
 :root[data-theme="dark"] .job-chip { border-color: #274232; background: #16281f; color: #7cc79a; }
-:root[data-theme="dark"] .job-score.is-strong { border-color: #274232; background: linear-gradient(180deg, #12241b, #0e1d16); color: #7cc79a; }
-:root[data-theme="dark"] .job-score.is-good { border-color: #2b3d5e; background: linear-gradient(180deg, #16233a, #121c30); color: #9dbcff; }
-
 
 /* =========================================================================
    Badges with weight: solid, saturated, legible at a glance
@@ -1049,28 +958,6 @@
   color: #fff;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), 0 2px 6px rgb(15 107 68 / 25%);
 }
-
-.onboarding-page .job-score {
-  border: 1px solid #0d7a4e;
-  background: linear-gradient(180deg, #17a06a, #0d7a4e);
-  color: #fff;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), 0 8px 18px -8px rgb(13 122 78 / 60%);
-}
-.onboarding-page .job-score small { color: rgb(255 255 255 / 88%); opacity: 1; }
-.onboarding-page .job-score.is-good {
-  border-color: #1d4ed8;
-  background: linear-gradient(180deg, #3d7df7, #1d4ed8);
-  color: #fff;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), 0 8px 18px -8px rgb(29 78 216 / 55%);
-}
-.onboarding-page .job-score.is-good small { color: rgb(255 255 255 / 88%); }
-.onboarding-page .job-score.is-possible {
-  border-color: var(--line-strong);
-  background: var(--surface-muted);
-  color: var(--ink-soft);
-  box-shadow: none;
-}
-.onboarding-page .job-score.is-possible small { color: var(--muted); }
 
 .job-chip {
   padding: 4px 10px 4px 8px;
@@ -1100,14 +987,6 @@
 :root[data-theme="dark"] .job-why { color: #9fb0c6; }
 
 /* The earlier pastel rule out-ranked the new base tile; make the strong state explicit. */
-.onboarding-page .job-score.is-strong {
-  border: 1px solid #0d7a4e;
-  background: linear-gradient(180deg, #17a06a, #0d7a4e);
-  color: #fff;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), 0 8px 18px -8px rgb(13 122 78 / 60%);
-}
-.onboarding-page .job-score.is-strong small { color: rgb(255 255 255 / 88%); opacity: 1; }
-
 
 /* =========================================================================
    Global surface pass: every page, one visual language
@@ -1288,7 +1167,6 @@
   }
 }
 
-
 /* A verdict spine on every card: the list stops looking like paper. */
 .onboarding-page .job-card { overflow: hidden; }
 .onboarding-page .job-card::before {
@@ -1343,7 +1221,6 @@
   border-bottom-color: var(--line-strong);
 }
 
-
 /* A disabled action should read as unavailable, not as a pale blue button. */
 .onboarding-page .onboarding-submit:disabled,
 .onboarding-page .onboarding-submit[aria-disabled="true"] {
@@ -1354,7 +1231,6 @@
   opacity: 1;
   cursor: not-allowed;
 }
-
 
 /* Filter bar ------------------------------------------------------------- */
 .onboarding-page .jobs-filters--chips {
@@ -1464,7 +1340,6 @@
   word-break: break-all;
 }
 
-
 /* Saved filter chips ------------------------------------------------------ */
 .saved-filters { margin-top: 10px; }
 .saved-filters-row {
@@ -1534,7 +1409,6 @@
 }
 .saved-filters-add button:disabled { opacity: 0.45; cursor: not-allowed; }
 .saved-filters-add button:not(:disabled):hover { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-strong); }
-
 
 /* =========================================================================
    Signed-in shell: sidebar + workspace
@@ -1698,7 +1572,6 @@
   .app-main .jobs-shell { width: calc(100% - 28px); }
 }
 
-
 /* Profile header ---------------------------------------------------------- */
 .profile-head {
   display: grid;
@@ -1771,7 +1644,6 @@
   .profile-head { grid-template-columns: 56px minmax(0, 1fr); gap: 14px; }
   .profile-avatar { width: 56px; height: 56px; border-radius: 16px; font-size: 19px; }
 }
-
 
 /* Score breakdown --------------------------------------------------------- */
 .job-breakdown { margin-top: 6px; }
@@ -1876,7 +1748,6 @@
 .app-card small { color: var(--muted); font-size: 10px; }
 .app-card time { color: var(--muted-soft); font-family: var(--font-mono); font-size: 9px; }
 
-
 /* Priority rating --------------------------------------------------------- */
 .app-priority {
   color: #d79a2b;
@@ -1907,7 +1778,6 @@
   color: #b47a12;
 }
 
-
 /* Paste a link ------------------------------------------------------------ */
 .jobs-import {
   display: grid;
@@ -1934,7 +1804,6 @@
   .jobs-import-submit { width: 100%; justify-content: center; }
 }
 
-
 /* Eligibility and trust chips -------------------------------------------- */
 .job-tag.is-warn {
   border-color: var(--warn-line);
@@ -1946,7 +1815,6 @@
   background: var(--danger-soft);
   color: var(--danger);
 }
-
 
 /* Eligibility and trust panels ------------------------------------------- */
 .job-trust-panel,
@@ -1980,7 +1848,6 @@
 .job-eligibility.is-check { border-color: var(--warn-line); background: var(--warn-soft); }
 .job-eligibility.is-check h2 { color: var(--warn); }
 .job-eligibility p { margin: 8px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
-
 
 /* Digest ------------------------------------------------------------------ */
 .digest-grid {
@@ -2019,7 +1886,6 @@
 @media (max-width: 860px) {
   .digest-grid { grid-template-columns: 1fr; }
 }
-
 
 /* Form details on the profile --------------------------------------------- */
 .profile-form-details {
@@ -2279,50 +2145,51 @@
 
 .dash-match-side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
 
-/* Score as a ring: the arc is the score out of 100, the number sits inside. */
-.dash-donut {
+/* Score as a ring: the arc is the score out of 100, the number sits inside.
+   Used on /jobs and /dashboard so the two never drift. */
+.match-donut {
   position: relative;
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
+  width: var(--donut-size, 56px);
+  height: var(--donut-size, 56px);
   flex: none;
 }
-.dash-donut svg {
+.match-donut svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   transform: rotate(-90deg);
 }
-.dash-donut circle { fill: none; stroke-width: 3.4; }
-.dash-donut-track { stroke: var(--line); }
-.dash-donut-value {
+.match-donut circle { fill: none; stroke-width: 3.4; }
+.match-donut-track { stroke: var(--line); }
+.match-donut-value {
   stroke: var(--accent);
   stroke-linecap: round;
   stroke-dasharray: 97.4;
 }
-.dash-donut-body { display: grid; place-items: center; line-height: 1; }
-.dash-donut-body b {
+.match-donut-body { display: grid; place-items: center; line-height: 1; }
+.match-donut-body b {
   color: var(--ink);
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: calc(var(--donut-size, 56px) * 0.27);
   font-weight: 650;
   letter-spacing: -0.02em;
 }
-.dash-donut-body small {
+.match-donut-body small {
   margin-top: 2px;
   color: var(--muted-soft);
-  font-size: 7px;
+  font-size: calc(var(--donut-size, 56px) * 0.125);
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
-.dash-donut.is-strong .dash-donut-value { stroke: #17a06a; }
-.dash-donut.is-good .dash-donut-value { stroke: var(--accent); }
-.dash-donut.is-possible .dash-donut-value { stroke: #d97706; }
-.dash-donut.is-weak .dash-donut-value { stroke: var(--muted-soft); }
-.dash-donut.is-strong .dash-donut-body b { color: #0d7a4e; }
+.match-donut.is-strong .match-donut-value { stroke: #17a06a; }
+.match-donut.is-good .match-donut-value { stroke: var(--accent); }
+.match-donut.is-possible .match-donut-value { stroke: #d97706; }
+.match-donut.is-weak .match-donut-value { stroke: var(--muted-soft); }
+.match-donut.is-strong .match-donut-body b { color: #0d7a4e; }
 .dash-match-actions { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
 .dash-action {
   padding: 5px 9px;

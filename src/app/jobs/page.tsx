@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import Link from "next/link";
 
 import AppShell from "@/components/app-shell";
+import MatchDonut from "@/components/match-donut";
 
 import { addHiringPost } from "@/app/actions/hiring-post";
 import { importJob } from "@/app/actions/import-job";
@@ -730,10 +731,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                       </p>
                     </div>
                     {fit ? (
-                      <div className={`job-score is-${fit.verdict}`}>
-                        {fit.score}
-                        <small>match</small>
-                      </div>
+                      <MatchDonut score={fit.score} verdict={fit.verdict} size={64} />
                     ) : null}
                   </div>
 
