@@ -134,28 +134,6 @@ export default async function AppShell({
           <span>jobautomation</span>
         </Link>
 
-        {session?.user ? (
-          <Link className="app-user" href="/profile">
-            <span aria-hidden="true" className="app-avatar">
-              {initials(name)}
-            </span>
-            <span className="app-user-body">
-              <strong>{name}</strong>
-              <small>{headline}</small>
-            </span>
-          </Link>
-        ) : (
-          <Link className="app-user" href="/sign-in?next=%2Fdashboard">
-            <span aria-hidden="true" className="app-avatar">
-              {initials(name)}
-            </span>
-            <span className="app-user-body">
-              <strong>{name}</strong>
-              <small>Sign in to save a profile</small>
-            </span>
-          </Link>
-        )}
-
         <nav aria-label="Workspace" className="app-nav">
           {LINKS.map((link) => (
             <Link
@@ -194,10 +172,21 @@ export default async function AppShell({
         <div className="app-side-foot">
           {session?.user ? (
             <>
-              <span className="app-user-email" title={session.user.email}>
-                {session.user.email}
-              </span>
-              <SignOutButton />
+              <Link className="app-user app-user--foot" href="/profile">
+                <span aria-hidden="true" className="app-avatar">
+                  {initials(name)}
+                </span>
+                <span className="app-user-body">
+                  <strong>{name}</strong>
+                  <small>{headline}</small>
+                </span>
+              </Link>
+              <div className="app-side-meta">
+                <span className="app-user-email" title={session.user.email}>
+                  {session.user.email}
+                </span>
+                <SignOutButton />
+              </div>
             </>
           ) : (
             <Link className="app-side-cta" href="/onboarding/resume?path=new-grad">

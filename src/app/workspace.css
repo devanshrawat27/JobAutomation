@@ -1484,13 +1484,18 @@
 /* The address and the way out sit at the foot of the sidebar. */
 .app-side-foot {
   margin-top: auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
   gap: 8px;
   padding-top: 10px;
   border-top: 1px solid var(--line);
 }
+.app-side-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.app-user--foot { padding: 6px 8px; border-color: var(--line); background: var(--surface-soft); }
 .app-side-foot .app-side-cta { width: 100%; }
 .app-user-email {
   min-width: 0;
@@ -2392,15 +2397,16 @@
 /* A page header is a header, not a hero. */
 .jobs-shell { padding-top: 26px; }
 .jobs-hero {
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 32px;
-  align-items: start;
+  display: block;
   padding-bottom: 18px;
 }
 .jobs-stats {
   display: flex;
-  gap: 26px;
+  gap: 32px;
+  margin: 18px 0 0;
+  padding: 14px 0 0;
   border: 0;
+  border-top: 1px solid var(--line);
   border-radius: 0;
   background: none;
   overflow: visible;
@@ -2639,7 +2645,9 @@
 .profile-counts-line { margin: 0 0 18px; color: var(--muted); font-size: 11.5px; }
 
 /* Sidebar: one row per destination, like a real workspace. */
-.app-shell { grid-template-columns: 240px minmax(0, 1fr); }
+@media (min-width: 981px) {
+  .app-shell { grid-template-columns: 240px minmax(0, 1fr); }
+}
 .app-side { gap: 14px; padding: 16px 12px 14px; }
 .app-brand { font-size: 13px; }
 .app-brand .brand-mark { width: 24px; height: 24px; border-radius: 7px 7px 7px 2px; }
