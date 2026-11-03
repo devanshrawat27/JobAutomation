@@ -3,6 +3,7 @@
 import { Document, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 
 export type ResumePdfData = {
+  contact?: string[];
   headline?: string;
   summary?: string;
   sections?: Array<{ title: string; lines: Array<{ text: string }> }>;
@@ -19,6 +20,7 @@ const styles = StyleSheet.create({
     color: "#111111",
   },
   headline: { fontSize: 16, fontFamily: "Helvetica-Bold", marginBottom: 5 },
+  contact: { fontSize: 9, color: "#444444", marginBottom: 6 },
   summary: { fontSize: 9.5, color: "#333333", marginBottom: 12 },
   section: { marginBottom: 10 },
   sectionTitle: {
@@ -51,6 +53,9 @@ function ResumePdf({ data, footer }: { data: ResumePdfData; footer: string }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        {data.contact && data.contact.length > 0 ? (
+          <Text style={styles.contact}>{data.contact.join(" · ")}</Text>
+        ) : null}
         {data.headline ? <Text style={styles.headline}>{data.headline}</Text> : null}
         {data.summary ? <Text style={styles.summary}>{data.summary}</Text> : null}
 

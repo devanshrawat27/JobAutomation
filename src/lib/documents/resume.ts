@@ -10,6 +10,8 @@ export type ResumeLine = { text: string; factKeys: string[] };
 export type ResumeSection = { title: string; lines: ResumeLine[] };
 
 export type ResumeDocument = {
+  /** Name, email, phone, city and links, taken straight from confirmed facts. */
+  contact: string[];
   headline: string;
   summary: string;
   sections: ResumeSection[];
@@ -113,6 +115,28 @@ function compact(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }
 
+/**
+ * A resume without an email or phone fails the first ATS check and the first
+ * human glance. This block is copied from confirmed facts, never written by the
+ * model, so it cannot be invented.
+ */
+export function contactBlock(facts: CoverLetterFact[]): string[] {
+  const pick = (pattern: RegExp) =>
+    facts.find((fact) => pattern.test(fact.label) || pattern.test(fact.key))?.value.trim();
+
+  const values = [
+    pick(/full name|^name$/i),
+    pick(/e-?mail/i),
+    pick(/phone|mobile|contact number/i),
+    pick(/city|location|based in/i),
+    pick(/github/i),
+    pick(/linkedin/i),
+    pick(/portfolio|website/i),
+  ].filter((value): value is string => Boolean(value && value.length > 0));
+
+  return [...new Set(values)].slice(0, 6);
+}
+
 function guardLine(
   text: string,
   factIds: string[],
@@ -201,7 +225,15 @@ async function buildOnce(
   const totalLines = sections.reduce((count, section) => count + section.lines.length, 0);
   if (totalLines < 3) throw new Error("no resume line passed the fact guard");
 
+  const contact = contactBlock(input.facts);
+  for (const value of contact) {
+    for (const fact of input.facts) {
+      if (fact.value.trim() === value) cited.add(fact.key);
+    }
+  }
+
   const plainText = [
+    contact.join(" · "),
     parsed.data.headline,
     summary,
     ...sections.map((section) => `${section.title}\n${section.lines.map((line) => `• ${line.text}`).join("\n")}`),
@@ -210,6 +242,7 @@ async function buildOnce(
     .join("\n\n");
 
   return {
+    contact,
     headline: compact(parsed.data.headline),
     summary,
     sections,

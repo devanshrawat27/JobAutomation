@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { createApplication } from "@/app/actions/applications";
 import { rebuildDocument, regenerateWithFixes, updateDocumentContent } from "@/app/actions/documents";
 import { prisma } from "@/lib/db";
+import { checkResume } from "@/lib/documents/ats";
 import { getCurrentSession } from "@/lib/session";
 import CopyButton from "./copy-button";
 
@@ -55,6 +56,29 @@ export default async function DocumentPage({
 
   const isResume = document.kind === "RESUME";
   const resume = isResume ? (document.data as ResumeData | null) : null;
+
+  const postingParts = document.postingId.split(":");
+  const postingSkills =
+    isResume && postingParts.length === 3
+      ? (
+          await prisma.jobPosting.findFirst({
+            where: { board: postingParts[1], externalId: postingParts[2] },
+            select: { skills: true },
+          })
+        )?.skills ?? []
+      : [];
+
+  const ats = isResume
+    ? checkResume({
+        content: document.content,
+        shape: {
+          headline: resume?.headline,
+          summary: resume?.summary,
+          sections: (resume?.sections ?? []).map((section) => ({ title: section.title })),
+        },
+        jobSkills: postingSkills,
+      })
+    : null;
 
   // Version chain: walk back through rebuilds, then forward to the newest.
   const chain: string[] = [document.id];
@@ -268,6 +292,42 @@ export default async function DocumentPage({
                 </button>
               </form>
             ) : null}
+          </section>
+        ) : null}
+
+        {ats ? (
+          <section aria-labelledby="ats-title" className="doc-ats">
+            <div className="doc-ats-head">
+              <div>
+                <h2 id="ats-title">ATS read</h2>
+                <p>Deterministic checks on structure. Every point is a rule, not an opinion.</p>
+              </div>
+              <span className={`doc-ats-score is-${ats.grade}`}>
+                {ats.score}
+                <small>/100</small>
+              </span>
+            </div>
+            <p className={`doc-ats-summary is-${ats.grade}`}>{ats.summary}</p>
+            <ul className="doc-ats-checks">
+              {ats.checks.map((check) => (
+                <li className={`is-${check.status}`} key={check.id}>
+                  <span aria-hidden="true" className="doc-ats-state">
+                    {check.status === "pass" ? "✓" : check.status === "warn" ? "!" : "×"}
+                  </span>
+                  <div>
+                    <strong>{check.label}</strong>
+                    <p>{check.detail}</p>
+                  </div>
+                  <span className="doc-ats-points">
+                    {check.points}/{check.max}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="jobs-note">
+              This reads structure, not meaning. It cannot tell whether the work was good — only whether a parser and a
+              six-second scan will find it.
+            </p>
           </section>
         ) : null}
 

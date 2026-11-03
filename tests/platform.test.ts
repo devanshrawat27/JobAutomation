@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { unsupportedNumbers } from "../src/lib/documents/guard.ts";
+import { checkResume } from "../src/lib/documents/ats.ts";
 import { formatSalary, medianSalary, parseSalary } from "../src/lib/jobs/salary.ts";
 import { isWithinListingWindow, listingCutoff, postingDate } from "../src/lib/jobs/window.ts";
 import { visiblePostings } from "../src/lib/jobs/visibility.ts";
@@ -61,4 +62,29 @@ test("salary formatting and median", () => {
   assert.equal(medianSalary([10, 30, 20]), 20);
   assert.equal(medianSalary([10, 20, 30, 40]), 25);
   assert.equal(medianSalary([]), null);
+});
+
+test("the ATS read rewards structure and exposes gaps", () => {
+  const strong = checkResume({
+    content: [
+      "Devansh Rawat",
+      "devansh@example.com · +91 98765 43210",
+      "Experience",
+      "Acme — Software Engineer, 2024 – 2025",
+      "- Built a payments service handling 2M requests and cut latency 40%",
+      "- Led 4 engineers and shipped weekly",
+      "Education",
+      "B.Tech in Computer Science, 2023 – 2027",
+      "Skills",
+      "React, TypeScript, Node.js, PostgreSQL",
+    ].join("\n"),
+    shape: { sections: [{ title: "Experience" }, { title: "Education" }, { title: "Skills" }] },
+    jobSkills: ["React", "TypeScript", "Node.js"],
+  });
+  assert.ok(strong.score >= 80, `expected a strong score, got ${strong.score}`);
+  assert.equal(strong.checks.find((check) => check.id === "contact")?.status, "pass");
+
+  const weak = checkResume({ content: "I am a hardworking person. I want a job.", jobSkills: ["React"] });
+  assert.equal(weak.grade, "weak");
+  assert.ok(weak.score < 40, `expected a weak score, got ${weak.score}`);
 });

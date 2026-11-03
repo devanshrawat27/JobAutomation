@@ -167,6 +167,7 @@ export async function createResume(formData: FormData): Promise<void> {
       company: context.company.slice(0, 120),
       content: resume.plainText,
       data: {
+        contact: resume.contact,
         headline: resume.headline,
         summary: resume.summary,
         sections: resume.sections,

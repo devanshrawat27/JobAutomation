@@ -10,6 +10,7 @@ import SavedFilters from "@/components/saved-filters";
 import { scanNow, setJobDecision } from "@/app/actions/jobs";
 import { BOARDS } from "@/lib/jobs/boards";
 import { searchJobs } from "@/lib/jobs";
+import { companySlug } from "@/lib/jobs/company";
 import { lastScan } from "@/lib/jobs/ingest";
 import { visiblePostings } from "@/lib/jobs/detail";
 import { listingWindowWhere } from "@/lib/jobs/window";
@@ -767,7 +768,9 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                         <Link href={`/jobs/${posting.board}/${posting.externalId}`}>{posting.title}</Link>
                       </h2>
                       <p className="job-card-meta">
-                        <b>{posting.company}</b>
+                        <Link className="job-company" href={`/company/${companySlug(posting.company)}`}>
+                          {posting.company}
+                        </Link>
                         {posting.location ? <><span aria-hidden="true">·</span><span>{posting.location}</span></> : null}
                         {posting.department ? <><span aria-hidden="true">·</span><span>{posting.department}</span></> : null}
                       </p>

@@ -5,6 +5,7 @@ import AppShell from "@/components/app-shell";
 import MatchDonut from "@/components/match-donut";
 import { setJobDecision } from "@/app/actions/jobs";
 import { FOLLOW_UP_DAYS, getDashboardData, NEW_MATCH_DAYS, SCAN_STALE_MINUTES } from "@/lib/dashboard/data";
+import { companySlug } from "@/lib/jobs/company";
 import { formatSalary } from "@/lib/jobs/salary";
 import { getCurrentSession } from "@/lib/session";
 
@@ -166,7 +167,9 @@ export default async function DashboardPage() {
                               {match.saved ? <span className="dash-tag is-saved">Saved</span> : null}
                             </div>
                             <p className="dash-match-meta">
-                              <b>{match.company}</b>
+                              <Link className="job-company" href={`/company/${companySlug(match.company)}`}>
+                                {match.company}
+                              </Link>
                               {match.location ? <span>· {match.location}</span> : null}
                               {match.department ? <span>· {match.department}</span> : null}
                               {formatSalary(match.salaryMin, match.salaryMax) ? (
