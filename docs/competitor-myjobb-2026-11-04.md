@@ -1,6 +1,6 @@
 # Competitor read: myjobb.ai
 
-Accessed 4 Nov 2026. Public pages only (`/`, `/features`, `/features/ai-job-matching`, `/features/referral-finder`, `/features/ai-resume-builder`, `/pricing`, `/changelog`, `/jobs/browse`, one city/role listing). No account was created and no private screen was opened. REA was not used: the workspace rule keeps it off competitor web apps, and nothing here needed it.
+Accessed 4 Nov 2026. Public pages only (`/`, `/features`, `/features/ai-job-matching`, `/features/referral-finder`, `/features/ai-resume-builder`, `/pricing`, `/changelog`, `/jobs/browse`, one city/role listing). No account was created and no private screen was opened. The workspace now explicitly permits REA on public/black-box competitor surfaces (public pages, shipped bundles, public endpoints, store-listed extensions); an earlier public analysis of myjobb already sits in `reverse Engineering/myjobb-engine-analysis.md`.
 
 ## What they are
 
