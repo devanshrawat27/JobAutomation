@@ -9,13 +9,54 @@ import { getCurrentSession } from "@/lib/session";
 
 type Active = "dashboard" | "profile" | "jobs" | "documents" | "applications" | "digest";
 
-const LINKS: Array<{ key: Active; href: string; label: string; hint: string }> = [
-  { key: "dashboard", href: "/dashboard", label: "Overview", hint: "What needs you today" },
-  { key: "jobs", href: "/jobs", label: "Discover jobs", hint: "Live roles, ranked for you" },
-  { key: "applications", href: "/applications", label: "Applications", hint: "What you sent, when" },
-  { key: "documents", href: "/documents", label: "Documents", hint: "Resumes and letters" },
-  { key: "profile", href: "/profile", label: "My profile", hint: "The facts every answer cites" },
-  { key: "digest", href: "/digest", label: "Daily digest", hint: "What changed since last time" },
+const ICONS = {
+  overview: (
+    <svg fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 16 16" width="15">
+      <rect height="5" rx="1" width="5" x="2" y="2" />
+      <rect height="5" rx="1" width="5" x="9" y="2" />
+      <rect height="5" rx="1" width="5" x="2" y="9" />
+      <rect height="5" rx="1" width="5" x="9" y="9" />
+    </svg>
+  ),
+  jobs: (
+    <svg fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 16 16" width="15">
+      <rect height="8" rx="1.2" width="12" x="2" y="5" />
+      <path d="M5.6 5V3.6a1 1 0 0 1 1-1h2.8a1 1 0 0 1 1 1V5M2 8.4h12" />
+    </svg>
+  ),
+  applications: (
+    <svg fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 16 16" width="15">
+      <path d="M14 2 6.6 9.4" />
+      <path d="M14 2 9.7 14l-3.1-4.6L2 6.3 14 2Z" />
+    </svg>
+  ),
+  documents: (
+    <svg fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 16 16" width="15">
+      <path d="M4 2h5l3 3v9H4V2Z" />
+      <path d="M9 2v3h3M6.2 8h3.6M6.2 10.6h3.6" />
+    </svg>
+  ),
+  profile: (
+    <svg fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 16 16" width="15">
+      <circle cx="8" cy="5.4" r="2.6" />
+      <path d="M2.9 13.4c0-2.5 2.3-4 5.1-4s5.1 1.5 5.1 4" />
+    </svg>
+  ),
+  digest: (
+    <svg fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 16 16" width="15">
+      <rect height="11" rx="1.4" width="12" x="2" y="3" />
+      <path d="M2 6.4h12M5.4 2v2.2M10.6 2v2.2M5.2 9.2h2.2" />
+    </svg>
+  ),
+} as const;
+
+const LINKS: Array<{ key: Active; href: string; label: string; hint: string; icon: keyof typeof ICONS }> = [
+  { key: "dashboard", href: "/dashboard", label: "Overview", hint: "What needs you today", icon: "overview" },
+  { key: "jobs", href: "/jobs", label: "Discover jobs", hint: "Live roles, ranked for you", icon: "jobs" },
+  { key: "applications", href: "/applications", label: "Applications", hint: "What you sent, when", icon: "applications" },
+  { key: "documents", href: "/documents", label: "Documents", hint: "Resumes and letters", icon: "documents" },
+  { key: "profile", href: "/profile", label: "My profile", hint: "The facts every answer cites", icon: "profile" },
+  { key: "digest", href: "/digest", label: "Daily digest", hint: "What changed since last time", icon: "digest" },
 ];
 
 function initials(name: string): string {
@@ -121,9 +162,10 @@ export default async function AppShell({
               className={`app-nav-link${active === link.key ? " is-active" : ""}`}
               href={link.href}
               key={link.key}
+              title={link.hint}
             >
+              <span aria-hidden="true" className="app-nav-icon">{ICONS[link.icon]}</span>
               <span className="app-nav-label">{link.label}</span>
-              <span className="app-nav-hint">{link.hint}</span>
               {counts[link.key] !== null ? <span className="app-nav-count">{counts[link.key]}</span> : null}
             </Link>
           ))}

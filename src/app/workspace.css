@@ -2637,6 +2637,45 @@
   font-weight: 600;
 }
 .profile-counts-line { margin: 0 0 18px; color: var(--muted); font-size: 11.5px; }
+
+/* Sidebar: one row per destination, like a real workspace. */
+.app-shell { grid-template-columns: 240px minmax(0, 1fr); }
+.app-side { gap: 14px; padding: 16px 12px 14px; }
+.app-brand { font-size: 13px; }
+.app-brand .brand-mark { width: 24px; height: 24px; border-radius: 7px 7px 7px 2px; }
+.app-brand .brand-mark span { width: 9px; height: 9px; }
+.app-user { grid-template-columns: 32px minmax(0, 1fr); gap: 9px; padding: 8px; }
+.app-avatar { width: 32px; height: 32px; border-radius: 7px; font-size: 11px; }
+.app-user-body strong { font-size: 12.5px; font-weight: 620; }
+.app-user-body small { font-size: 10px; letter-spacing: 0; }
+.app-nav { gap: 1px; margin-top: 2px; }
+.app-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 9px;
+  border-radius: 6px;
+}
+.app-nav-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 16px;
+  color: var(--muted-soft);
+  transition: color 0.15s ease;
+}
+.app-nav-link:hover { background: var(--surface-soft); color: var(--ink); }
+.app-nav-link:hover .app-nav-icon,
+.app-nav-link.is-active .app-nav-icon { color: var(--ink); }
+.app-nav-label { margin-right: auto; font-size: 12.5px; font-weight: 550; letter-spacing: -0.005em; }
+.app-nav-count { font-size: 9.5px; padding: 1px 5px; }
+.app-progress { padding: 10px 11px; }
+.app-progress-head span,
+.app-progress-head strong { font-size: 10.5px; }
+.app-progress-track { height: 4px; }
+.app-progress-note { font-size: 10px; }
+.app-side-foot { padding-top: 9px; }
+.app-user-email { font-size: 10px; }
 .jobs-tabs a span,
 .app-nav-hint,
 .job-card-meta,
