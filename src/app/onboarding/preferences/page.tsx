@@ -116,7 +116,7 @@ export default async function PreferencesPage() {
           <span aria-hidden="true" className="brand-mark"><span /></span>
           <span>jobautomation</span>
         </Link>
-        <span className="onboarding-step">Onboarding · 6 short steps</span>
+        <span className="onboarding-step">About 3 minutes · no wrong answers</span>
       </header>
 
       <PreferencesWizard
@@ -146,6 +146,11 @@ export default async function PreferencesPage() {
         suggestedCity={cityFromProfile ?? "Bengaluru"}
         hasResume={experience.length > 0 || skillValues.length > 0}
       />
+
+      <footer className="onboarding-footer">
+        <Link href="/onboarding/resume">← Your resume</Link>
+        <span>Every answer here is editable later on your profile.</span>
+      </footer>
     </main>
   );
 }

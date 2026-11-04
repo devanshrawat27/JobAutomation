@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getCurrentSession } from "@/lib/session";
 import OnboardingForm from "./onboarding-form";
+import Link from "next/link";
 
 type CandidatePath = "new-grad" | "experienced";
 
@@ -23,9 +24,24 @@ export default async function OnboardingPage({
     : 0;
 
   return (
-    <OnboardingForm
-      factCount={factCount}
-      initialPath={isCandidatePath(path) ? path : ""}
-    />
+    <main className="onboarding-page">
+      <header className="onboarding-header">
+        <Link aria-label="JobAutomation home" className="brand" href="/">
+          <span aria-hidden="true" className="brand-mark"><span /></span>
+          <span>jobautomation</span>
+        </Link>
+        <span className="onboarding-step">About 8 minutes · no wrong answers</span>
+      </header>
+
+      <OnboardingForm
+        factCount={factCount}
+        initialPath={isCandidatePath(path) ? path : ""}
+      />
+
+      <footer className="onboarding-footer">
+        <Link href="/">← Back to home</Link>
+        <span>Your facts stay yours. You review what gets used.</span>
+      </footer>
+    </main>
   );
 }

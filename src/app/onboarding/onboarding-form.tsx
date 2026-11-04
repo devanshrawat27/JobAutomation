@@ -35,35 +35,31 @@ export default function OnboardingForm({
   }
 
   return (
-    <main className="onboarding-page">
-      <header className="onboarding-header">
-        <Link className="brand" href="/" aria-label="JobAutomation home">
-          <span className="brand-mark" aria-hidden="true"><span /></span>
-          <span>jobautomation</span>
-        </Link>
-        <span className="onboarding-step">Step 1 of 8 <span aria-hidden="true">·</span> about a minute</span>
-      </header>
-      <div className="onboarding-progress" aria-hidden="true"><i style={{ width: "12.5%" }} /></div>
+    <div className="wiz-shell">
+      <aside className="wiz-aside" aria-hidden="true">
+        <span className="wiz-aside-glyph">01</span>
+        <div className="wiz-aside-top">
+          <p className="wiz-aside-kicker">Your starting point</p>
+          <p className="wiz-aside-line">let&rsquo;s begin.</p>
+        </div>
+        <div className="wiz-aside-foot">
+          <div className="wiz-track-bar"><i style={{ width: "12.5%" }} /></div>
+          <p className="wiz-aside-note">8 short steps · stop and return whenever you like</p>
+        </div>
+      </aside>
 
-      <section className="onboarding-content" aria-labelledby="onboarding-title">
-        <p className="section-kicker">A profile shaped around you</p>
+      <section className="wiz-main" aria-labelledby="onboarding-title">
+        <p className="wiz-main-kicker">Step 1 of 8</p>
         <h1 id="onboarding-title">Where are you in your career?</h1>
         <p className="onboarding-intro">
-          Choose the starting point that fits today. We’ll use it to prioritize the profile details that matter to you.
+          Choose the starting point that fits today. It only decides which questions we ask first — every path ends with
+          the same reviewable profile.
         </p>
 
         {hasProfile ? (
-          <div className="profile-exists">
-            <p>
-              <strong>You already have a profile</strong> — {factCount} confirmed {factCount === 1 ? "detail" : "details"}.
-              Picking a path only changes which questions we suggest next.
-            </p>
-            <div className="profile-exists-actions">
-              <Link className="onboarding-submit" href="/profile">
-                Open my profile <span aria-hidden="true">→</span>
-              </Link>
-              <Link className="intake-secondary" href="/jobs">Find jobs</Link>
-            </div>
+          <div className="wiz-fineprint">
+            You already have {factCount} confirmed {factCount === 1 ? "detail" : "details"} on this account. Picking a path
+            only changes which questions we suggest next.
           </div>
         ) : null}
 
@@ -93,39 +89,35 @@ export default function OnboardingForm({
               ))}
             </fieldset>
 
-            <div className="path-form-footer">
-              <p>You can change this later. Your career history can include education, internships, and professional work.</p>
-              <button className="onboarding-submit" type="submit" disabled={!selectedPath}>
+            <div className="wiz-nav">
+              <Link className="wiz-back" href="/">← Home</Link>
+              <button className="wiz-next" type="submit" disabled={!selectedPath}>
                 Continue <span aria-hidden="true">→</span>
               </button>
             </div>
+            <p className="wiz-skip">
+              <span>You can change this later. Your history can include education, internships and professional work.</span>
+            </p>
           </form>
         ) : (
-          <div className="path-confirmation" role="status" aria-live="polite">
-            <span className="confirmation-mark" aria-hidden="true">✓</span>
-            <div>
-              <p className="confirmation-kicker">Starting point selected</p>
-              <h2>{paths[selectedPath as CandidatePath].label}</h2>
-              <p className="confirmation-copy">
-                Next, you’ll add a resume and review the profile details suggested from it. You’ll be able to correct or skip any suggestion.
-              </p>
-              <div className="confirmation-actions">
-                <Link className="onboarding-submit" href={`/onboarding/resume?path=${selectedPath}`}>
-                  Add your resume <span aria-hidden="true">→</span>
-                </Link>
-                <button className="text-button" type="button" onClick={() => setContinued(false)}>
-                  Change my selection
-                </button>
-              </div>
+          <div className="wiz-brief" role="status" aria-live="polite">
+            <h2 className="path-confirm-title">{paths[selectedPath as CandidatePath].label}</h2>
+            <p className="onboarding-intro">
+              Next, add a resume and review every profile detail suggested from it. You can correct or skip any suggestion.
+            </p>
+            <div className="wiz-nav">
+              <button className="wiz-back" onClick={() => setContinued(false)} type="button">← Change</button>
+              <Link className="wiz-next" href={`/onboarding/resume?path=${selectedPath}`}>
+                Add your resume <span aria-hidden="true">→</span>
+              </Link>
             </div>
           </div>
         )}
-      </section>
 
-      <footer className="onboarding-footer">
-        <Link href="/">← Back to home</Link>
-        <span>Your facts stay yours. You review what gets used.</span>
-      </footer>
-    </main>
+        <p className="wiz-fineprint">
+          Your facts stay yours. You review what gets used, and nothing is sent to an employer without you.
+        </p>
+      </section>
+    </div>
   );
 }
