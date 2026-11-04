@@ -474,6 +474,18 @@
 .fact-card,
 .fact-value,
 .fact-source { overflow-wrap: anywhere; }
+.fact-group,
+.fact-list,
+.fact-head,
+.fact-badges { min-width: 0; }
+.fact-head,
+.fact-badges,
+.review-groups .fact-group-head { flex-wrap: wrap; gap: 6px 10px; }
+@media (max-width: 620px) {
+  .onboarding-page .onboarding-content-wide { width: calc(100% - 32px); }
+  .review-groups .fact-group-head span { display: none; }
+  .review-banner { font-size: 11.5px; }
+}
 .onboarding-page .review-groups .fact-group-head h2 { font-family: var(--font-sans); font-weight: 620; }
 
 /* Forms ------------------------------------------------------------------- */

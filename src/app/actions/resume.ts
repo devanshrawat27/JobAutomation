@@ -4,6 +4,7 @@ import { aiExtractionEnabled } from "@/lib/ai/gemini";
 import { extractWithAi } from "@/lib/resume/extract-with-ai";
 import { proposeFactsFromResume, type ResumeProposal } from "@/lib/resume/propose-facts";
 import { readResumeText, ResumeReadError, type ResumeFormat } from "@/lib/resume/read-text";
+import { sanitizeProposal } from "@/lib/resume/sanitize";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
@@ -33,6 +34,8 @@ function formatFor(file: File): ResumeFormat | null {
   return null;
 }
 
+/** "LinkedIn" on its own is a link label, not the URL behind it. */
+
 /**
  * Read the uploaded resume on this server and propose facts.
  *
@@ -61,6 +64,7 @@ export async function extractResumeFacts(formData: FormData): Promise<ExtractRes
     }
 
     extraction ??= proposeFactsFromResume(text, file.name);
+    extraction = sanitizeProposal(extraction);
     if (ocr) extraction = { ...extraction, ocr: true };
     if (extraction.facts.length === 0) return { ok: false, reason: "no-facts" };
     return { ok: true, extraction };

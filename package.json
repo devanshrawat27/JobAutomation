@@ -19,7 +19,7 @@
     "db:studio": "prisma studio",
     "jobs:scan": "node scripts/jobs-worker.mjs 1",
     "jobs:worker": "node scripts/jobs-worker.mjs 15",
-    "test": "node --import tsx --test tests/engine.test.ts tests/platform.test.ts"
+    "test": "node --import tsx --test tests/engine.test.ts tests/platform.test.ts tests/resume-sanitize.test.ts"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.100",
