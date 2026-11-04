@@ -7,6 +7,8 @@ import { matchWithRules } from "@/lib/match/rules";
 import type { FactForMatch, MatchResult, RequirementMatch, RequirementStatus } from "@/lib/match/types";
 
 const TTL_MS = 30 * 60 * 1000;
+/** A page must not wait on a model for 45 seconds. After this, use word overlap. */
+const AI_MATCH_TIMEOUT_MS = 9_000;
 
 type CacheEntry = { result: MatchResult; at: number };
 const cache = new Map<string, CacheEntry>();
@@ -91,7 +93,12 @@ export async function matchJob({ userId, postingId, title, description, facts }:
   let result: MatchResult;
   if (aiExtractionEnabled() && description.length >= 200 && facts.length > 0) {
     try {
-      result = await matchWithAi(title, description, facts);
+      result = await Promise.race([
+        matchWithAi(title, description, facts),
+        new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error("match model timed out")), AI_MATCH_TIMEOUT_MS);
+        }),
+      ]);
     } catch (error) {
       console.error("AI match failed, using word overlap", error instanceof Error ? error.message : error);
       result = matchWithRules(description, facts);

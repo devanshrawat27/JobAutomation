@@ -7,19 +7,19 @@
 :root {
   color-scheme: light;
 
-  --bg: #eef2f9;
-  --bg-deep: #e6ecf6;
+  --bg: #f2f5fb;
+  --bg-deep: #e8eef8;
   --surface: #ffffff;
-  --surface-soft: #f7f9fd;
-  --surface-muted: #eaeff8;
+  --surface-soft: #f8faff;
+  --surface-muted: #edf2fa;
 
-  --ink: #0b1524;
-  --ink-soft: #28364d;
-  --muted: #55657c;
-  --muted-soft: #7d8da4;
+  --ink: #0e1729;
+  --ink-soft: #27364d;
+  --muted: #5b6b7f;
+  --muted-soft: #7f8ea3;
 
-  --line: #dde5f1;
-  --line-strong: #c6d3e5;
+  --line: #e2e8f2;
+  --line-strong: #cfd9e8;
 
   --accent: #2563eb;
   --accent-strong: #1a45c4;
@@ -47,13 +47,13 @@
   --info-soft: #eaf2fd;
   --info-line: #cfe0f6;
 
-  --radius-sm: 8px;
-  --radius: 12px;
-  --radius-lg: 18px;
+  --radius-sm: 9px;
+  --radius: 14px;
+  --radius-lg: 22px;
 
-  --shadow-sm: 0 1px 2px rgb(14 23 41 / 5%);
-  --shadow-md: 0 12px 32px rgb(14 23 41 / 8%);
-  --shadow-lg: 0 24px 60px rgb(14 23 41 / 10%);
+  --shadow-sm: 0 1px 2px rgb(14 23 41 / 6%);
+  --shadow-md: 0 18px 40px -22px rgb(14 23 41 / 26%);
+  --shadow-lg: 0 44px 90px -44px rgb(14 23 41 / 34%);
 
   --font-sans: var(--font-display), "SF Pro Text", "Segoe UI", ui-sans-serif, system-ui, -apple-system,
     "Helvetica Neue", Arial, sans-serif;
@@ -1968,3 +1968,59 @@ body {
 }
 .fact-previous span { display: block; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
 .fact-previous q { quotes: none; white-space: pre-wrap; }
+
+/* =========================================================================
+   Design refresh — paper, signal, structure
+   Keeps Ink / Paper / Signal Blue; tightens type, depth and rhythm.
+   ========================================================================= */
+
+body {
+  font-size: 14.5px;
+  line-height: 1.55;
+  letter-spacing: -0.006em;
+  background-image: radial-gradient(1100px 560px at 50% -12%, rgb(37 99 235 / 7%), transparent 70%);
+  background-repeat: no-repeat;
+}
+
+h1, h2, h3, h4 { letter-spacing: -0.035em; text-wrap: balance; }
+p { text-wrap: pretty; }
+
+::selection { background: rgb(37 99 235 / 18%); color: var(--ink); }
+
+/* Quiet uppercase label. The brand's mono voice without a second typeface. */
+.eyebrow {
+  margin: 0;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* One accent, one primary. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: linear-gradient(180deg, #3d7df7, #2563eb 55%, #1d4ed8);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), 0 12px 24px -14px rgb(37 99 235 / 75%);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgb(255 255 255 / 24%), 0 18px 30px -14px rgb(37 99 235 / 80%); }
+.btn-primary:active { transform: translateY(0); filter: brightness(0.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}

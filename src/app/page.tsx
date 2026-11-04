@@ -126,30 +126,83 @@ export default function Home() {
       </header>
 
       <section className="lp2-hero" aria-labelledby="hero-title">
-        <p className="lp2-eyebrow lp2-in" style={{ "--d": "0ms" } as React.CSSProperties}>India-first · new grad and experienced</p>
+        <div className="lp2-hero-copy">
+          <p className="lp2-eyebrow lp2-in" style={{ "--d": "0ms" } as React.CSSProperties}>India-first · new grad and experienced</p>
 
-        <h1 id="hero-title">
-          <span className="lp2-line lp2-in" style={{ "--d": "90ms" } as React.CSSProperties}>Your resume in.</span>
-          <span className="lp2-line is-muted lp2-in" style={{ "--d": "180ms" } as React.CSSProperties}>Right jobs out.</span>
-        </h1>
+          <h1 id="hero-title">
+            <span className="lp2-line lp2-in" style={{ "--d": "90ms" } as React.CSSProperties}>Your resume in.</span>
+            <span className="lp2-line is-muted lp2-in" style={{ "--d": "180ms" } as React.CSSProperties}>
+              Right <span className="lp2-accent">jobs</span> out.
+            </span>
+          </h1>
 
-        <p className="lp2-sub lp2-in" style={{ "--d": "280ms" } as React.CSSProperties}>
-          A job-search workspace that reads your resume once, keeps a profile you confirmed, and prepares the resume, the
-          letter and the form answers for each posting. You review everything. You press submit.
-        </p>
+          <p className="lp2-sub lp2-in" style={{ "--d": "280ms" } as React.CSSProperties}>
+            A job-search workspace that reads your resume once, keeps a profile you confirmed, and prepares the resume, the
+            letter and the form answers for each posting. You review everything. You press submit.
+          </p>
 
-        <div className="lp2-cta-row lp2-in" style={{ "--d": "380ms" } as React.CSSProperties}>
-          <Link className="lp2-primary" href="/onboarding">
-            Start with your resume <span aria-hidden="true">→</span>
-          </Link>
-          <Link className="lp2-ghost" href="#how">
-            See how it works
-          </Link>
+          <div className="lp2-cta-row lp2-in" style={{ "--d": "380ms" } as React.CSSProperties}>
+            <Link className="lp2-primary" href="/onboarding">
+              Start with your resume <span aria-hidden="true">→</span>
+            </Link>
+            <Link className="lp2-ghost" href="#how">
+              See how it works
+            </Link>
+          </div>
+
+          <p className="lp2-fineprint lp2-in" style={{ "--d": "460ms" } as React.CSSProperties}>
+            Free to start · no card · nothing is submitted for you
+          </p>
         </div>
 
-        <p className="lp2-fineprint lp2-in" style={{ "--d": "460ms" } as React.CSSProperties}>
-          Free to start · no card · nothing is submitted for you
-        </p>
+        <div aria-hidden="true" className="lp2-hero-art">
+          <article className="lp2-matchcard">
+            <header className="lp2-matchcard-head">
+              <span className="lp2-logo">S</span>
+              <div>
+                <strong>Software Engineer, New Grad</strong>
+                <small>Stripe · Bengaluru · Full-time</small>
+              </div>
+              <span className="lp2-matchcard-score">70</span>
+            </header>
+
+            <div className="lp2-matchcard-why">
+              <small>Why it fits</small>
+              <ul>
+                <li><i>✓</i> TypeScript, React and Node.js match</li>
+                <li><i>✓</i> 0–2 years — your internship counts</li>
+                <li><i>✓</i> Posted 2 days ago · Greenhouse</li>
+              </ul>
+            </div>
+
+            <footer className="lp2-matchcard-foot">
+              <span>Resume v3 · 12 facts cited</span>
+              <span className="lp2-matchcard-btn">Prepare →</span>
+            </footer>
+          </article>
+
+          <div className="lp2-float lp2-float--profile">
+            <b>Profile confirmed</b>
+            <span>24 facts · 5 areas</span>
+          </div>
+          <div className="lp2-float lp2-float--doc">
+            <b>Nothing auto-submits</b>
+            <span>You press the button</span>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Where jobs come from" className="lp2-sources">
+        <p className="lp2-sources-label">Postings read from employer boards</p>
+        <ul>
+          <li>Greenhouse</li>
+          <li>Lever</li>
+          <li>Ashby</li>
+          <li>SmartRecruiters</li>
+          <li>Workable</li>
+          <li>Hacker News</li>
+          <li>Mastodon</li>
+        </ul>
       </section>
 
       <section aria-labelledby="demo-title" className="lp2-demo" id="demo">
