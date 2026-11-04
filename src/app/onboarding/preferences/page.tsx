@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/db";
+import { parseDateRange, totalMonths, type DateRange } from "@/lib/match/experience";
 import { getCurrentSession } from "@/lib/session";
 import PreferencesWizard from "./preferences-wizard";
 
@@ -95,6 +96,19 @@ export default async function PreferencesPage() {
     `${location} ${byKey.get("contact.city") ?? ""}`,
   )?.[0];
 
+  // Like their step 03, prefill total years from the dates already confirmed
+  // on the profile. It stays editable and is only saved if the candidate
+  // accepts it.
+  const ranges: DateRange[] = [];
+  for (const fact of experience) {
+    if (fact.key.startsWith("preferences.")) continue;
+    for (const line of fact.value.split("\n")) {
+      const range = parseDateRange(line);
+      if (range) ranges.push(range);
+    }
+  }
+  const derivedYears = Math.round((totalMonths(ranges) / 12) * 10) / 10;
+
   return (
     <main className="onboarding-page">
       <header className="onboarding-header">
@@ -109,7 +123,7 @@ export default async function PreferencesPage() {
         initial={{
           roles: byKey.get("preferences.targetRoles") ?? "",
           topSkills: byKey.get("preferences.topSkills") ?? "",
-          years: byKey.get("preferences.years") ?? "",
+          years: byKey.get("preferences.years") ?? (derivedYears > 0 ? String(derivedYears) : ""),
           locations: byKey.get("preferences.locations") ?? "",
           remote: /remote/i.test(byKey.get("preferences.locations") ?? "") ||
             /remote/i.test(byKey.get("preferences.workMode") ?? ""),
