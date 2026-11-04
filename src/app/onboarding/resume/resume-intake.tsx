@@ -431,145 +431,125 @@ export default function ResumeIntake({
     return (
       <main className="onboarding-page">
         <StepHeader step="Step 2" />
-        <section aria-labelledby="resume-title" className="intake-layout">
-          <div className="intake-lede">
-            <p className="section-kicker">Step 2 · Resume intake</p>
-            <h1 id="resume-title">
-              {mergeMode ? (
-                <>Adding a newer resume?</>
-              ) : (
-                <>
-                  Your resume, read once.
-                  <br />
-                  <em>Then never again.</em>
-                </>
-              )}
-            </h1>
+        <div className="wiz-shell">
+          <aside className="wiz-aside" aria-hidden="true">
+            <span className="wiz-aside-glyph">02</span>
+            <div className="wiz-aside-top">
+              <p className="wiz-aside-kicker">Your resume</p>
+              <p className="wiz-aside-line">start with who you are.</p>
+            </div>
+            <div className="wiz-aside-foot">
+              <div className="wiz-track-bar"><i style={{ width: "25%" }} /></div>
+              <p className="wiz-aside-note">
+                {mergeMode ? "Adds and refreshes only · nothing is deleted" : "Read once, then discarded · facts only after you confirm"}
+              </p>
+            </div>
+          </aside>
+
+          <section aria-labelledby="resume-title" className="wiz-main">
+            <p className="wiz-main-kicker">Step 2 of 8</p>
+            <h1 id="resume-title">{mergeMode ? "Adding a newer resume?" : "Your resume, read once."}</h1>
             <p className="onboarding-intro">
               {mergeMode
                 ? `Your profile already holds ${existingFacts.length} confirmed details. This upload only adds or refreshes them — nothing already saved is deleted, and you review each change first.`
-                : "We read the file to propose profile details, with the exact line each one came from. You confirm what is true. From then on, your profile is the only thing we use."}
+                : "We read the file to propose profile details, with the exact line each one came from. You confirm what is true; from then on, your profile is the only thing we use."}
             </p>
 
-            <ol className="intake-route">
-              <li>
-                <span aria-hidden="true">01</span>
-                <div>
-                  <b>Read</b>
-                  <p>PDF or DOCX, text or scanned pages. The file is discarded after reading.</p>
-                </div>
-              </li>
-              <li>
-                <span aria-hidden="true">02</span>
-                <div>
-                  <b>Review</b>
-                  <p>One card per company and per project, each with its source line. Keep, edit or skip.</p>
-                </div>
-              </li>
-              <li>
-                <span aria-hidden="true">03</span>
-                <div>
-                  <b>Save once</b>
-                  <p>Confirmed details become your profile. Later uploads merge into it and delete nothing.</p>
-                </div>
-              </li>
-            </ol>
-
-            <p className="intake-privacy">
-              Read on this server. Nothing is shared with an employer, and no fact is written without your confirmation.
-            </p>
-          </div>
-
-          <div className="intake-panel">
-            <p className="intake-note">
-              <span aria-hidden="true">✳</span>
-              <span>
-                {signedIn ? (
-                  <>
-                    <strong>Reads on this server.</strong>{" "}
-                    {aiEnabled
-                      ? "Your PDF or DOCX is read by Google Gemini (via your configured API key) to propose facts and is not stored. Only the resume text is sent."
-                      : "Your PDF or DOCX is parsed in memory by text rules and is not stored. No AI provider receives it."}
-                  </>
-                ) : (
-                  <>
-                    <strong>Sign in to read your own resume.</strong> Until then you can preview the review step with sample
-                    details.
-                  </>
-                )}
-              </span>
-            </p>
-
-            <div
-              className={`dropzone${dragging ? " is-dragging" : ""}${file ? " has-file" : ""}${signedIn ? "" : " is-locked"}`}
-              onDragOver={(event) => {
-                event.preventDefault();
-                setDragging(true);
-              }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={(event) => {
-                event.preventDefault();
-                setDragging(false);
-                acceptFile(event.dataTransfer.files[0] ?? null);
-              }}
-            >
-              <input
-                accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                className="sr-only"
-                disabled={!signedIn}
-                id="resume-file"
-                onChange={(event) => acceptFile(event.target.files?.[0] ?? null)}
-                type="file"
-              />
-              <label className="dropzone-label" htmlFor="resume-file">
-                <span className="dropzone-icon" aria-hidden="true">
-                  {file ? "✓" : "▤"}
+            <div className="intake-panel">
+              <p className="intake-note">
+                <span aria-hidden="true">✳</span>
+                <span>
+                  {signedIn ? (
+                    <>
+                      <strong>Reads on this server.</strong>{" "}
+                      {aiEnabled
+                        ? "Your PDF or DOCX is read by Google Gemini (via your configured API key) to propose facts and is not stored. Only the resume text is sent."
+                        : "Your PDF or DOCX is parsed in memory by text rules and is not stored. No AI provider receives it."}
+                    </>
+                  ) : (
+                    <>
+                      <strong>Sign in to read your own resume.</strong> Until then you can preview the review step with sample
+                      details.
+                    </>
+                  )}
                 </span>
-                <span className="dropzone-copy">
-                  <span className="dropzone-title">{file ? file.name : "Drop your resume here"}</span>
-                  <span className="dropzone-meta">
-                    {file ? `${formatBytes(file.size)} · PDF or DOCX` : "or choose a file · PDF or DOCX · up to 5 MB"}
+              </p>
+
+              <div
+                className={`dropzone${dragging ? " is-dragging" : ""}${file ? " has-file" : ""}${signedIn ? "" : " is-locked"}`}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setDragging(true);
+                }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  setDragging(false);
+                  acceptFile(event.dataTransfer.files[0] ?? null);
+                }}
+              >
+                <input
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  className="sr-only"
+                  disabled={!signedIn}
+                  id="resume-file"
+                  onChange={(event) => acceptFile(event.target.files?.[0] ?? null)}
+                  type="file"
+                />
+                <label className="dropzone-label" htmlFor="resume-file">
+                  <span className="dropzone-icon" aria-hidden="true">
+                    {file ? "✓" : "▤"}
                   </span>
-                </span>
-                <span aria-hidden="true" className="dropzone-choose">
-                  {file ? "Replace" : "Browse"}
-                </span>
-              </label>
+                  <span className="dropzone-copy">
+                    <span className="dropzone-title">{file ? file.name : "Drop your resume here"}</span>
+                    <span className="dropzone-meta">
+                      {file ? `${formatBytes(file.size)} · PDF or DOCX` : "or choose a file · PDF or DOCX · up to 5 MB"}
+                    </span>
+                  </span>
+                  <span aria-hidden="true" className="dropzone-choose">
+                    {file ? "Replace" : "Browse"}
+                  </span>
+                </label>
 
-              <div className="dropzone-foot">
-                {file ? (
-                  <button className="text-button" onClick={() => setFile(null)} type="button">
-                    Remove file
-                  </button>
-                ) : null}
-                {!signedIn ? (
-                  <Link className="text-button" href={signInToUploadPath}>
-                    Sign in to read your resume
-                  </Link>
-                ) : null}
-                {fileError ? (
-                  <p className="intake-error" role="alert">
-                    {fileError}
-                  </p>
-                ) : null}
+                <div className="dropzone-foot">
+                  {file ? (
+                    <button className="text-button" onClick={() => setFile(null)} type="button">
+                      Remove file
+                    </button>
+                  ) : null}
+                  {!signedIn ? (
+                    <Link className="text-button" href={signInToUploadPath}>
+                      Sign in to read your resume
+                    </Link>
+                  ) : null}
+                  {fileError ? (
+                    <p className="intake-error" role="alert">
+                      {fileError}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="intake-actions">
+                <button
+                  className="onboarding-submit"
+                  disabled={!file || !signedIn || extracting}
+                  onClick={readUploadedResume}
+                  type="button"
+                >
+                  {extracting ? "Reading your resume…" : "Read my resume"} <span aria-hidden="true">→</span>
+                </button>
+                <button className="intake-secondary" onClick={() => setPhase("review")} type="button">
+                  Preview with sample details
+                </button>
               </div>
             </div>
 
-            <div className="intake-actions">
-              <button
-                className="onboarding-submit"
-                disabled={!file || !signedIn || extracting}
-                onClick={readUploadedResume}
-                type="button"
-              >
-                {extracting ? "Reading your resume…" : "Read my resume"} <span aria-hidden="true">→</span>
-              </button>
-              <button className="intake-secondary" onClick={() => setPhase("review")} type="button">
-                Preview with sample details
-              </button>
-            </div>
-          </div>
-        </section>
+            <p className="wiz-fineprint">
+              Read on this server. Nothing is shared with an employer, and no fact is written without your confirmation.
+            </p>
+          </section>
+        </div>
         <StepFooter path={path} />
       </main>
     );
@@ -581,7 +561,7 @@ export default function ResumeIntake({
       <section className="onboarding-content onboarding-content-wide" aria-labelledby="review-title">
         <div className="review-topline">
           <div>
-            <p className="section-kicker">Step 2 · Review</p>
+            <p className="section-kicker">Step 2 of 8 · Review</p>
             <h1 id="review-title">Check every detail before it counts.</h1>
             <p className="onboarding-intro">
               Confirm what is right, correct what is wrong, and skip what you do not want to reuse. Each item shows the resume
@@ -722,10 +702,9 @@ function StepHeader({ step }: { step: string }) {
           <span>jobautomation</span>
         </Link>
         <span className="onboarding-step">
-          Step {current === 1 ? 1 : 2} of 8 <span aria-hidden="true">·</span> {current === 1 ? "about a minute" : "about 2 minutes"}
+          {current === 1 ? "About a minute" : "About 2 minutes"}
         </span>
       </header>
-      <div className="onboarding-progress" aria-hidden="true"><i style={{ width: `${current === 1 ? 12.5 : 25}%` }} /></div>
     </>
   );
 }

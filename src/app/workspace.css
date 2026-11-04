@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow-x: clip;
   background:
     radial-gradient(1200px 520px at 78% -8%, rgb(37 99 235 / 7%), transparent 62%),
     var(--bg);
@@ -460,11 +461,20 @@
 .onboarding-page .review-counts dt { font-size: 11.5px; }
 .onboarding-page .review-counts dd { font-variant-numeric: tabular-nums; }
 .onboarding-page .review-open h2 {
-  font-family: var(--font-serif);
-  font-size: 17px;
-  font-weight: 520;
-  letter-spacing: -0.01em;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
 }
+.review-shell,
+.review-groups,
+.review-topline,
+.review-summary { min-width: 0; }
+.review-banner,
+.fact-card,
+.fact-value,
+.fact-source { overflow-wrap: anywhere; }
+.onboarding-page .review-groups .fact-group-head h2 { font-family: var(--font-sans); font-weight: 620; }
 
 /* Forms ------------------------------------------------------------------- */
 .onboarding-page .auth-content { width: min(620px, 100% - 56px); margin-inline: auto; }
@@ -3040,8 +3050,8 @@
   .job-fit-head { align-items: flex-start; }
 }
 
-/* The theme dock sits over the form's primary action while onboarding. */
-body:has(.wiz-shell) .theme-dock { display: none; }
+/* Keep the theme control out of the way during the whole onboarding flow. */
+body:has(.onboarding-page) .theme-dock { display: none; }
 
 /* Onboarding wizard: editorial split, step panel left, question right. */
 .wiz-shell {
