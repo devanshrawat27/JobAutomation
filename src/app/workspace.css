@@ -2562,15 +2562,16 @@
 .app-nav { gap: 1px; }
 .app-nav-link { border-radius: 6px; padding: 8px 10px; }
 .app-nav-link.is-active {
-  background: var(--surface-soft);
+  background: var(--accent-soft);
   box-shadow: inset 2px 0 0 var(--accent);
-  color: var(--ink);
+  color: var(--accent-strong);
 }
-.app-nav-link.is-active .app-nav-hint { color: var(--muted); }
+.app-nav-link.is-active:hover { background: var(--accent-soft); color: var(--accent-strong); }
+.app-nav-link.is-active .app-nav-hint { color: var(--accent-strong); }
 .app-nav-link.is-active .app-nav-count {
-  border-color: var(--line);
+  border-color: var(--accent-line);
   background: var(--surface);
-  color: var(--ink-soft);
+  color: var(--accent-strong);
 }
 .app-nav-count { border-radius: 4px; font-size: 9px; }
 .app-brand { font-weight: 650; letter-spacing: -0.02em; }
@@ -2621,7 +2622,7 @@
 }
 .app-nav-link:hover { background: var(--surface-soft); color: var(--ink); }
 .app-nav-link:hover .app-nav-icon,
-.app-nav-link.is-active .app-nav-icon { color: var(--ink); }
+.app-nav-link.is-active .app-nav-icon { color: var(--accent-strong); }
 .app-nav-label { margin-right: auto; font-size: 12.5px; font-weight: 550; letter-spacing: -0.005em; }
 .app-nav-count { font-size: 9.5px; padding: 1px 5px; }
 .app-progress { padding: 10px 11px; }
