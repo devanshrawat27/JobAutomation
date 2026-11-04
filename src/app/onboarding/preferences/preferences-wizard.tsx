@@ -622,7 +622,7 @@ export default function PreferencesWizard({ initial, knownSkills, suggestedRoles
             {brief ? (
               <>
                 <button className="onboarding-submit" type="submit">
-                  Save and see jobs <span aria-hidden="true">→</span>
+                  Save and see your match <span aria-hidden="true">→</span>
                 </button>
                 <button className="intake-secondary" onClick={() => setBrief(false)} type="button">
                   Back

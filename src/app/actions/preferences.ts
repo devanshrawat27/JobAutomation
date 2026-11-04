@@ -158,5 +158,5 @@ export async function savePreferences(formData: FormData): Promise<void> {
   revalidatePath("/profile");
   revalidatePath("/jobs");
   revalidatePath("/dashboard");
-  redirect("/dashboard");
+  redirect("/onboarding/first-match");
 }

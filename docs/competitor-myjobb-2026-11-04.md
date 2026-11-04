@@ -73,3 +73,11 @@ Sequence: `login → import (01) → pjr (02) → skills (03) → location (04) 
 | Brief | "Here's my brief on you" before results | Is / Wants / Where / Pay / Never rows | Added as the final review screen |
 
 What their wizard does that ours still does not: import a profile from a LinkedIn URL, prefill years from resume dates, and hand off to an agent that applies. The first two are candidates for the next pass; the third is out of scope by product rule.
+
+## After step 08: the brief and the handoff (observed live)
+
+- **Brief** (`personaBrief`): “OUR READ ON YOU” narrative paragraph, `AGENT BRIEF · NO. 1928`, `RESUME + 9 ANSWERS`, an identity block (name · city · level · years), then **IS / WANTS / WHERE / WORTH**, **SKILLS, BY YEARS USED** (each skill with `<1 yr`), **AGENT'S NOTES**, and a stamp: `MYJOBB UNDERSTOOD 04 · 11 · 26`. Actions: “Show me my top 3 jobs”, “See the job your agent picked”, “Something off? Edit”.
+- **Results**: one job at a time — “Your agent picked one to start with”, “745 more highly matched jobs are lined up right behind it”, a card with match %, “Worth applying”/“Top pick”, title, city, mode, pay, years, a written **A NOTE FOR YOU** addressed to the candidate, then **Apply with agent** and **I don't like this job, skip and show more**. Copy underneath: “These are real applications, submitted to real job boards on your behalf… about 15 seconds.”
+- Step 08 also creates an **`@myjobb.in` alias** (`rawat.devansh2@myjobb.in`) and asks three declarations: criminal offence, government/public-sector employment, non-compete or service bond.
+
+Ours: the brief lives inside the wizard; the handoff is `/onboarding/first-match` (one role, score, matches/gaps, a deterministic note, open/show-more/edit). We do not generate an alias, take a board password, or submit.

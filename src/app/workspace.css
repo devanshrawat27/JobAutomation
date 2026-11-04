@@ -3260,6 +3260,44 @@
   .wiz-actions .text-button { margin-left: 0; }
 }
 
+/* First-match handoff after onboarding. */
+.first-match {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.first-match-head { display: flex; align-items: center; gap: 16px; }
+.first-match-verdict {
+  margin: 0 0 3px;
+  color: var(--accent-strong);
+  font-size: 11px;
+  font-weight: 650;
+}
+.first-match-head h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 630;
+  letter-spacing: -0.022em;
+  line-height: 1.2;
+}
+.first-match-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; color: var(--muted); font-size: 12px; }
+.first-match-meta span + span::before { content: "·"; margin-right: 8px; color: var(--muted-soft); }
+.first-match-note {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+.first-match-note p:last-child { margin: 6px 0 0; color: var(--ink-soft); font-size: 12.5px; line-height: 1.65; }
+.first-match .wiz-actions { margin-top: 18px; padding-top: 0; border-top: 0; }
+@media (max-width: 640px) {
+  .first-match-head { align-items: flex-start; }
+}
+
 /* Step-based application flow. */
 .app-steps {
   margin: 16px 0;
