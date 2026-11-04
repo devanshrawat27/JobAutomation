@@ -148,6 +148,14 @@ function communityLabel(board: string): string | null {
   return null;
 }
 
+/** Remote aggregators are labelled apart from community posts. */
+function remoteLabel(board: string): string | null {
+  if (board === "remotive") return "Remotive";
+  if (board === "himalayas") return "Himalayas";
+  if (board === "jobicy") return "Jobicy";
+  return null;
+}
+
 const relative = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
 function updatedLabel(iso: string | null): string | null {
@@ -293,8 +301,10 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
         : posting.board === "captured"
           ? "captured"
           : posting.board === "hiring" || posting.board === "jobopening" || posting.board === "techjobs"
-          ? "mastodon"
-          : "greenhouse";
+            ? "mastodon"
+            : posting.board === "remotive" || posting.board === "himalayas" || posting.board === "jobicy"
+              ? posting.board
+              : "greenhouse";
 
   // The numbers an Indian posting actually gates on.
   const gradeFact = facts.find((fact) => /grade|cgpa|gpa|percentage|marks/i.test(fact.label));
@@ -778,6 +788,9 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                         {trust.risk === "high" ? <span className="job-tag is-danger">Check before applying</span> : null}
                         {communityLabel(posting.board) ? (
                           <span className="job-tag is-direct">{communityLabel(posting.board)}</span>
+                        ) : null}
+                        {remoteLabel(posting.board) ? (
+                          <span className="job-tag">{remoteLabel(posting.board)}</span>
                         ) : null}
                         {alternates > 0 ? <span className="job-tag">+{alternates} more board{alternates === 1 ? "" : "s"}</span> : null}
                       </p>

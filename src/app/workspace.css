@@ -2901,6 +2901,24 @@
   .job-packet li > a { grid-column: 2; justify-self: start; }
 }
 
+/* Whole card opens the role; actions stay above the overlay. */
+.onboarding-page .job-card { position: relative; }
+.onboarding-page .job-card h2 a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 14px;
+}
+.onboarding-page .job-card .job-card-actions,
+.onboarding-page .job-card .job-breakdown,
+.onboarding-page .job-card .job-trust {
+  position: relative;
+  z-index: 2;
+}
+.onboarding-page .job-card:hover { border-color: var(--accent-line); }
+.onboarding-page .job-card:hover h2 a { color: var(--accent-strong); }
+
 /* Thin-list suggestions: a named filter and a real count. */.jobs-widen {
   display: flex;
   flex-wrap: wrap;

@@ -7,8 +7,11 @@ import { prisma } from "@/lib/db";
 import { BOARDS } from "@/lib/jobs/boards";
 import { htmlToText } from "@/lib/jobs/html";
 import { ashbyAdapter } from "@/lib/jobs/ashby";
+import { himalayasAdapter } from "@/lib/jobs/himalayas";
 import { hnAdapter } from "@/lib/jobs/hn";
+import { jobicyAdapter } from "@/lib/jobs/jobicy";
 import { leverAdapter } from "@/lib/jobs/lever";
+import { remotiveAdapter } from "@/lib/jobs/remotive";
 import { smartRecruitersPostings } from "@/lib/jobs/smartrecruiters";
 import { mastodonAdapter } from "@/lib/jobs/mastodon";
 import { seniorityOf } from "@/lib/jobs/match";
@@ -136,7 +139,13 @@ async function rawPostings(board: BoardRef): Promise<RawPosting[]> {
           ? leverAdapter
           : board.source === "ashby"
             ? ashbyAdapter
-            : null;
+            : board.source === "remotive"
+              ? remotiveAdapter
+              : board.source === "himalayas"
+                ? himalayasAdapter
+                : board.source === "jobicy"
+                  ? jobicyAdapter
+                  : null;
 
   if (adapter) {
     const postings = await adapter.listPostings(board);

@@ -3,10 +3,13 @@ import "server-only";
 import { BOARDS } from "@/lib/jobs/boards";
 import { greenhouseAdapter } from "@/lib/jobs/greenhouse";
 import { ashbyAdapter } from "@/lib/jobs/ashby";
+import { himalayasAdapter } from "@/lib/jobs/himalayas";
 import { hnAdapter } from "@/lib/jobs/hn";
+import { jobicyAdapter } from "@/lib/jobs/jobicy";
 import { leverAdapter } from "@/lib/jobs/lever";
 import { smartRecruitersPostings } from "@/lib/jobs/smartrecruiters";
 import { mastodonAdapter } from "@/lib/jobs/mastodon";
+import { remotiveAdapter } from "@/lib/jobs/remotive";
 import type { BoardRef, BoardResult, JobPosting } from "@/lib/jobs/types";
 
 const TTL_MS = 10 * 60 * 1000;
@@ -36,7 +39,13 @@ async function listBoard(board: BoardRef): Promise<BoardResult> {
             ? await leverAdapter.listPostings(board)
             : board.source === "ashby"
               ? await ashbyAdapter.listPostings(board)
-              : await greenhouseAdapter.listPostings(board);
+              : board.source === "remotive"
+                ? await remotiveAdapter.listPostings(board)
+                : board.source === "himalayas"
+                  ? await himalayasAdapter.listPostings(board)
+                  : board.source === "jobicy"
+                    ? await jobicyAdapter.listPostings(board)
+                    : await greenhouseAdapter.listPostings(board);
     const now = Date.now();
     cache.set(key, { postings, fetchedAt: now });
     return { board, postings, fetchedAt: new Date(now).toISOString() };

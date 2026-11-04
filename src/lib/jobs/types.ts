@@ -1,4 +1,4 @@
-export type JobSourceId = "greenhouse" | "lever" | "ashby" | "workable" | "smartrecruiters" | "hn" | "manual" | "mastodon";
+export type JobSourceId = "greenhouse" | "lever" | "ashby" | "workable" | "smartrecruiters" | "hn" | "manual" | "mastodon" | "remotive" | "himalayas" | "jobicy";
 
 export type BoardRef = {
   source: JobSourceId;

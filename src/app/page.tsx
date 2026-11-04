@@ -208,7 +208,7 @@ export default async function Home() {
       </section>
 
       <section aria-label="Where jobs come from" className="lp2-sources">
-        <p className="lp2-sources-label">Postings read from employer boards</p>
+        <p className="lp2-sources-label">Postings read from employer boards and remote job APIs</p>
         <ul>
           <li>Greenhouse</li>
           <li>Lever</li>
@@ -217,6 +217,9 @@ export default async function Home() {
           <li>Workable</li>
           <li>Hacker News</li>
           <li>Mastodon</li>
+          <li>Remotive</li>
+          <li>Himalayas</li>
+          <li>Jobicy</li>
         </ul>
       </section>
 
