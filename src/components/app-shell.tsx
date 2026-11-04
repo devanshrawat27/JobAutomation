@@ -110,6 +110,7 @@ export default async function AppShell({
     ["experience", "Experience"],
     ["projects", "Projects"],
     ["skills", "Skills"],
+    ["preferences", "Job preferences"],
   ] as const;
 
   const filled = AREAS.filter(([id]) => facts.some((fact) => fact.groupId === id)).map(([, label]) => label);

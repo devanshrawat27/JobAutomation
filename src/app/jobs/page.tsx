@@ -398,6 +398,14 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
   function matchesView(entry: Entry): boolean {
     const { posting, fit } = entry;
     const decision = byPosting.get(posting.id);
+
+    if (effectiveView === "for-you" || effectiveView === "fresher") {
+      const text = `${posting.company} ${posting.title}`.toLowerCase();
+      if (candidate.exclude.some((word) => text.includes(word))) return false;
+      const pay = posting.salaryMax ?? posting.salaryMin;
+      if (candidate.salaryFloor && pay !== null && pay < candidate.salaryFloor) return false;
+    }
+
     if (effectiveView === "saved") return decision === "SAVED";
     if (effectiveView === "dismissed") return decision === "DISMISSED";
     if (decision === "DISMISSED") return false;

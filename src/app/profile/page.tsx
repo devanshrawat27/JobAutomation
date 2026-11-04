@@ -19,7 +19,7 @@ function groupTitle(id: string): string {
   return factGroups[id as FactGroupId]?.title ?? id;
 }
 
-const groupOrder: FactGroupId[] = ["contact", "education", "experience", "projects", "skills"];
+const groupOrder: FactGroupId[] = ["contact", "education", "experience", "projects", "skills", "preferences"];
 
 function groupRank(id: string): number {
   const index = groupOrder.indexOf(id as FactGroupId);

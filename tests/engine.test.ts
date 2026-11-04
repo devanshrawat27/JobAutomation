@@ -155,3 +155,19 @@ test("an open-ended role counts elapsed months, not inclusive ones", () => {
   assert.ok(range);
   assert.equal(rangeMonths(range), 3);
 });
+
+test("saved job preferences feed the candidate model", () => {
+  const candidate = buildCandidate([
+    { label: "Target roles", value: "Backend Engineer, Platform Engineer", group: "preferences" },
+    { label: "Preferred locations", value: "Pune, Remote", group: "preferences" },
+    { label: "Work mode", value: "remote", group: "preferences" },
+    { label: "Minimum salary (LPA)", value: "10", group: "preferences" },
+    { label: "Excluded companies or words", value: "HackerRank, staffing", group: "preferences" },
+  ]);
+
+  assert.equal(candidate.salaryFloor, 10);
+  assert.deepEqual(candidate.exclude, ["hackerrank", "staffing"]);
+  assert.equal(candidate.remoteFriendly, true);
+  assert.ok(candidate.locations.includes("pune"));
+  assert.ok(candidate.titles.includes("Backend Engineer"));
+});

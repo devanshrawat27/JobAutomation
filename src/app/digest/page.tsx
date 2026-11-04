@@ -18,6 +18,7 @@ const AREAS = [
   ["experience", "Experience"],
   ["projects", "Projects"],
   ["skills", "Skills"],
+  ["preferences", "Job preferences"],
 ] as const;
 
 /**

@@ -2984,6 +2984,24 @@
 .onboarding-page .job-card:hover { border-color: var(--accent-line); }
 .onboarding-page .job-card:hover h2 a { color: var(--accent-strong); }
 
+/* Job preferences form. */
+.prefs-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.prefs-form .prefs-wide { grid-column: 1 / -1; }
+.prefs-actions { display: flex; flex-wrap: wrap; gap: 8px; grid-column: 1 / -1; margin-top: 4px; }
+@media (max-width: 720px) {
+  .prefs-form { grid-template-columns: 1fr; }
+  .prefs-form .prefs-wide { grid-column: auto; }
+}
+
 /* Step-based application flow. */
 .app-steps {
   margin: 16px 0;

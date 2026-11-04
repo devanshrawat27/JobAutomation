@@ -29,6 +29,9 @@ export type CandidateModel = {
   /** Still studying, or graduated in the current/future year. */
   student: boolean;
   graduationYear: number | null;
+  /** Preferences saved during onboarding, used to filter and rank. */
+  salaryFloor: number | null;
+  exclude: string[];
 };
 
 export type JobSignals = {
@@ -163,9 +166,39 @@ export function buildCandidate(facts: CandidateFacts[]): CandidateModel {
   const locations = new Set<string>();
   let remoteFriendly = false;
   let graduationYear: number | null = null;
+  let salaryFloor: number | null = null;
+  const exclude: string[] = [];
 
   for (const fact of facts) {
     const label = fact.label.toLowerCase();
+
+    if (fact.group === "preferences") {
+      if (/target role/.test(label)) {
+        for (const part of fact.value.split(/[,;\n]/)) {
+          const title = part.trim();
+          if (title.length >= 2) titles.add(title);
+        }
+      }
+      if (/location/.test(label)) {
+        for (const part of fact.value.split(/[,;\/]/)) {
+          const place = normalizeSkill(part);
+          if (place.length >= 3) locations.add(place);
+          if (/remote/.test(place)) remoteFriendly = true;
+        }
+      }
+      if (/work mode/.test(label) && /remote|hybrid/i.test(fact.value)) remoteFriendly = true;
+      if (/salary/.test(label)) {
+        const amount = Number(fact.value.replace(/[^0-9.]/g, ""));
+        if (Number.isFinite(amount) && amount > 0) salaryFloor = amount;
+      }
+      if (/exclude|avoid/.test(label)) {
+        for (const part of fact.value.split(/[,;\n]/)) {
+          const word = part.trim().toLowerCase();
+          if (word) exclude.push(word);
+        }
+      }
+      continue;
+    }
 
     if (/skill|language|frontend|front-end|backend|back-end|data|tools|framework|database|cloud|fundamentals|technolog/i.test(label)) {
       skillText.push(fact.value);
@@ -243,6 +276,8 @@ export function buildCandidate(facts: CandidateFacts[]): CandidateModel {
     family: roleFamily(`${[...titles].join(" ")} ${roleWords.join(" ")}`) ?? familyFromSkills(skills),
     student: graduationYear !== null && graduationYear >= new Date().getFullYear(),
     graduationYear,
+    salaryFloor,
+    exclude,
   };
 }
 

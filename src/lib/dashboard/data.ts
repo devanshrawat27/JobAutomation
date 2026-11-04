@@ -30,6 +30,7 @@ const PROFILE_AREAS = [
   ["experience", "Experience"],
   ["projects", "Projects"],
   ["skills", "Skills"],
+  ["preferences", "Job preferences"],
 ] as const;
 
 export const PIPELINE_STAGES = [
@@ -215,6 +216,12 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
   const scored: DashboardMatch[] = profileReady
     ? postings
         .filter((posting) => !dismissed.has(posting.id))
+        .filter((posting) => {
+          const text = `${posting.company} ${posting.title}`.toLowerCase();
+          if (candidate.exclude.some((word) => text.includes(word))) return false;
+          const pay = posting.salaryMax ?? posting.salaryMin;
+          return !(candidate.salaryFloor !== null && pay !== null && pay < candidate.salaryFloor);
+        })
         .map((posting) => {
           const fit = matchPosting(
             {

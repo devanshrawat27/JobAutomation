@@ -402,11 +402,11 @@ export default function ResumeIntake({
                 </button>
                 {signedIn ? (
                   <>
-                    <Link className="onboarding-submit" href="/dashboard">
-                      Go to your overview <span aria-hidden="true">→</span>
+                    <Link className="onboarding-submit" href="/onboarding/preferences">
+                      Set job preferences <span aria-hidden="true">→</span>
                     </Link>
-                    <Link className="intake-secondary" href="/profile">
-                      View saved profile
+                    <Link className="intake-secondary" href="/dashboard">
+                      Skip to your overview
                     </Link>
                   </>
                 ) : (

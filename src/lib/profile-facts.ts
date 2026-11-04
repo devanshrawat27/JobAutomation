@@ -16,7 +16,7 @@ export type FactConfidence = "high" | "medium" | "low";
 
 export type FactStatus = "suggested" | "confirmed" | "edited" | "skipped" | "not-applicable";
 
-export type FactGroupId = "contact" | "education" | "experience" | "projects" | "skills" | "achievements";
+export type FactGroupId = "contact" | "education" | "experience" | "projects" | "skills" | "achievements" | "preferences";
 
 export type ProfileFact = {
   id: string;
@@ -45,6 +45,7 @@ export const factGroups: Record<FactGroupId, { title: string; note: string }> = 
   projects: { title: "Projects", note: "Work that shows what you can do" },
   skills: { title: "Skills and certifications", note: "Reusable across applications" },
   achievements: { title: "Honours and achievements", note: "Only what your resume states" },
+  preferences: { title: "Job preferences", note: "What the matcher should aim at" },
 };
 
 export const confidenceLabels: Record<FactConfidence, string> = {
