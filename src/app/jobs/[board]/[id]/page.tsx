@@ -2,13 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import CopyText from "@/components/copy-text";
+import MatchDonut from "@/components/match-donut";
 import ApplicationSteps from "./application-steps";
 import { prisma } from "@/lib/db";
 import { buildAnswers } from "@/lib/form/answers";
 import { checkEligibility, parseEligibility } from "@/lib/jobs/eligibility";
 import { getJobDetail, type ResolvedJob } from "@/lib/jobs/detail";
 import { assessPosting } from "@/lib/jobs/trust";
-import { buildCandidate } from "@/lib/jobs/match";
+import { buildCandidate, matchPosting } from "@/lib/jobs/match";
 import { buildReferralKit } from "@/lib/referrals";
 import { formatSalary } from "@/lib/jobs/salary";
 import { matchJob } from "@/lib/match";
@@ -94,6 +95,24 @@ export default async function JobDetailPage({
       : null;
 
   const referralCandidate = factInput.length > 0 ? buildCandidate(factInput) : null;
+  const fit =
+    detail && referralCandidate
+      ? matchPosting(
+          {
+            source: detail.posting.source,
+            title: detail.posting.title,
+            department: detail.posting.department,
+            location: detail.posting.location,
+            description: detail.description,
+            skills: detail.skills,
+            seniority: detail.seniority,
+            yearsMin: detail.yearsMin,
+            remote: detail.remote,
+            updatedAt: detail.postedAt ?? detail.firstSeenAt,
+          },
+          referralCandidate,
+        )
+      : null;
   const referral =
     detail && session?.user && referralCandidate
       ? buildReferralKit({
@@ -194,6 +213,8 @@ export default async function JobDetailPage({
               {formatSalary(detail.salaryMin, detail.salaryMax) ? (
                 <span>{formatSalary(detail.salaryMin, detail.salaryMax)}</span>
               ) : null}
+              {detail.remote ? <span>Remote</span> : null}
+              {detail.yearsMin !== null ? <span>{detail.yearsMin}+ yrs</span> : null}
               {detail.postedAt ? (
                 <span>Posting updated {updatedLabel(detail.postedAt)}</span>
               ) : detail.firstSeenAt ? (
@@ -204,6 +225,91 @@ export default async function JobDetailPage({
                 Apply on the employer&apos;s site ↗
               </a>
             </p>
+
+            {fit ? (
+              <section aria-labelledby="fit-title" className="job-fit">
+                <div className="job-fit-head">
+                  <MatchDonut score={fit.score} verdict={fit.verdict} size={64} />
+                  <div>
+                    <p className="section-kicker">Why this is a match</p>
+                    <h2 id="fit-title">
+                      {fit.verdict === "strong"
+                        ? "Strong match"
+                        : fit.verdict === "good"
+                          ? "Good match"
+                          : fit.verdict === "possible"
+                            ? "Possible match"
+                            : "Weak match"}
+                    </h2>
+                    <p>{fit.reasons[0] ?? "The posting and your profile share little that can be checked."}</p>
+                  </div>
+                </div>
+
+                <div className="job-fit-lists">
+                  <div>
+                    <h3>Matches</h3>
+                    <ul>
+                      {fit.matched.map((skill) => (
+                        <li key={skill}>✓ {skill}</li>
+                      ))}
+                      {fit.reasons.slice(1, 3).map((reason) => (
+                        <li key={reason}>{reason}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3>Gaps</h3>
+                    <ul>
+                      {fit.missing.length > 0 ? (
+                        fit.missing.map((skill) => <li key={skill}>{skill} — not on your profile</li>)
+                      ) : (
+                        <li>No named skill is missing.</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+
+                {fit.missing.length > 0 ? (
+                  <p className="job-fit-advice">
+                    If you have real evidence for {fit.missing.slice(0, 2).join(" or ")}, add it to your profile. Otherwise
+                    the draft leaves it out.
+                  </p>
+                ) : null}
+
+                {detail.skills.length > 0 ? (
+                  <div aria-label="Named skills" className="job-fit-skills">
+                    {detail.skills.slice(0, 10).map((skill) => (
+                      <span className={fit.matched.includes(skill) ? "is-on" : "is-off"} key={skill}>
+                        {fit.matched.includes(skill) ? "✓" : "×"} {skill}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+
+                <details className="job-breakdown job-fit-breakdown">
+                  <summary>How we got to {fit.score}</summary>
+                  <ul>
+                    {[
+                      ["Named skills", fit.parts.skills, 45],
+                      ["Title match", fit.parts.title, 20],
+                      ["Experience asked", fit.parts.seniority, 15],
+                      ["Location", fit.parts.location, 10],
+                      ["Freshness", fit.parts.freshness, 5],
+                    ].map(([label, value, max]) => (
+                      <li key={String(label)}>
+                        <span>{label}</span>
+                        <i>
+                          <b style={{ width: `${Math.round((Number(value) / Number(max)) * 100)}%` }} />
+                        </i>
+                        <em>
+                          {value}/{max}
+                        </em>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              </section>
+            ) : null}
 
             {tracked ? (
               <p className="doc-banner is-ok" role="status">

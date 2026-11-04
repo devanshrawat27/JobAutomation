@@ -28,6 +28,10 @@ export type ResolvedJob = JobDetail & {
   /** Lakhs per annum, when the posting states pay. */
   salaryMin: number | null;
   salaryMax: number | null;
+  skills: string[];
+  seniority: string | null;
+  yearsMin: number | null;
+  remote: boolean;
 };
 
 const SOURCE_IDS: ReadonlySet<string> = new Set<JobSourceId>([
@@ -79,6 +83,10 @@ export async function getJobDetail(
       lastSeenAt: true,
       salaryMin: true,
       salaryMax: true,
+      skills: true,
+      seniority: true,
+      yearsMin: true,
+      remote: true,
     },
   });
 
@@ -110,6 +118,10 @@ export async function getJobDetail(
       ownerUserId: stored.ownerUserId,
       salaryMin: stored.salaryMin,
       salaryMax: stored.salaryMax,
+      skills: stored.skills,
+      seniority: stored.seniority,
+      yearsMin: stored.yearsMin,
+      remote: stored.remote,
     };
   }
 
@@ -130,6 +142,10 @@ export async function getJobDetail(
     ownerUserId: null,
     salaryMin: null,
     salaryMax: null,
+    skills: [],
+    seniority: null,
+    yearsMin: null,
+    remote: false,
   };
 }
 
