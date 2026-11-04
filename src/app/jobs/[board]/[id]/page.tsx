@@ -183,7 +183,7 @@ export default async function JobDetailPage({
               ) : null}
               <span>Read from {detail.origin === "corpus" ? "the stored corpus" : "the employer's board"}</span>
               <a href={detail.posting.url} rel="noreferrer noopener" target="_blank">
-                View original posting ↗
+                Apply on the employer&apos;s site ↗
               </a>
             </p>
 
@@ -198,10 +198,10 @@ export default async function JobDetailPage({
 
             <div className="profile-links">
               <Link className="intake-secondary" href={`/jobs/${boardToken}/${id}/prepare`}>
-                Prepare an application <span aria-hidden="true">→</span>
+                Tailor my resume <span aria-hidden="true">→</span>
               </Link>
               <Link className="intake-secondary" href={`/jobs/${boardToken}/${id}/answers`}>
-                Application answers <span aria-hidden="true">→</span>
+                Get form answers <span aria-hidden="true">→</span>
               </Link>
             </div>
 
@@ -264,13 +264,31 @@ export default async function JobDetailPage({
             {match ? (
               <section aria-labelledby="match-title" className="match-panel">
                 <div className="match-head">
-                  <h2 id="match-title">How your profile answers this job</h2>
+                  <h2 id="match-title">How you match this job</h2>
                   <span className="match-method">
                     {match.method === "ai"
                       ? "Read by Gemini, every quote checked against the job text and your facts"
                       : "Word overlap only (no model) — treat this as a rough guide"}
                   </span>
                 </div>
+
+                <p className="match-summary">
+                  {match.counts.match === 0 ? (
+                    <>
+                      You do not clearly meet any of the <strong>{match.requirements.length}</strong> requirements
+                    </>
+                  ) : (
+                    <>
+                      You clearly meet <strong>{match.counts.match}</strong> of{" "}
+                      <strong>{match.requirements.length}</strong> requirements
+                    </>
+                  )}
+                  {match.counts.gap > 0 ? `, and ${match.counts.gap} look like gaps` : ""}
+                  {match.counts.unknown > 0
+                    ? `; ${match.counts.unknown} ${match.counts.unknown === 1 ? "needs" : "need"} checking`
+                    : ""}
+                  .
+                </p>
 
                 <ul className="match-counts">
                   {statusOrder.map((status) => (
@@ -307,8 +325,8 @@ export default async function JobDetailPage({
                 </ol>
 
                 <p className="jobs-note">
-                  This is a reading aid, not a prediction. Nothing is scored, nothing is submitted, and applying still
-                  happens on the employer’s site.
+                  This compares the posting with your confirmed facts. It is not a prediction, and nothing is submitted
+                  from here.
                 </p>
               </section>
             ) : null}

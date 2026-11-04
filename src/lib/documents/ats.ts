@@ -173,6 +173,6 @@ export function checkResume({
     summary:
       failed.length === 0
         ? "No blocking issues found. Read it once more for meaning."
-        : `${failed.length} blocking issue${failed.length === 1 ? "" : "s"}: ${failed.map((check) => check.label.toLowerCase()).join(", ")}.`,
+        : `${failed.length} thing${failed.length === 1 ? "" : "s"} to fix: ${failed.map((check) => check.label.toLowerCase()).join(", ")}.`,
   };
 }

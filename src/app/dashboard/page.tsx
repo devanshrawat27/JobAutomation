@@ -60,35 +60,35 @@ export default async function DashboardPage() {
   const metrics = [
     {
       key: "new",
-      label: "New matches",
+      label: "New jobs for you",
       value: data.metrics.newMatches,
-      hint: `Strong fits discovered in the last ${NEW_MATCH_DAYS} days`,
+      hint: `Added in the last ${NEW_MATCH_DAYS} days`,
       href: "/jobs?view=for-you",
-      action: "See matches",
+      action: "See jobs",
     },
     {
       key: "saved",
-      label: "Shortlisted",
+      label: "Saved jobs",
       value: data.metrics.shortlisted,
       hint: "Roles you saved, not applied to",
       href: "/jobs?view=saved",
-      action: "Open shortlist",
+      action: "See saved",
     },
     {
       key: "progress",
-      label: "Applications in progress",
+      label: "Applications open",
       value: data.metrics.inProgress,
-      hint: "Prepared, filled or submit attempted",
+      hint: "Started, filled or submitted — not answered yet",
       href: "/applications",
-      action: "Open tracker",
+      action: "See applications",
     },
     {
       key: "followup",
-      label: "Follow-ups due",
+      label: "Follow-ups",
       value: data.metrics.followUps,
-      hint: `No status change for ${FOLLOW_UP_DAYS}+ days`,
+      hint: `No update for ${FOLLOW_UP_DAYS}+ days`,
       href: "/applications",
-      action: "Review",
+      action: "Check",
     },
   ];
 
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
               <h1 id="overview-title">
                 {greeting()}, {firstName}.
               </h1>
-              <p className="dash-lede">Here is what needs your attention today.</p>
+              <p className="dash-lede">Here is what to do next.</p>
             </div>
             <div className="dash-actions">
               <Link className="onboarding-submit" href="/jobs">
@@ -136,10 +136,10 @@ export default async function DashboardPage() {
                 <div className="dash-panel-head">
                   <div>
                     <p className="dash-eyebrow">For you</p>
-                    <h2 id="dash-matches">Best matches right now</h2>
+                    <h2 id="dash-matches">Jobs picked for you</h2>
                   </div>
                   <Link className="dash-panel-link" href="/jobs?view=for-you">
-                    View all {data.matchPool > 0 ? `(${data.matchPool})` : ""} <span aria-hidden="true">→</span>
+                    See all {data.matchPool > 0 ? `(${data.matchPool})` : ""} <span aria-hidden="true">→</span>
                   </Link>
                 </div>
 
@@ -203,7 +203,7 @@ export default async function DashboardPage() {
                               <MatchDonut score={match.score} verdict={match.verdict} />
                             <div className="dash-match-actions">
                               <Link className="dash-action" href={`/jobs/${match.board}/${match.externalId}`}>
-                                View match
+                                View job
                               </Link>
                               <form action={setJobDecision}>
                                 <input name="postingId" type="hidden" value={match.id} />
@@ -231,7 +231,7 @@ export default async function DashboardPage() {
                                 <input name="url" type="hidden" value={match.url} />
                                 <input name="returnTo" type="hidden" value="/dashboard" />
                                 <button className="dash-action" name="decision" type="submit" value="dismissed">
-                                  Dismiss
+                                  Not interested
                                 </button>
                               </form>
                             </div>
@@ -251,7 +251,7 @@ export default async function DashboardPage() {
                 <div className="dash-panel-head">
                   <div>
                     <p className="dash-eyebrow">Today</p>
-                    <h2 id="dash-attention">Needs your attention</h2>
+                    <h2 id="dash-attention">What needs you</h2>
                   </div>
                   <span className="dash-panel-count">{data.attention.length}</span>
                 </div>
@@ -281,7 +281,7 @@ export default async function DashboardPage() {
                 <div className="dash-panel-head">
                   <div>
                     <p className="dash-eyebrow">Pipeline</p>
-                    <h2 id="dash-pipeline">Where each application is</h2>
+                    <h2 id="dash-pipeline">Your applications</h2>
                   </div>
                 </div>
                 <ul className="dash-pipeline">
@@ -306,7 +306,7 @@ export default async function DashboardPage() {
                 <div className="dash-panel-head">
                   <div>
                     <p className="dash-eyebrow">Profile</p>
-                    <h2 id="dash-readiness">Ready for the next form?</h2>
+                    <h2 id="dash-readiness">Is your profile ready?</h2>
                   </div>
                 </div>
                 <div className="dash-progress" aria-hidden="true">
@@ -336,7 +336,7 @@ export default async function DashboardPage() {
                 <div className="dash-panel-head">
                   <div>
                     <p className="dash-eyebrow">Sources</p>
-                    <h2 id="dash-scan">Scanner health</h2>
+                    <h2 id="dash-scan">Job sources</h2>
                   </div>
                 </div>
                 <dl className="dash-scan">

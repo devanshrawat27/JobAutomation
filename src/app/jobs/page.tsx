@@ -484,7 +484,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
           ? "Postings you kept. Nothing here has been applied to."
           : effectiveView === "dismissed"
             ? "Postings you hid. Undo puts one back."
-            : "Everything from the last 14 days, newest first. Older postings stay stored but leave the list — they are not marked closed.";
+            : "Every posting from the last 14 days, newest first. Older ones stay stored but leave the list.";
   const visible = ordered.slice(0, 60).map((entry) => {
     const rules = parseEligibility(entry.posting.description);
     return {
@@ -519,53 +519,56 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
             <p className="section-kicker">Job discovery</p>
             <h1 id="jobs-title">{effectiveView === "fresher" ? "Fresher roles" : "Jobs"}</h1>
             <p className="onboarding-intro">
-              Every posting is published by the employer on their own job board, and every card says why it matched you.
-              Saving or dismissing only changes what you see here — nothing is ever applied to.
+              Every posting comes from the employer&apos;s own board. Each card says why it fits, and nothing is ever applied to
+              without you.
             </p>
           </div>
 
           <dl className="jobs-stats">
             <div>
-              <dt>Live postings (14 days)</dt>
+              <dt>Open roles</dt>
               <dd>{allOpen}</dd>
             </div>
             <div>
-              <dt>Employer boards</dt>
+              <dt>Boards checked</dt>
               <dd>{activeBoards.length}</dd>
             </div>
             <div>
-              <dt>Last scan</dt>
+              <dt>Last checked</dt>
               <dd>{scan?.endedAt ? updatedLabel(scan.endedAt.toISOString()) : "not yet"}</dd>
             </div>
             <div>
-              <dt>Strong matches</dt>
+              <dt>Strong fits</dt>
               <dd>{forYouAvailable ? strongCount : "—"}</dd>
             </div>
             <div>
-              <dt>Median pay stated</dt>
+              <dt>Typical pay</dt>
               <dd>{medianPay !== null ? `₹${medianPay} LPA` : "—"}</dd>
             </div>
           </dl>
         </div>
 
-        <form action={importJob} className="jobs-import" id="import">
-          <label className="jobs-field jobs-import-field">
-            <span>Paste a job link</span>
-            <input
-              name="url"
-              placeholder="jobs.lever.co/… · boards.greenhouse.io/… · jobs.ashbyhq.com/… · apply.workable.com/…"
-              required
-              type="url"
-            />
-          </label>
-          <button className="onboarding-submit jobs-import-submit" type="submit">
-            Import this job <span aria-hidden="true">→</span>
-          </button>
-        </form>
-        <p className="jobs-import-hint">
-          Greenhouse, Lever, Ashby and Workable links open in one click. LinkedIn and X cannot be read automatically — use
-          the extension or paste the post below.
-        </p>
+        <details className="jobs-add" id="import">
+          <summary>Add a job from a link</summary>
+          <form action={importJob} className="jobs-import">
+            <label className="jobs-field jobs-import-field">
+              <span>Paste a job link</span>
+              <input
+                name="url"
+                placeholder="jobs.lever.co/… · boards.greenhouse.io/… · jobs.ashbyhq.com/… · apply.workable.com/…"
+                required
+                type="url"
+              />
+            </label>
+            <button className="onboarding-submit jobs-import-submit" type="submit">
+              Import this job <span aria-hidden="true">→</span>
+            </button>
+          </form>
+          <p className="jobs-import-hint">
+            Greenhouse, Lever, Ashby and Workable links open in one click. LinkedIn and X cannot be read automatically — use
+            the extension or paste the post below.
+          </p>
+        </details>
 
         {importedRef ? (
           <p className="doc-banner is-ok" role="status">
@@ -591,9 +594,9 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
             <input defaultValue={query} name="q" placeholder="title, team or city" type="search" />
           </label>
           <label className="jobs-field">
-            <span>Board</span>
+            <span>Company</span>
             <select defaultValue={boardToken} name="board">
-              <option value="">All boards</option>
+              <option value="">All companies</option>
               {BOARDS.map((option) => (
                 <option key={option.token} value={option.token}>{option.company}</option>
               ))}
@@ -729,19 +732,19 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
               </Link>
             ) : null}
             <Link className={effectiveView === "all" || effectiveView === "" ? "is-active" : ""} href="/jobs?view=all">
-              All <span>{allOpen}</span>
+              All jobs <span>{allOpen}</span>
             </Link>
             <Link className={effectiveView === "saved" ? "is-active" : ""} href="/jobs?view=saved">
               Saved <span>{savedCount}</span>
             </Link>
             <Link className={effectiveView === "dismissed" ? "is-active" : ""} href="/jobs?view=dismissed">
-              Dismissed <span>{dismissedCount}</span>
+              Hidden <span>{dismissedCount}</span>
             </Link>
           </nav>
 
           <form action={scanNow} className="jobs-scan">
             <button className="jobs-scan-btn" type="submit">
-              Scan boards now
+              Check for new jobs
             </button>
           </form>
         </div>
@@ -820,7 +823,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                 : effectiveView === "saved"
                   ? "Use Save on a posting to keep it here."
                   : effectiveView === "dismissed"
-                    ? "Dismiss a posting to hide it from the lists."
+                    ? "Use Hide on a posting to keep it out of your list."
                     : "Try a shorter search, or clear the board filter."}
             </p>
             <Link className="intake-secondary" href="/jobs?view=all">
@@ -889,7 +892,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                       ) : null}
                       {fit.reasons.length > 0 ? <p className="job-why">{fit.reasons.slice(0, 2).join(" · ")}</p> : null}
                       <details className="job-breakdown">
-                        <summary>Why {fit.score}?</summary>
+                        <summary>Why this score?</summary>
                         <ul>
                           {[
                             ["Named skills", fit.parts.skills, 45],
@@ -948,7 +951,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                             type="submit"
                             value="dismissed"
                           >
-                            Dismiss
+                            Hide
                           </button>
                           {decision ? (
                             <button className="job-action" name="decision" type="submit" value="clear">
@@ -958,7 +961,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
                         </form>
                       ) : null}
                       <a className="job-link" href={posting.url} rel="noreferrer noopener" target="_blank">
-                        View posting <span aria-hidden="true">↗</span>
+                        Employer page <span aria-hidden="true">↗</span>
                       </a>
                     </div>
                   </div>

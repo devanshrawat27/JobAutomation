@@ -299,7 +299,7 @@ export default async function DocumentPage({
           <section aria-labelledby="ats-title" className="doc-ats">
             <div className="doc-ats-head">
               <div>
-                <h2 id="ats-title">ATS read</h2>
+                <h2 id="ats-title">ATS check</h2>
                 <p>Deterministic checks on structure. Every point is a rule, not an opinion.</p>
               </div>
               <span className={`doc-ats-score is-${ats.grade}`}>
@@ -307,7 +307,10 @@ export default async function DocumentPage({
                 <small>/100</small>
               </span>
             </div>
-            <p className={`doc-ats-summary is-${ats.grade}`}>{ats.summary}</p>
+            <p className={`doc-ats-summary is-${ats.grade}`}>
+              <strong>{ats.grade === "strong" ? "Strong" : ats.grade === "fair" ? "Fair" : "Needs a look"}.</strong>{" "}
+              {ats.summary}
+            </p>
             <ul className="doc-ats-checks">
               {ats.checks.map((check) => (
                 <li className={`is-${check.status}`} key={check.id}>

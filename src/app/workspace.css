@@ -2785,8 +2785,47 @@
 .doc-ats-checks p { margin: 1px 0 0; color: var(--muted); font-size: 10.5px; line-height: 1.45; }
 .doc-ats-points { padding-top: 2px; color: var(--muted-soft); font-family: var(--font-mono); font-size: 9.5px; }
 
-/* Thin-list suggestions: a named filter and a real count. */
-.jobs-widen {
+/* Add-a-job disclosure: one quiet row until opened. */
+.jobs-add {
+  margin: 18px 0 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.jobs-add > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+.jobs-add > summary::-webkit-details-marker { display: none; }
+.jobs-add > summary::before { content: "+"; color: var(--muted); font-family: var(--font-mono); }
+.jobs-add[open] > summary::before { content: "−"; }
+.jobs-add .jobs-import {
+  margin: 0;
+  padding: 0 14px 4px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.jobs-add .jobs-import-field span { color: var(--muted); }
+.jobs-add .jobs-import-hint { margin: 0; padding: 0 14px 12px; }
+
+/* One-sentence summary above the requirement cards. */
+.match-summary {
+  margin: 0 0 12px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.match-summary strong { color: var(--ink); font-weight: 650; }
+
+/* Thin-list suggestions: a named filter and a real count. */.jobs-widen {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
