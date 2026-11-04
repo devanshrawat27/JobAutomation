@@ -108,9 +108,6 @@ export default async function DashboardPage() {
               <Link className="onboarding-submit" href="/jobs">
                 Find jobs <span aria-hidden="true">→</span>
               </Link>
-              <Link className="intake-secondary" href="/jobs#import">
-                Import a job
-              </Link>
               <Link className="intake-secondary" href={`/onboarding/resume?path=${data.candidate.student ? "new-grad" : "experienced"}&new=1`}>
                 Update resume
               </Link>

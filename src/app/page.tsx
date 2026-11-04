@@ -66,7 +66,7 @@ const differentiators = [
   {
     icon: "community" as const,
     title: "Community posts included",
-    copy: "Founder and team posts from Hacker News and Mastodon, plus one-click import from Greenhouse, Lever, Ashby and Workable.",
+    copy: "Founder and team posts from Hacker News and Mastodon, next to the employer's own boards — plus a one-click save when you are already reading a posting.",
   },
 ];
 
