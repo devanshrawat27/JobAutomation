@@ -20,6 +20,8 @@ export type CandidateModel = {
   titles: string[];
   roleWords: string[];
   years: number;
+  /** Exact dated months, so a short internship is not rounded twice. */
+  months: number;
   locations: string[];
   remoteFriendly: boolean;
   seniority: "fresher" | "junior" | "mid" | "senior" | "lead";
@@ -134,12 +136,17 @@ function datedRanges(facts: CandidateFacts[]): DateRange[] {
   const ranges: DateRange[] = [];
 
   for (const fact of facts) {
+    // Only the experience group counts as work. Education carries a "Dates"
+    // fact too ("Aug 2023 – May 2027"); counting it made a three-month intern
+    // look like a 3.8-year engineer.
+    if (fact.group) {
+      if (fact.group !== "experience") continue;
+    } else if (!/work experience|employment|experience/i.test(fact.label)) {
+      continue;
+    }
+
     // Experience cards hold "Company — Role", the dates and bullets on separate
     // lines; any line that parses as a range counts once.
-    const looksLikeExperience =
-      fact.group === "experience" || /date|experience|role|intern|work/i.test(fact.label);
-    if (!looksLikeExperience) continue;
-
     for (const line of fact.value.split("\n")) {
       const range = parseDateRange(line);
       if (range) ranges.push(range);
@@ -229,6 +236,7 @@ export function buildCandidate(facts: CandidateFacts[]): CandidateModel {
     titles: [...titles],
     roleWords,
     years,
+    months,
     locations: [...locations],
     remoteFriendly,
     seniority,

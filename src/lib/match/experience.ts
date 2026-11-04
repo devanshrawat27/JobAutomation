@@ -15,7 +15,7 @@ const MONTHS: Record<string, number> = {
 
 type MonthIndex = { year: number; month: number };
 
-export type DateRange = { start: MonthIndex; end: MonthIndex };
+export type DateRange = { start: MonthIndex; end: MonthIndex; open?: boolean };
 
 /**
  * Parse the date ranges that appear in profile facts, e.g.
@@ -33,7 +33,11 @@ export function parseDateRange(value: string, now = new Date()): DateRange | nul
     if (startMonth === undefined) return null;
 
     if (withMonths[3]) {
-      return { start: { year: startYear, month: startMonth }, end: { year: now.getFullYear(), month: now.getMonth() } };
+      return {
+        start: { year: startYear, month: startMonth },
+        end: { year: now.getFullYear(), month: now.getMonth() },
+        open: true,
+      };
     }
 
     const endMonth = MONTHS[withMonths[4].toLowerCase()];
@@ -45,7 +49,7 @@ export function parseDateRange(value: string, now = new Date()): DateRange | nul
   const yearsOnly = text.match(/\b(\d{4})\s*[–—−-]\s*(?:(present|current|now|today)|(\d{4}))/i);
   if (yearsOnly) {
     const start = { year: Number(yearsOnly[1]), month: 0 };
-    if (yearsOnly[2]) return { start, end: { year: now.getFullYear(), month: now.getMonth() } };
+    if (yearsOnly[2]) return { start, end: { year: now.getFullYear(), month: now.getMonth() }, open: true };
     return { start, end: { year: Number(yearsOnly[3]), month: 11 } };
   }
 
@@ -56,9 +60,9 @@ function toMonthNumber({ year, month }: MonthIndex): number {
   return year * 12 + month;
 }
 
-/** Inclusive month count for one range. */
+/** Months for one range. An open-ended "Present" range counts elapsed months, not inclusive ones. */
 export function rangeMonths(range: DateRange): number {
-  const span = toMonthNumber(range.end) - toMonthNumber(range.start) + 1;
+  const span = toMonthNumber(range.end) - toMonthNumber(range.start) + 1 - (range.open ? 1 : 0);
   return Math.max(0, span);
 }
 

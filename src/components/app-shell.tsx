@@ -4,6 +4,7 @@ import SignOutButton from "@/components/sign-out-button";
 import { prisma } from "@/lib/db";
 import { visiblePostings } from "@/lib/jobs/detail";
 import { buildCandidate } from "@/lib/jobs/match";
+import { formatMonths } from "@/lib/match/experience";
 import { listingWindowWhere } from "@/lib/jobs/window";
 import { getCurrentSession } from "@/lib/session";
 
@@ -100,7 +101,7 @@ export default async function AppShell({
   const headline = candidate.student
     ? `Student${candidate.graduationYear ? ` · class of ${candidate.graduationYear}` : ""}`
     : candidate.years > 0
-      ? `${candidate.years} years · ${candidate.family ?? "profile"}`
+      ? `${formatMonths(candidate.months)} · ${candidate.family ?? "profile"}`
       : "No profile yet";
 
   const AREAS = [

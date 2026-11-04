@@ -8,6 +8,7 @@ import { prisma } from "@/lib/db";
 import { saveFormDetail } from "@/app/actions/form-detail";
 import { buildAnswers } from "@/lib/form/answers";
 import { buildCandidate } from "@/lib/jobs/match";
+import { formatMonths } from "@/lib/match/experience";
 import { getCurrentSession } from "@/lib/session";
 import ProfileActions from "./profile-actions";
 import ProfileFactRow from "./profile-fact-row";
@@ -48,7 +49,7 @@ export default async function ProfilePage() {
   const headline = candidate.student
     ? `Student${candidate.graduationYear ? ` · class of ${candidate.graduationYear}` : ""}`
     : candidate.years > 0
-      ? `${candidate.years} years · ${candidate.family ?? "profile"}`
+      ? `${formatMonths(candidate.months)} · ${candidate.family ?? "profile"}`
       : "No dated experience yet";
 
   // The questions employer forms ask that a resume never answers.

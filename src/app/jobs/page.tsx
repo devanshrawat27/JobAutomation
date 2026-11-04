@@ -11,6 +11,7 @@ import { lastScan } from "@/lib/jobs/ingest";
 import { visiblePostings } from "@/lib/jobs/detail";
 import { listingWindowWhere } from "@/lib/jobs/window";
 import { buildCandidate, entryFriendly, matchPosting, roleFamily, seniorityOf } from "@/lib/jobs/match";
+import { formatMonths } from "@/lib/match/experience";
 import { checkEligibility, parseEligibility, type EligibilityProfile } from "@/lib/jobs/eligibility";
 import { parseReach } from "@/lib/jobs/place";
 import { formatSalary, medianSalary } from "@/lib/jobs/salary";
@@ -669,7 +670,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
             ) : (
               <b>{candidate.seniority}</b>
             )}
-            <span> · {candidate.years} years from your dates · {candidate.skills.length} skills · {candidate.family ?? "no role family"}</span>
+            <span> · {formatMonths(candidate.months)} from your dates · {candidate.skills.length} skills · {candidate.family ?? "no role family"}</span>
           </p>
         ) : (
           <div className="jobs-gate">

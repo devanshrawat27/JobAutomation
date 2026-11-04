@@ -4,8 +4,9 @@ import assert from "node:assert/strict";
 import { checkEligibility, parseEligibility } from "../src/lib/jobs/eligibility.ts";
 import { assessPosting } from "../src/lib/jobs/trust.ts";
 import { matchPosting, buildCandidate, entryFriendly, mustHaveSkills } from "../src/lib/jobs/match.ts";
+import { formatMonths } from "../src/lib/match/experience.ts";
 import { parseReach, scoreReach } from "../src/lib/jobs/place.ts";
-import { parseDateRange, requiredYears, totalMonths } from "../src/lib/match/experience.ts";
+import { parseDateRange, rangeMonths, requiredYears, totalMonths } from "../src/lib/match/experience.ts";
 import { extractSkills } from "../src/lib/jobs/skills.ts";
 
 const profile = { cgpa: 8.4, cgpaScale: 10, percentage: 84, graduationYear: 2027, degree: "B.Tech in Computer Science" };
@@ -132,4 +133,25 @@ test("must-have skills are read from the posting's own wording", () => {
   assert.ok(must.has("Java"));
   assert.ok(!must.has("Node.js"));
   assert.ok(!must.has("Figma"));
+});
+
+test("education dates are not work experience", () => {
+  const candidate = buildCandidate([
+    { label: "Institution", value: "Graphic Era Hill University", group: "education" },
+    { label: "Dates", value: "Aug 2023 – May 2027", group: "education" },
+    {
+      label: "Experience",
+      value: "Acme — SDE Intern\nJan 2024 – Mar 2024\n• Built an API",
+      group: "experience",
+    },
+  ]);
+
+  assert.equal(candidate.months, 3);
+  assert.equal(formatMonths(candidate.months), "3 months");
+});
+
+test("an open-ended role counts elapsed months, not inclusive ones", () => {
+  const range = parseDateRange("Aug 2026 – Present", new Date(2026, 10, 4));
+  assert.ok(range);
+  assert.equal(rangeMonths(range), 3);
 });
