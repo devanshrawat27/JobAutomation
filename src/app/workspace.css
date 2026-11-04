@@ -3441,10 +3441,12 @@
 }
 .jobs-filters .jobs-submit:hover { background: linear-gradient(180deg, #4a86f8, #2f6cf0 55%, #1e50dd); }
 .jobs-filters > .jobs-field:first-of-type { flex: 2 1 300px; }
-.jobs-filters--chips .jobs-field { flex: 1 1 150px; }
+.jobs-filters--chips .jobs-field { flex: 1 1 108px; max-width: 126px; }
 
 .onboarding-page .jobs-filter-apply {
   width: auto;
+  flex: 0 0 auto;
+  margin-left: auto;
   border-color: #1d4ed8;
   background: linear-gradient(180deg, #3d7df7, #2563eb 55%, #1d4ed8);
   color: #fff;
@@ -3456,6 +3458,11 @@
   color: #fff;
 }
 .onboarding-page .jobs-filters--chips .jobs-filter-apply { width: auto; }
+
+/* The onboarding footer is a sentence plus one action, not a full-width bar. */
+.onboarding-page .path-form-footer { align-items: center; }
+.onboarding-page .path-form-footer .onboarding-submit { width: auto; min-width: 190px; }
+.onboarding-page .path-form-footer p { flex: 1 1 auto; max-width: 460px; }
 
 .jobs-gate { display: grid; gap: 14px; }
 .jobs-gate h2 { margin: 0; font-size: 22px; font-weight: 650; letter-spacing: -0.03em; }
@@ -3475,7 +3482,271 @@
   .onboarding-page .jobs-filters--chips .jobs-filter-clear { grid-column: auto; }
 }
 
+/* The filter strip is one row: six fields and the action. */
+.onboarding-page .jobs-filters--chips {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+  align-items: end;
+}
+.onboarding-page .jobs-filters--chips .jobs-field { max-width: none; }
+.onboarding-page .jobs-filters--chips .jobs-filter-apply { width: auto; margin-left: 0; }
+
+@media (max-width: 1180px) {
+  .onboarding-page .jobs-filters--chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .onboarding-page .jobs-filters--chips .jobs-filter-apply { grid-column: 1 / -1; justify-self: start; }
+}
+@media (max-width: 640px) {
+  .onboarding-page .jobs-filters--chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 620px) {
   .jobs-filters .jobs-submit { width: 100%; }
 }
+
+/* =========================================================================
+   Prepare page — the job, the evidence, and one clear action
+   ========================================================================= */
+
+.prepare-page { width: min(1120px, 100% - 48px); }
+.prepare-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 40px;
+  align-items: start;
+}
+.prepare-main h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(32px, 4vw, 44px);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+.prepare-main .onboarding-intro { max-width: 620px; color: var(--muted); font-size: 14px; }
+
+.prepare-job {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  margin: 26px 0 20px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.prepare-job-avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 17px;
+  font-weight: 720;
+}
+.prepare-job-body { min-width: 0; }
+.prepare-job-company {
+  display: block;
+  color: var(--muted-soft);
+  font-size: 9.5px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.prepare-job-body strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 640;
+  letter-spacing: -0.02em;
+}
+.prepare-job-body small { display: block; margin-top: 2px; color: var(--muted); font-size: 11.5px; }
+.prepare-job-link {
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.prepare-job-link:hover { text-decoration: underline; }
+
+.prepare-facts {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.prepare-facts-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.prepare-facts-head h2 { margin: 0; color: var(--ink); font-size: 13.5px; font-weight: 640; }
+.prepare-facts-head a { color: var(--accent-strong); font-size: 11.5px; font-weight: 600; }
+.prepare-facts dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 22px;
+  margin: 0;
+}
+.prepare-facts dl div { display: grid; gap: 2px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.prepare-facts dt {
+  color: var(--muted-soft);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.prepare-facts dd { margin: 0; color: var(--ink-soft); font-size: 12.5px; line-height: 1.45; }
+.prepare-facts .prepare-more { margin: 12px 0 0; color: var(--muted-soft); font-size: 11.5px; }
+
+.prepare-aside { position: sticky; top: 24px; }
+.prepare-card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+.prepare-benefits { display: grid; gap: 9px; margin: 14px 0 20px; padding: 0; list-style: none; }
+.prepare-benefits li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.prepare-benefits li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--ok);
+  font-size: 11px;
+  font-weight: 700;
+}
+.prepare-actions { display: grid; gap: 8px; margin: 0 0 16px; }
+.prepare-actions button { width: 100%; justify-content: center; }
+.prepare-privacy { margin: 14px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.prepare-card .intake-note { margin: 0; }
+
+@media (max-width: 960px) {
+  .prepare-page { width: calc(100% - 32px); }
+  .prepare-layout { grid-template-columns: 1fr; gap: 24px; }
+  .prepare-aside { position: static; }
+  .prepare-facts dl { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   Document page — an editor that reads like paper, not a form
+   ========================================================================= */
+
+.doc-editor {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.doc-editor textarea {
+  min-height: 420px;
+  padding: 24px 26px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.doc-editor .doc-actions { justify-content: flex-end; }
+.doc-editor .onboarding-submit {
+  width: auto;
+  padding: 9px 18px;
+  border: 1px solid #1d4ed8;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #3d7df7, #2563eb 55%, #1d4ed8);
+  box-shadow: 0 12px 22px -14px rgb(37 99 235 / 85%);
+  color: #fff;
+  font-size: 12.5px;
+}
+.doc-actions { align-items: center; gap: 8px; }
+.doc-actions .intake-secondary,
+.doc-actions button.intake-secondary {
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 11.5px;
+}
+.doc-evidence {
+  margin-top: 28px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.doc-evidence ul { grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+.doc-evidence li { padding: 10px 12px; border-radius: 10px; background: var(--surface-soft); }
+.doc-evidence li span { font-size: 9px; letter-spacing: 0.12em; }
+.doc-evidence li q { font-size: 12.5px; }
+.doc-ats { margin-top: 28px; }
+
+@media (max-width: 860px) {
+  .doc-evidence ul { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   Application page — status as one compact action, history as a timeline
+   ========================================================================= */
+
+.app-form {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.app-form .onboarding-submit {
+  width: auto;
+  justify-self: start;
+  padding: 9px 18px;
+  border-radius: 9px;
+  font-size: 12.5px;
+}
+.app-links { display: grid; gap: 8px; align-content: start; }
+.app-timeline { margin-top: 28px; }
+.app-timeline ol {
+  display: grid;
+  gap: 0;
+  margin: 12px 0 0;
+  padding: 0 0 0 22px;
+  border-left: 1px solid var(--line);
+  list-style: none;
+}
+.app-timeline li {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 0 0 18px 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.app-timeline li::before {
+  content: "";
+  position: absolute;
+  left: -27px;
+  top: 5px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--surface);
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-line);
+}
+.app-timeline li:last-child { padding-bottom: 0; }
+.app-timeline li p { flex: 1 0 100%; margin: 0; color: var(--muted); font-size: 12px; }
+.app-timeline time { color: var(--muted-soft); font-size: 10.5px; }
 

@@ -2,6 +2,11 @@ import Link from "next/link";
 
 import Reveal from "@/components/landing/reveal";
 import Tilt from "@/components/landing/tilt";
+import { prisma } from "@/lib/db";
+import { visiblePostings } from "@/lib/jobs/visibility";
+import { listingWindowWhere } from "@/lib/jobs/window";
+
+export const revalidate = 300;
 
 const steps = [
   {
@@ -97,7 +102,16 @@ const faqs = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  let openRoles = 0;
+  try {
+    openRoles = await prisma.jobPosting.count({
+      where: { closedAt: null, AND: [visiblePostings(null), listingWindowWhere()] },
+    });
+  } catch {
+    openRoles = 0;
+  }
+
   return (
     <main className="lp2">
       <header className="lp2-header">
@@ -139,6 +153,11 @@ export default function Home() {
           <p className="lp2-sub lp2-in" style={{ "--d": "280ms" } as React.CSSProperties}>
             A job-search workspace that reads your resume once, keeps a profile you confirmed, and prepares the resume, the
             letter and the form answers for each posting. You review everything. You press submit.
+          </p>
+
+          <p className="lp2-live lp2-in" style={{ "--d": "330ms" } as React.CSSProperties}>
+            <b>{openRoles > 0 ? openRoles.toLocaleString("en-IN") : "1,300+"}</b> open roles · 18 employer boards ·
+            rescanned every 15 minutes
           </p>
 
           <div className="lp2-cta-row lp2-in" style={{ "--d": "380ms" } as React.CSSProperties}>
@@ -185,10 +204,6 @@ export default function Home() {
             <b>Profile confirmed</b>
             <span>24 facts · 5 areas</span>
           </div>
-          <div className="lp2-float lp2-float--doc">
-            <b>Nothing auto-submits</b>
-            <span>You press the button</span>
-          </div>
         </div>
       </section>
 
@@ -229,11 +244,12 @@ export default function Home() {
               </div>
 
               <div className="lp2-shot-nav">
-                <span>Profile <b>24</b></span>
-                <span className="is-active">Jobs <b>1,293</b></span>
+                <span>Overview</span>
+                <span className="is-active">Discover jobs <b>{openRoles > 0 ? openRoles.toLocaleString("en-IN") : "1,363"}</b></span>
+                <span>Applications</span>
                 <span>Documents <b>3</b></span>
-                <span>Applications <b>2</b></span>
-                <span>Digest</span>
+                <span>My profile <b>24</b></span>
+                <span>Daily digest</span>
               </div>
 
               <div className="lp2-shot-meter">
@@ -245,9 +261,9 @@ export default function Home() {
               <div className="lp2-shot-head">
                 <div>
                   <small>For you</small>
-                  <strong>Shortlisted roles</strong>
+                  <strong>Jobs picked for you</strong>
                 </div>
-                <span className="lp2-pill">scanned 2 min ago</span>
+                <span className="lp2-pill">updated 2 min ago</span>
               </div>
               <div className="lp2-shot-filters">
                 <span className="is-on">All roles</span>
@@ -265,7 +281,9 @@ export default function Home() {
                     <strong>{title}</strong>
                     <small>{meta}</small>
                   </div>
-                  <span className={`lp2-score is-${tone}`}>{score}</span>
+                  <span aria-hidden="true" className={`lp2-ring is-${tone}`} style={{ "--p": Number(score) } as React.CSSProperties}>
+                    <i>{score}</i>
+                  </span>
                 </div>
               ))}
             </div>

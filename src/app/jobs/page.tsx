@@ -509,7 +509,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
           <dl className="jobs-stats">
             <div>
               <dt>Open roles</dt>
-              <dd>{allOpen}</dd>
+              <dd>{allOpen.toLocaleString("en-IN")}</dd>
             </div>
             <div>
               <dt>Boards checked</dt>
@@ -521,7 +521,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
             </div>
             <div>
               <dt>Strong fits</dt>
-              <dd>{forYouAvailable ? strongCount : "—"}</dd>
+              <dd>{forYouAvailable ? strongCount.toLocaleString("en-IN") : "—"}</dd>
             </div>
             <div>
               <dt>Typical pay</dt>

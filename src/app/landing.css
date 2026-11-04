@@ -1019,7 +1019,7 @@
 .lp2-hero-art {
   position: relative;
   min-height: 0;
-  padding: 26px 0 46px;
+  padding: 26px 0 10px;
 }
 .lp2-hero-art::before {
   content: "";
@@ -1196,6 +1196,7 @@
 }
 
 /* Section rhythm: smaller than the hero, still confident. */
+.lp2-section { text-align: left; }
 .lp2-section h2,
 .lp2-closing h2 { font-size: clamp(31px, 3.9vw, 50px); line-height: 1.04; }
 .lp2-section { margin-top: clamp(72px, 9vw, 120px); }
@@ -1288,4 +1289,89 @@
   .lp2-step { border-right: 0; border-bottom: 1px solid var(--line); padding: 22px 0; }
   .lp2-closing { width: calc(100% - 32px); border-radius: 18px; }
 }
+
+/* =========================================================================
+   Landing polish · 4 Nov 2026
+   A full-width header, no fake link underline, and a mock that matches the
+   workspace the visitor will actually see.
+   ========================================================================= */
+.lp2-header {
+  top: 0;
+  margin-top: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: none;
+}
+.lp2-header-inner {
+  width: min(1180px, 100% - 48px);
+  padding: 12px 0;
+  gap: 26px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.lp2-accent::after { display: none; }
+
+.lp2-live {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+}
+.lp2-live b { color: var(--ink); font-weight: 650; }
+
+.lp2-ring {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: conic-gradient(var(--ring, var(--accent)) calc(var(--p, 0) * 1%), var(--line) 0);
+}
+.lp2-ring::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+.lp2-ring i {
+  position: relative;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 650;
+}
+.lp2-ring.is-strong { --ring: #17a06a; }
+.lp2-ring.is-good { --ring: var(--accent); }
+
+.lp2-matchcard-btn {
+  border: 1px solid var(--inverse-bg);
+  background: var(--inverse-bg);
+  box-shadow: none;
+  color: var(--inverse-fg);
+}
+
+@media (max-width: 560px) {
+  .lp2-header-inner { gap: 8px; }
+  .lp2-actions { gap: 10px; }
+  .lp2-signin { font-size: 12px; }
+  .lp2-install { padding: 7px 10px; font-size: 12px; }
+}
+
+
+@media (max-width: 720px) {
+  .lp2-header { padding: 0; top: 0; margin-top: 0; }
+  .lp2-header-inner { width: calc(100% - 28px); padding: 10px 0; gap: 12px; }
+  .lp2-hero { margin-top: 34px; }
+}
+
 
