@@ -3,11 +3,52 @@ import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/db";
 import { getCurrentSession } from "@/lib/session";
-import { savePreferences } from "@/app/actions/preferences";
+import PreferencesWizard from "./preferences-wizard";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Job preferences — JobAutomation" };
+export const metadata = { title: "Your job preferences — JobAutomation" };
+
+const GENERIC_SKILLS = [
+  "TypeScript",
+  "JavaScript",
+  "Python",
+  "Java",
+  "React.js",
+  "Next.js",
+  "Node.js",
+  "SQL",
+  "PostgreSQL",
+  "Docker",
+];
+
+function listFrom(values: string[]): string[] {
+  const out = new Set<string>();
+  for (const value of values) {
+    for (const part of value.split(/[,;\n·|]/)) {
+      const item = part.trim();
+      if (item.length >= 2 && item.length <= 40) out.add(item);
+    }
+  }
+  return [...out];
+}
+
+function roleSuggestions(labels: string[], values: string[]): string[] {
+  const out = new Set<string>();
+  const add = (value: string | undefined) => {
+    const text = value?.trim() ?? "";
+    if (text.length > 2 && text.length <= 60) out.add(text);
+  };
+
+  for (const value of values) {
+    for (const line of value.split("\n")) add(line.split("—")[1]);
+  }
+  for (const label of labels) {
+    add(label.split("—")[1]);
+  }
+
+  return [...out].slice(0, 6);
+}
 
 export default async function PreferencesPage() {
   const session = await getCurrentSession();
@@ -17,16 +58,42 @@ export default async function PreferencesPage() {
 
   const facts = await prisma.profileFact.findMany({
     where: { userId: session.user.id },
-    select: { groupId: true, key: true, value: true, status: true },
+    orderBy: [{ position: "asc" }],
+    select: { groupId: true, key: true, label: true, value: true, status: true },
   });
   const confirmed = facts.filter((fact) => fact.status === "CONFIRMED" || fact.status === "EDITED");
 
   if (confirmed.length === 0) redirect("/onboarding");
 
-  const pref = new Map<string, string>();
+  const byKey = new Map<string, string>();
   for (const fact of facts) {
-    if (fact.key.startsWith("preferences.")) pref.set(fact.key, fact.value);
+    if (fact.status === "CONFIRMED" || fact.status === "EDITED") byKey.set(fact.key, fact.value);
   }
+
+  const skillValues = confirmed
+    .filter((fact) => fact.groupId === "skills")
+    .map((fact) => fact.value);
+  const contactValues = confirmed
+    .filter((fact) => fact.groupId === "contact")
+    .map((fact) => fact.value);
+  const experience = confirmed.filter((fact) => fact.groupId === "experience");
+
+  const knownSkills = [
+    ...new Set([
+      ...listFrom(skillValues),
+      ...listFrom(contactValues.filter((value) => value.length < 50 && !/@|https?:/.test(value))),
+    ]),
+  ].slice(0, 40);
+
+  const roles = roleSuggestions(
+    experience.map((fact) => fact.label),
+    experience.map((fact) => fact.value),
+  );
+
+  const location = byKey.get("contact.location") ?? "";
+  const cityFromProfile = /bengaluru|bangalore|mumbai|pune|delhi|gurugram|noida|hyderabad|chennai|kolkata|ahmedabad/i.exec(
+    `${location} ${byKey.get("contact.city") ?? ""}`,
+  )?.[0];
 
   return (
     <main className="onboarding-page">
@@ -35,91 +102,36 @@ export default async function PreferencesPage() {
           <span aria-hidden="true" className="brand-mark"><span /></span>
           <span>jobautomation</span>
         </Link>
-        <span className="onboarding-step">Step 3 of 3 <span aria-hidden="true">·</span> about a minute</span>
+        <span className="onboarding-step">Onboarding · 6 short steps</span>
       </header>
-      <div className="onboarding-progress" aria-hidden="true"><i style={{ width: "100%" }} /></div>
 
-      <section aria-labelledby="prefs-title" className="onboarding-content">
-        <p className="section-kicker">Job preferences</p>
-        <h1 id="prefs-title">What should the matcher aim at?</h1>
-        <p className="onboarding-intro">
-          These are yours, not guesses. They filter and rank the feed; you can change them any time from your profile.
-          Leave anything blank and it will not be used.
-        </p>
-
-        <form action={savePreferences} className="prefs-form">
-          <label className="jobs-field prefs-wide">
-            <span>Target roles (up to 3)</span>
-            <input
-              defaultValue={pref.get("preferences.targetRoles") ?? ""}
-              name="roles"
-              placeholder="Backend Engineer, Platform Engineer"
-              type="text"
-            />
-          </label>
-
-          <label className="jobs-field">
-            <span>Preferred locations</span>
-            <input
-              defaultValue={pref.get("preferences.locations") ?? ""}
-              name="locations"
-              placeholder="Bengaluru, Pune, Remote"
-              type="text"
-            />
-          </label>
-
-          <label className="jobs-field">
-            <span>Work mode</span>
-            <select defaultValue={pref.get("preferences.workMode") ?? ""} name="mode">
-              <option value="">Any mode</option>
-              <option value="onsite">On-site</option>
-              <option value="hybrid">Hybrid</option>
-              <option value="remote">Remote</option>
-            </select>
-          </label>
-
-          <label className="jobs-field">
-            <span>Minimum salary (LPA)</span>
-            <input
-              defaultValue={pref.get("preferences.minSalary") ?? ""}
-              min={0}
-              name="salary"
-              placeholder="e.g. 8"
-              step="0.5"
-              type="number"
-            />
-          </label>
-
-          <label className="jobs-field prefs-wide">
-            <span>Companies or words to avoid</span>
-            <input
-              defaultValue={pref.get("preferences.exclude") ?? ""}
-              name="exclude"
-              placeholder="Staffing agencies, a company name, a keyword"
-              type="text"
-            />
-          </label>
-
-          <div className="prefs-actions">
-            <button className="onboarding-submit" type="submit">
-              Save and see jobs <span aria-hidden="true">→</span>
-            </button>
-            <Link className="intake-secondary" href="/dashboard">
-              Skip for now
-            </Link>
-          </div>
-        </form>
-
-        <p className="intake-privacy">
-          These preferences live on your account like any other confirmed fact. They only change what this workspace shows
-          you — nothing is shared with an employer.
-        </p>
-      </section>
-
-      <footer className="onboarding-footer">
-        <Link href="/dashboard">← Your overview</Link>
-        <span>Change these later on your profile.</span>
-      </footer>
+      <PreferencesWizard
+        initial={{
+          roles: byKey.get("preferences.targetRoles") ?? "",
+          topSkills: byKey.get("preferences.topSkills") ?? "",
+          years: byKey.get("preferences.years") ?? "",
+          locations: byKey.get("preferences.locations") ?? "",
+          remote: /remote/i.test(byKey.get("preferences.locations") ?? "") ||
+            /remote/i.test(byKey.get("preferences.workMode") ?? ""),
+          currentCtc: byKey.get("preferences.currentCtc") ?? "",
+          fresher: byKey.get("preferences.currentCtc") === "0",
+          expectedCtc: byKey.get("preferences.expectedCtc") ?? byKey.get("preferences.minSalary") ?? "",
+          mode: byKey.get("preferences.workMode") ?? "",
+          relocate: byKey.get("preferences.relocate") ?? "",
+          availability: byKey.get("preferences.availability") ?? "",
+          phone: byKey.get("contact.phone") ?? "",
+          linkedin: byKey.get("contact.linkedin") ?? "",
+          github: byKey.get("contact.github") ?? "",
+          portfolio: byKey.get("contact.website") ?? "",
+          gender: byKey.get("preferences.gender") ?? "",
+          disability: byKey.get("preferences.disability") ?? "",
+          exclude: byKey.get("preferences.exclude") ?? "",
+        }}
+        knownSkills={knownSkills.length > 0 ? knownSkills : GENERIC_SKILLS}
+        suggestedRoles={roles}
+        suggestedCity={cityFromProfile ?? "Bengaluru"}
+        hasResume={experience.length > 0 || skillValues.length > 0}
+      />
     </main>
   );
 }

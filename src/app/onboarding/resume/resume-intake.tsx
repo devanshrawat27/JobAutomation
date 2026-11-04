@@ -722,10 +722,10 @@ function StepHeader({ step }: { step: string }) {
           <span>jobautomation</span>
         </Link>
         <span className="onboarding-step">
-          Step {current} of 2 <span aria-hidden="true">·</span> {current === 1 ? "about a minute" : "about 2 minutes"}
+          Step {current === 1 ? 1 : 2} of 8 <span aria-hidden="true">·</span> {current === 1 ? "about a minute" : "about 2 minutes"}
         </span>
       </header>
-      <div className="onboarding-progress" aria-hidden="true"><i style={{ width: `${current * 50}%` }} /></div>
+      <div className="onboarding-progress" aria-hidden="true"><i style={{ width: `${current === 1 ? 12.5 : 25}%` }} /></div>
     </>
   );
 }

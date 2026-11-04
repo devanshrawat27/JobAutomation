@@ -46,7 +46,7 @@ export default async function ResumeIntakePage({
             <span aria-hidden="true" className="brand-mark"><span /></span>
             <span>jobautomation</span>
           </Link>
-          <span className="onboarding-step">Step 2 · Profile ready</span>
+          <span className="onboarding-step">Step 2 of 8 · Profile ready</span>
         </header>
 
         <section aria-labelledby="ready-title" className="onboarding-content">

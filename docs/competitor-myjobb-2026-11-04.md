@@ -55,3 +55,21 @@ An India-first "AI job agent" that finds jobs, auto-applies through the candidat
 - ATS score for an uploaded or generated resume (deterministic + keyword), and a company page built from our corpus.
 - Semantic title similarity without a trained model (embeddings over stored titles, if a provider key is available).
 - A denser scan cadence if we want a 6-hour view.
+
+## Onboarding teardown (live walkthrough, 4 Nov 2026)
+
+Sequence: `login → import (01) → pjr (02) → skills (03) → location (04) → comp (05) → final (06) → workEligibility (07) → lastDetails (08) → personaBrief → results → apply`.
+
+| Step | Their question | Controls | Ours |
+| --- | --- | --- | --- |
+| 01 Your story | "Let's build your apply-ready profile" | Resume upload or LinkedIn URL | Resume only (no LinkedIn import) |
+| 02 Target roles | up to 3 titles, prefilled from resume | chips + add a title | Added |
+| 03 Skills | up to 5 top skills + total years | chips (24+), add, years prefilled from resume | Added |
+| 04 Where | cities, or remote | city chips + add + "Open to remote" | Added |
+| 05 Compensation | current CTC, "I'm a fresher", expected CTC | rupee/LPA inputs + a why-we-ask note | Added |
+| 06 How you work | mode, relocation, start date | three required single-choice groups | Added |
+| 07 Where you are | full postal address, US/Canada authorisation and visa, phone, LinkedIn, DOB | fields; required for Workday | Not copied: we do not submit forms, so we ask only phone and LinkedIn |
+| 08 Last details | GitHub, portfolio (same as GitHub), gender, disability, **ATS password** | chips + password field | Added except the ATS password — we never take board logins |
+| Brief | "Here's my brief on you" before results | Is / Wants / Where / Pay / Never rows | Added as the final review screen |
+
+What their wizard does that ours still does not: import a profile from a LinkedIn URL, prefill years from resume dates, and hand off to an agent that applies. The first two are candidates for the next pass; the third is out of scope by product rule.

@@ -32,6 +32,8 @@ export type CandidateModel = {
   /** Preferences saved during onboarding, used to filter and rank. */
   salaryFloor: number | null;
   exclude: string[];
+  /** Willing to move for the right role, so any Indian city is reachable. */
+  relocate: boolean;
 };
 
 export type JobSignals = {
@@ -167,6 +169,8 @@ export function buildCandidate(facts: CandidateFacts[]): CandidateModel {
   let remoteFriendly = false;
   let graduationYear: number | null = null;
   let salaryFloor: number | null = null;
+  let explicitYears: number | null = null;
+  let relocate = false;
   const exclude: string[] = [];
 
   for (const fact of facts) {
@@ -187,10 +191,16 @@ export function buildCandidate(facts: CandidateFacts[]): CandidateModel {
         }
       }
       if (/work mode/.test(label) && /remote|hybrid/i.test(fact.value)) remoteFriendly = true;
-      if (/salary/.test(label)) {
+      if (/salary|ctc|expected/i.test(label)) {
         const amount = Number(fact.value.replace(/[^0-9.]/g, ""));
-        if (Number.isFinite(amount) && amount > 0) salaryFloor = amount;
+        if (Number.isFinite(amount) && amount > 0) salaryFloor = Math.max(salaryFloor ?? 0, amount);
       }
+      if (/years of experience|total years/i.test(label)) {
+        const amount = Number(fact.value.replace(/[^0-9.]/g, ""));
+        if (Number.isFinite(amount) && amount >= 0) explicitYears = amount;
+      }
+      if (/relocate/i.test(label) && /^(yes|true|1|open)/i.test(fact.value.trim())) relocate = true;
+      if (/top skill/i.test(label)) skillText.push(fact.value);
       if (/exclude|avoid/.test(label)) {
         for (const part of fact.value.split(/[,;\n]/)) {
           const word = part.trim().toLowerCase();
@@ -260,7 +270,10 @@ export function buildCandidate(facts: CandidateFacts[]): CandidateModel {
   const roleWords = ROLE_WORDS.filter((word) => new RegExp(`(^|[^a-z])${word}([^a-z]|$)`).test(wholeText));
 
   const months = totalMonths(datedRanges(facts));
-  const years = Math.round((months / 12) * 10) / 10;
+  const computedYears = Math.round((months / 12) * 10) / 10;
+  // "Total years of experience" is a confirmed answer; it outranks dates when
+  // the candidate has stated it, because resumes often omit early work.
+  const years = explicitYears ?? computedYears;
   const seniority = [...LEVELS].find((level) => years >= level.years)?.level ?? "fresher";
 
   return {
@@ -269,7 +282,7 @@ export function buildCandidate(facts: CandidateFacts[]): CandidateModel {
     titles: [...titles],
     roleWords,
     years,
-    months,
+    months: explicitYears !== null ? Math.round(explicitYears * 12) : months,
     locations: [...locations],
     remoteFriendly,
     seniority,
@@ -278,6 +291,7 @@ export function buildCandidate(facts: CandidateFacts[]): CandidateModel {
     graduationYear,
     salaryFloor,
     exclude,
+    relocate,
   };
 }
 
@@ -402,7 +416,16 @@ function locationPart(
     remoteFriendly: candidate.remoteFriendly,
   };
 
-  return scoreReach(reach, place);
+  const result = scoreReach(reach, place);
+
+  // "No, keep me local" leaves the normal city signal. "Yes" means another
+  // Indian city is not a gap — a foreign posting still has to clear its own
+  // work-authorisation restriction.
+  if (candidate.relocate && !result.blocked && !result.foreign && result.points < 8) {
+    return { ...result, points: 8, reason: "Elsewhere in India, and you said you would relocate" };
+  }
+
+  return result;
 }
 
 function freshnessPart(job: JobSignals): number {

@@ -171,3 +171,21 @@ test("saved job preferences feed the candidate model", () => {
   assert.ok(candidate.locations.includes("pune"));
   assert.ok(candidate.titles.includes("Backend Engineer"));
 });
+
+test("stated years and expected CTC outrank resume dates and old floors", () => {
+  const candidate = buildCandidate([
+    { label: "Total years of experience", value: "4", group: "preferences" },
+    { label: "Expected CTC (LPA)", value: "14", group: "preferences" },
+    { label: "Minimum salary (LPA)", value: "9", group: "preferences" },
+    { label: "Willing to relocate", value: "yes", group: "preferences" },
+    { label: "Work experience — Backend Intern", value: "Acme\nJan 2026 – Mar 2026", group: "experience" },
+    { label: "Top skills", value: "Go, PostgreSQL", group: "preferences" },
+  ]);
+
+  assert.equal(candidate.years, 4);
+  assert.equal(candidate.months, 48);
+  assert.equal(candidate.seniority, "senior");
+  assert.equal(candidate.salaryFloor, 14);
+  assert.equal(candidate.relocate, true);
+  assert.ok(candidate.skills.some((skill) => /postgres/i.test(skill)));
+});
