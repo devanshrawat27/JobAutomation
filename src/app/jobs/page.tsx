@@ -1,11 +1,8 @@
-import { randomBytes } from "node:crypto";
 import Link from "next/link";
 
 import AppShell from "@/components/app-shell";
 import MatchDonut from "@/components/match-donut";
 
-import { addHiringPost } from "@/app/actions/hiring-post";
-import SavedFilters from "@/components/saved-filters";
 import { scanNow, setJobDecision } from "@/app/actions/jobs";
 import { BOARDS } from "@/lib/jobs/boards";
 import { searchJobs } from "@/lib/jobs";
@@ -297,18 +294,6 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
           : posting.board === "hiring" || posting.board === "jobopening" || posting.board === "techjobs"
           ? "mastodon"
           : "greenhouse";
-  let captureToken: string | null = null;
-  if (session?.user) {
-    const record = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { captureToken: true },
-    });
-    captureToken = record?.captureToken ?? null;
-    if (!captureToken) {
-      captureToken = randomBytes(18).toString("hex");
-      await prisma.user.update({ where: { id: session.user.id }, data: { captureToken } });
-    }
-  }
 
   // The numbers an Indian posting actually gates on.
   const gradeFact = facts.find((fact) => /grade|cgpa|gpa|percentage|marks/i.test(fact.label));
@@ -629,52 +614,6 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
             </Link>
           ) : null}
         </form>
-
-        <SavedFilters />
-
-        {captureToken ? (
-          <details className="jobs-paste">
-            <summary>Save the job you are looking at (browser extension)</summary>
-            <p>
-              LinkedIn and X refuse automated reads, so the extension saves what is already open in your own session: open
-              a posting, click the extension, press <strong>Save this job</strong>. Your personal token is below — paste it
-              into the extension once.
-            </p>
-            <p className="jobs-token">
-              <code>{captureToken}</code>
-            </p>
-          </details>
-        ) : null}
-
-        <details className="jobs-paste">
-          <summary>Add a hiring post you found (LinkedIn, X, Reddit)</summary>
-          <p>
-            Those platforms block automated reads, so paste the post here instead. It joins the same list, the same score
-            and the same cards — marked <strong>direct post</strong>.
-          </p>
-          <form action={addHiringPost} className="jobs-paste-form">
-            <label className="jobs-field">
-              <span>Link to the post</span>
-              <input name="url" placeholder="https://x.com/… or https://www.linkedin.com/posts/…" required type="url" />
-            </label>
-            <label className="jobs-field">
-              <span>Company (optional)</span>
-              <input name="company" placeholder="Acme" type="text" />
-            </label>
-            <label className="jobs-field jobs-field--wide">
-              <span>Post text</span>
-              <textarea
-                name="text"
-                placeholder="Paste the whole post — role, location, requirements, how to apply."
-                required
-                rows={5}
-              />
-            </label>
-            <button className="onboarding-submit" type="submit">
-              Add to my jobs <span aria-hidden="true">→</span>
-            </button>
-          </form>
-        </details>
 
         <div className="jobs-views">
           <nav aria-label="Job views" className="jobs-tabs">

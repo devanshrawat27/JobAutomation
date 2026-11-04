@@ -1267,50 +1267,11 @@
 .jobs-filter-clear:hover { color: var(--danger); }
 
 /* Paste a post ----------------------------------------------------------- */
-.jobs-paste {
-  margin-top: 12px;
-  border: 1px dashed var(--line-strong);
-  border-radius: 12px;
-  background: var(--surface-soft);
-}
-.jobs-paste summary {
-  padding: 11px 14px;
-  color: var(--ink-soft);
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  list-style: none;
-}
-.jobs-paste summary::-webkit-details-marker { display: none; }
-.jobs-paste summary::before { content: "+ "; color: var(--accent-strong); }
-.jobs-paste[open] summary::before { content: "− "; }
-.jobs-paste > p { margin: 0 14px 12px; max-width: 620px; color: var(--muted); font-size: 12px; line-height: 1.6; }
-.jobs-paste-form {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  padding: 0 14px 16px;
-}
-.jobs-paste-form .jobs-field--wide { grid-column: 1 / -1; }
-.jobs-paste-form textarea {
-  padding: 10px 12px;
-  border: 1px solid var(--line-strong);
-  border-radius: 10px;
-  background: var(--surface);
-  box-shadow: inset 0 1px 2px rgb(11 21 36 / 5%);
-  color: var(--ink);
-  font: inherit;
-  font-size: 13px;
-  resize: vertical;
-}
-.jobs-paste-form textarea:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.jobs-paste-form .onboarding-submit { grid-column: 1 / -1; justify-content: center; }
 
 @media (max-width: 900px) {
   .onboarding-page .jobs-filters--chips { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .onboarding-page .jobs-filters--chips .jobs-filter-apply,
   .onboarding-page .jobs-filters--chips .jobs-filter-clear { grid-column: 1 / -1; }
-  .jobs-paste-form { grid-template-columns: 1fr; }
 }
 
 /* Community posts are readable, not endorsed. */
@@ -1327,88 +1288,7 @@
   font-weight: 600;
 }
 
-.jobs-token { margin: 0 14px 14px; }
-.jobs-token code {
-  display: inline-block;
-  padding: 6px 9px;
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  word-break: break-all;
-}
-
 /* Saved filter chips ------------------------------------------------------ */
-.saved-filters { margin-top: 10px; }
-.saved-filters-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.saved-filters-list {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.saved-filters-list li {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: var(--surface);
-  overflow: hidden;
-}
-.saved-filters-list a {
-  padding: 5px 10px 5px 11px;
-  color: var(--ink-soft);
-  font-size: 11.5px;
-  font-weight: 600;
-}
-.saved-filters-list a:hover { color: var(--accent-strong); }
-.saved-filters-list a.is-active { background: var(--accent-soft); color: var(--accent-strong); }
-.saved-filters-list button {
-  padding: 5px 8px;
-  border: 0;
-  border-left: 1px solid var(--line);
-  background: transparent;
-  color: var(--muted-soft);
-  font: inherit;
-  font-size: 12px;
-  cursor: pointer;
-}
-.saved-filters-list button:hover { color: var(--danger); background: var(--danger-soft); }
-.saved-filters-hint { margin: 0; color: var(--muted-soft); font-size: 11.5px; }
-.saved-filters-add { display: inline-flex; gap: 6px; align-items: center; }
-.saved-filters-add input {
-  padding: 6px 9px;
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--ink);
-  font: inherit;
-  font-size: 11.5px;
-  width: 150px;
-}
-.saved-filters-add input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.saved-filters-add button {
-  padding: 6px 11px;
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--ink-soft);
-  font: inherit;
-  font-size: 11.5px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.saved-filters-add button:disabled { opacity: 0.45; cursor: not-allowed; }
-.saved-filters-add button:not(:disabled):hover { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-strong); }
 
 /* =========================================================================
    Signed-in shell: sidebar + workspace
@@ -2493,17 +2373,48 @@
   text-transform: none;
 }
 
+/* Filters: sentence-case labels, one row of fields, the button beside them. */
+.onboarding-page .jobs-field span,
+.onboarding-page .auth-field > span {
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+@media (min-width: 1100px) {
+  .onboarding-page .jobs-filters--chips {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
+  }
+}
+.onboarding-page .jobs-filter-apply { align-self: end; }
+
 /* Tabs behave like tabs. */
-.onboarding-page .jobs-tabs { gap: 18px; }
+.onboarding-page .jobs-views {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 22px;
+  border-bottom: 1px solid var(--line);
+}
+.onboarding-page .jobs-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
 .onboarding-page .jobs-tabs a {
-  margin: 0;
-  padding: 6px 0 8px;
+  margin: 0 0 -1px;
+  padding: 8px 0 10px;
   border: 0;
-  border-bottom: 1px solid transparent;
+  border-bottom: 2px solid transparent;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
   color: var(--muted);
+  font-size: 12.5px;
   font-weight: 600;
 }
 .onboarding-page .jobs-tabs a:hover {
@@ -2517,7 +2428,20 @@
   box-shadow: none;
   color: var(--ink);
 }
-.onboarding-page .jobs-tabs a.is-active span { color: var(--muted); }
+.onboarding-page .jobs-tabs a span {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  vertical-align: 1px;
+}
+.onboarding-page .jobs-tabs a.is-active span { background: var(--surface); color: var(--ink-soft); }
+.onboarding-page .jobs-views .jobs-scan { padding-bottom: 7px; }
 
 /* Surfaces: a border is enough. */
 .onboarding-page .job-card,
