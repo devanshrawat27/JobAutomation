@@ -149,50 +149,52 @@ export default async function AppShell({
           ))}
         </nav>
 
-        {facts.length > 0 ? (
-          <div className="app-progress" aria-label="Profile completeness">
-            <div className="app-progress-head">
-              <span>Profile</span>
-              <strong>{filled.length} of {AREAS.length} areas</strong>
+        <div className="app-side-bottom">
+          {facts.length > 0 ? (
+            <div className="app-progress" aria-label="Profile completeness">
+              <div className="app-progress-head">
+                <span>Profile</span>
+                <strong>{filled.length} of {AREAS.length} areas</strong>
+              </div>
+              <div className="app-progress-track">
+                <span style={{ width: `${completeness}%` }} />
+              </div>
+              {missing.length > 0 ? (
+                <p className="app-progress-note">
+                  Still empty: {missing.slice(0, 3).join(", ")}
+                  {missing.length > 3 ? ` +${missing.length - 3}` : ""}
+                </p>
+              ) : (
+                <p className="app-progress-note">Every area is filled.</p>
+              )}
             </div>
-            <div className="app-progress-track">
-              <span style={{ width: `${completeness}%` }} />
-            </div>
-            {missing.length > 0 ? (
-              <p className="app-progress-note">
-                Still empty: {missing.slice(0, 3).join(", ")}
-                {missing.length > 3 ? ` +${missing.length - 3}` : ""}
-              </p>
+          ) : null}
+
+          <div className="app-side-foot">
+            {session?.user ? (
+              <div className="app-account">
+                <Link className="app-account-user" href="/profile">
+                  <span aria-hidden="true" className="app-avatar">
+                    {initials(name)}
+                  </span>
+                  <span className="app-user-body">
+                    <strong>{name}</strong>
+                    <small>{headline}</small>
+                  </span>
+                </Link>
+                <div className="app-account-meta">
+                  <span className="app-user-email" title={session.user.email}>
+                    {session.user.email}
+                  </span>
+                  <SignOutButton />
+                </div>
+              </div>
             ) : (
-              <p className="app-progress-note">Every area is filled.</p>
+              <Link className="app-side-cta" href="/onboarding/resume?path=new-grad">
+                Add your resume
+              </Link>
             )}
           </div>
-        ) : null}
-
-        <div className="app-side-foot">
-          {session?.user ? (
-            <>
-              <Link className="app-user app-user--foot" href="/profile">
-                <span aria-hidden="true" className="app-avatar">
-                  {initials(name)}
-                </span>
-                <span className="app-user-body">
-                  <strong>{name}</strong>
-                  <small>{headline}</small>
-                </span>
-              </Link>
-              <div className="app-side-meta">
-                <span className="app-user-email" title={session.user.email}>
-                  {session.user.email}
-                </span>
-                <SignOutButton />
-              </div>
-            </>
-          ) : (
-            <Link className="app-side-cta" href="/onboarding/resume?path=new-grad">
-              Add your resume
-            </Link>
-          )}
         </div>
       </aside>
 
