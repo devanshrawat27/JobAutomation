@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { setApplicationPriority, setApplicationStatus } from "@/app/actions/applications";
+import CopyText from "@/components/copy-text";
 import { diffProfile, type SnapshotFact } from "@/lib/applications/diff";
 import { statusGroups, statusHints, statusLabels } from "@/lib/applications/status";
 import { prisma } from "@/lib/db";
@@ -49,6 +50,7 @@ export default async function ApplicationPage({
     ? (application.profileSnapshot as unknown as SnapshotFact[])
     : null;
   const diff = snapshot ? diffProfile(snapshot, currentFacts) : null;
+  const reference = `JA-${application.id.slice(-8).toUpperCase()}`;
 
   return (
     <main className="onboarding-page">
@@ -77,6 +79,48 @@ export default async function ApplicationPage({
         </p>
 
         <p className="app-hint">{statusHints[application.status]}</p>
+
+        <section aria-labelledby="receipt-title" className="app-receipt">
+          <div className="fact-group-head">
+            <h2 id="receipt-title">Receipt</h2>
+            <span>{statusLabels[application.status]}</span>
+          </div>
+          <dl>
+            <div>
+              <dt>Reference</dt>
+              <dd><code>{reference}</code></dd>
+            </div>
+            <div>
+              <dt>Prepared</dt>
+              <dd>{dateFormat.format(application.createdAt)}</dd>
+            </div>
+            <div>
+              <dt>Last change</dt>
+              <dd>{dateFormat.format(application.statusChangedAt)}</dd>
+            </div>
+            <div>
+              <dt>Document</dt>
+              <dd>
+                {application.document ? (
+                  <Link href={`/documents/${application.document.id}`}>{application.document.postingTitle}</Link>
+                ) : (
+                  "No document linked"
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Profile snapshot</dt>
+              <dd><code>{application.profileHash ?? "not recorded"}</code></dd>
+            </div>
+          </dl>
+          <div className="app-receipt-foot">
+            <CopyText label="Copy reference" text={`${reference} · ${application.postingTitle} · ${application.company}`} />
+            <p>
+              “Receipt confirmed” is for evidence you actually hold — a confirmation page, an email, or a reference number
+              from the employer. An uncertain submit stays “submit attempted”.
+            </p>
+          </div>
+        </section>
 
         <section aria-labelledby="priority-title" className="app-priority-panel">
           <div className="fact-group-head">

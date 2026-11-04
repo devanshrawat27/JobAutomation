@@ -648,6 +648,22 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
 
         <p className="jobs-view-note">{viewNote}</p>
 
+        <details className="jobs-method">
+          <summary>How these jobs are ranked</summary>
+          <p>Five things, all visible on each card. Nothing is guessed and no model decides the order.</p>
+          <ul>
+            <li><b>Named skills — 45.</b> Must-have skills from the posting’s own wording weigh double.</li>
+            <li><b>Title — 20.</b> Words shared with roles you have actually held.</li>
+            <li><b>Years asked — 15.</b> Your dated experience; neutral when the posting does not state years.</li>
+            <li><b>Location — 10.</b> Your city, remote-friendly, or unreachable from India.</li>
+            <li><b>Freshness — 5.</b> How recently the posting appeared.</li>
+          </ul>
+          <p>
+            Bands: <b>Strong</b> 66+, <b>Good</b> 50–65, <b>Possible</b> 32–49. The score is a reading aid, not a hiring
+            probability.
+          </p>
+        </details>
+
         {widenSuggestions.length > 0 ? (
           <div className="jobs-widen">
             <span>Thin list. Widening one filter adds:</span>
