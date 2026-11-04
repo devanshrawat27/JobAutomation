@@ -350,78 +350,93 @@ export default function ResumeIntake({
     return (
       <main className="onboarding-page">
         <StepHeader step="Step 2" />
-        <section className="onboarding-content" aria-labelledby="done-title">
-          <div className="path-confirmation review-done">
-            <span className="confirmation-mark" aria-hidden="true">✓</span>
-            <div>
-              <p className="confirmation-kicker">{mergeMode ? "Profile updated" : "Review complete"}</p>
-              <h2 id="done-title">
-                {mergeMode ? "Your profile is up to date." : `${counts.kept} ${counts.kept === 1 ? "detail is" : "details are"} ready to reuse`}
-              </h2>
-              <p className="confirmation-copy">
-                {mergeMode
-                  ? "Your earlier details are still there. This upload only added or refreshed what you confirmed — nothing was deleted."
-                  : "These are the facts a job application would draw on. Everything else stays out of your profile and can still be answered per application."}
-              </p>
-              <dl className="review-done-counts">
-                {mergeMode && saveResult ? (
-                  <>
-                    <div>
-                      <dt>Added</dt>
-                      <dd>{saveResult.added}</dd>
-                    </div>
-                    <div>
-                      <dt>Updated</dt>
-                      <dd>{saveResult.updated}</dd>
-                    </div>
-                    <div>
-                      <dt>Unchanged</dt>
-                      <dd>{saveResult.kept}</dd>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div>
-                      <dt>Kept</dt>
-                      <dd>{counts.kept}</dd>
-                    </div>
-                    <div>
-                      <dt>Skipped</dt>
-                      <dd>{counts.skipped}</dd>
-                    </div>
-                    <div>
-                      <dt>Not applicable</dt>
-                      <dd>{counts.notApplicable}</dd>
-                    </div>
-                  </>
-                )}
-              </dl>
-              <div className="confirmation-actions">
-                <button className="onboarding-submit" type="button" onClick={startOver}>
-                  {mergeMode ? "Upload another version" : "Review these details again"} <span aria-hidden="true">↺</span>
-                </button>
-                {signedIn ? (
-                  <>
-                    <Link className="onboarding-submit" href="/onboarding/preferences">
-                      Set job preferences <span aria-hidden="true">→</span>
-                    </Link>
-                    <Link className="intake-secondary" href="/dashboard">
-                      Skip to your overview
-                    </Link>
-                  </>
-                ) : (
-                  <Link className="intake-secondary" href="/onboarding">
-                    Change career path
-                  </Link>
-                )}
-              </div>
+        <div className="wiz-shell">
+          <aside className="wiz-aside" aria-hidden="true">
+            <span className="wiz-aside-glyph">02</span>
+            <div className="wiz-aside-top">
+              <p className="wiz-aside-kicker">Your resume</p>
+              <p className="wiz-aside-line">that is on the record.</p>
             </div>
-          </div>
-          <p className="intake-privacy">
-            Saved to your account. Job matching, document drafts and form answers all read these confirmed facts — nothing
-            reaches an employer until you submit it yourself.
-          </p>
-        </section>
+            <div className="wiz-aside-foot">
+              <div className="wiz-track-bar"><i style={{ width: "100%" }} /></div>
+              <p className="wiz-aside-note">Confirmed facts only · nothing else was kept</p>
+            </div>
+          </aside>
+
+          <section className="wiz-main" aria-labelledby="done-title">
+            <p className="wiz-main-kicker">Step 2 of 8 · done</p>
+            <h1 id="done-title">
+              {mergeMode ? "Your profile is up to date." : `${counts.kept} ${counts.kept === 1 ? "detail is" : "details are"} ready to reuse`}
+            </h1>
+            <p className="onboarding-intro">
+              {mergeMode
+                ? "Your earlier details are still there. This upload only added or refreshed what you confirmed — nothing was deleted."
+                : "These are the facts a job application would draw on. Everything else stays out of your profile and can still be answered per application."}
+            </p>
+
+            <dl className="review-done-counts">
+              {mergeMode && saveResult ? (
+                <>
+                  <div>
+                    <dt>Added</dt>
+                    <dd>{saveResult.added}</dd>
+                  </div>
+                  <div>
+                    <dt>Updated</dt>
+                    <dd>{saveResult.updated}</dd>
+                  </div>
+                  <div>
+                    <dt>Unchanged</dt>
+                    <dd>{saveResult.kept}</dd>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <dt>Kept</dt>
+                    <dd>{counts.kept}</dd>
+                  </div>
+                  <div>
+                    <dt>Skipped</dt>
+                    <dd>{counts.skipped}</dd>
+                  </div>
+                  <div>
+                    <dt>Not applicable</dt>
+                    <dd>{counts.notApplicable}</dd>
+                  </div>
+                </>
+              )}
+            </dl>
+
+            <div className="wiz-nav">
+              <button className="wiz-back" type="button" onClick={startOver}>
+                <span aria-hidden="true">↺</span> {mergeMode ? "Upload another" : "Review again"}
+              </button>
+              {signedIn ? (
+                <Link className="wiz-next" href="/onboarding/preferences">
+                  Set job preferences <span aria-hidden="true">→</span>
+                </Link>
+              ) : (
+                <Link className="wiz-next" href="/onboarding">
+                  Change career path <span aria-hidden="true">→</span>
+                </Link>
+              )}
+            </div>
+
+            {signedIn ? (
+              <p className="wiz-skip">
+                <Link href="/dashboard">Skip to your overview</Link>
+                <span>·</span>
+                <span>You can add a newer resume later.</span>
+              </p>
+            ) : null}
+
+            <p className="wiz-fineprint">
+              Saved to your account. Job matching, document drafts and form answers all read these confirmed facts — nothing
+              reaches an employer until you submit it yourself.
+            </p>
+          </section>
+        </div>
         <StepFooter path={path} />
       </main>
     );
