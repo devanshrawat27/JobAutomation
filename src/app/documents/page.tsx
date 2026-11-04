@@ -48,6 +48,11 @@ export default async function DocumentsPage() {
           Every draft keeps the fact keys it was written from, so you can see later what it claimed and where that came from.
         </p>
 
+        <div className="profile-links">
+          <Link className="intake-secondary" href="/ats">Scan any resume (ATS)</Link>
+          <Link className="intake-secondary" href="/jobs">Tailor one for a job</Link>
+        </div>
+
         {documents.length === 0 ? (
           <div className="profile-empty">
             <p>No documents yet.</p>
