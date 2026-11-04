@@ -2373,7 +2373,7 @@
   text-transform: none;
 }
 
-/* Filters: sentence-case labels, one row of fields, the button beside them. */
+/* Filters: sentence-case labels, fields that fit, one clear action. */
 .onboarding-page .jobs-field span,
 .onboarding-page .auth-field > span {
   color: var(--muted);
@@ -2383,12 +2383,35 @@
   letter-spacing: 0;
   text-transform: none;
 }
-@media (min-width: 1100px) {
-  .onboarding-page .jobs-filters--chips {
-    grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
-  }
+.onboarding-page .jobs-filters--chips {
+  grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
 }
-.onboarding-page .jobs-filter-apply { align-self: end; }
+.onboarding-page .jobs-filters--chips .jobs-field { min-width: 0; }
+.onboarding-page .jobs-filters--chips .jobs-field select { width: 100%; min-width: 0; }
+.onboarding-page .jobs-filter-apply {
+  align-self: end;
+  justify-content: center;
+  padding: 9px 12px;
+  border-color: var(--inverse-bg);
+  background: var(--inverse-bg);
+  color: var(--inverse-fg);
+}
+.onboarding-page .jobs-filter-apply:hover {
+  border-color: var(--inverse-bg-hover);
+  background: var(--inverse-bg-hover);
+  color: var(--inverse-fg);
+}
+
+@media (max-width: 1340px) {
+  .onboarding-page .jobs-filters--chips {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .onboarding-page .jobs-filters--chips .jobs-filter-apply,
+  .onboarding-page .jobs-filters--chips .jobs-filter-clear {
+    grid-column: 1 / -1;
+  }
+  .onboarding-page .jobs-filters--chips .jobs-filter-apply { width: 100%; }
+}
 
 /* Tabs behave like tabs. */
 .onboarding-page .jobs-views {
