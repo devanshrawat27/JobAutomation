@@ -713,16 +713,20 @@ export default function ResumeIntake({
 }
 
 function StepHeader({ step }: { step: string }) {
+  const current = step.includes("1") ? 1 : 2;
   return (
-    <header className="onboarding-header">
-      <Link aria-label="JobAutomation home" className="brand" href="/">
-        <span aria-hidden="true" className="brand-mark"><span /></span>
-        <span>jobautomation</span>
-      </Link>
-      <span className="onboarding-step">
-        Getting started <span aria-hidden="true">·</span> {step}
-      </span>
-    </header>
+    <>
+      <header className="onboarding-header">
+        <Link aria-label="JobAutomation home" className="brand" href="/">
+          <span aria-hidden="true" className="brand-mark"><span /></span>
+          <span>jobautomation</span>
+        </Link>
+        <span className="onboarding-step">
+          Step {current} of 2 <span aria-hidden="true">·</span> {current === 1 ? "about a minute" : "about 2 minutes"}
+        </span>
+      </header>
+      <div className="onboarding-progress" aria-hidden="true"><i style={{ width: `${current * 50}%` }} /></div>
+    </>
   );
 }
 

@@ -41,8 +41,9 @@ export default function OnboardingForm({
           <span className="brand-mark" aria-hidden="true"><span /></span>
           <span>jobautomation</span>
         </Link>
-        <span className="onboarding-step">Getting started <span aria-hidden="true">·</span> Step 1</span>
+        <span className="onboarding-step">Step 1 of 2 <span aria-hidden="true">·</span> about a minute</span>
       </header>
+      <div className="onboarding-progress" aria-hidden="true"><i style={{ width: "50%" }} /></div>
 
       <section className="onboarding-content" aria-labelledby="onboarding-title">
         <p className="section-kicker">A profile shaped around you</p>

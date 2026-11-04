@@ -57,6 +57,39 @@ export default async function DashboardPage() {
 
   const firstName = data.displayName || session.user.name?.trim().split(/\s+/)[0] || "there";
 
+  const applicationsTotal = data.pipeline.reduce((sum, stage) => sum + stage.count, 0);
+
+  const startSteps = [
+    {
+      title: "Confirm your profile",
+      detail: `${data.factsCount} confirmed fact${data.factsCount === 1 ? "" : "s"} that every application may use.`,
+      href: "/profile",
+      action: "Open profile",
+      done: data.factsCount > 0,
+    },
+    {
+      title: "Save a role worth pursuing",
+      detail: "The shortlist is where an application starts.",
+      href: "/jobs?view=for-you",
+      action: "See jobs",
+      done: data.metrics.shortlisted > 0,
+    },
+    {
+      title: "Prepare a tailored resume",
+      detail: "One resume per role, written only from your facts.",
+      href: "/jobs?view=for-you",
+      action: "Pick a role",
+      done: data.documentsCount > 0,
+    },
+    {
+      title: "Track the first application",
+      detail: "Then follow-ups, receipts and outcomes stay in one place.",
+      href: "/applications",
+      action: "Open tracker",
+      done: applicationsTotal > 0,
+    },
+  ];
+
   const metrics = [
     {
       key: "new",
@@ -126,6 +159,40 @@ export default async function DashboardPage() {
               </li>
             ))}
           </ul>
+
+          {applicationsTotal === 0 ? (
+            <section className="dash-start" aria-labelledby="dash-start-title">
+              <div className="dash-panel-head">
+                <div>
+                  <p className="dash-eyebrow">Getting started</p>
+                  <h2 id="dash-start-title">Four steps to your first application</h2>
+                </div>
+                <span className="dash-panel-count">
+                  {startSteps.filter((step) => step.done).length} of 4
+                </span>
+              </div>
+              <ol>
+                {startSteps.map((step) => (
+                  <li className={step.done ? "is-done" : ""} key={step.title}>
+                    <span aria-hidden="true" className="dash-start-mark">
+                      {step.done ? "✓" : ""}
+                    </span>
+                    <div>
+                      <strong>{step.title}</strong>
+                      <p>{step.detail}</p>
+                    </div>
+                    {step.done ? (
+                      <span className="dash-start-done">Done</span>
+                    ) : (
+                      <Link href={step.href}>
+                        {step.action} <span aria-hidden="true">→</span>
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
 
           <div className="dash-grid">
             <div className="dash-col">

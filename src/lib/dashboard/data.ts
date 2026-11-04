@@ -97,6 +97,7 @@ export type DashboardData = {
     inProgress: number;
     followUps: number;
   };
+  documentsCount: number;
   pipeline: Array<{ key: string; label: string; hint: string; count: number }>;
   readiness: {
     filled: string[];
@@ -138,7 +139,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
   const followUpSince = new Date(now - FOLLOW_UP_DAYS * 86_400_000);
   const staleSince = new Date(now - SCAN_STALE_MINUTES * 60_000);
 
-  const [facts, decisions, applications, documents, scan, postings] = await Promise.all([
+  const [facts, decisions, applications, documents, documentsCount, scan, postings] = await Promise.all([
     prisma.profileFact.findMany({
       where: { userId, status: { in: ["CONFIRMED", "EDITED"] } },
       orderBy: { position: "asc" },
@@ -169,6 +170,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       take: 20,
       select: { id: true, kind: true, postingTitle: true, company: true, createdAt: true, review: true },
     }),
+    prisma.document.count({ where: { userId } }),
     lastScan(),
     prisma.jobPosting.findMany({
       where: {
@@ -411,6 +413,7 @@ export async function getDashboardData(userId: string): Promise<DashboardData> {
       inProgress,
       followUps: followUps.length,
     },
+    documentsCount,
     pipeline,
     readiness: {
       filled: filledAreas,
