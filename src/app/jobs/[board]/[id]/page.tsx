@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import CopyText from "@/components/copy-text";
+import ApplicationSteps from "./application-steps";
 import { prisma } from "@/lib/db";
 import { buildAnswers } from "@/lib/form/answers";
 import { checkEligibility, parseEligibility } from "@/lib/jobs/eligibility";
@@ -214,67 +215,24 @@ export default async function JobDetailPage({
             ) : null}
 
             {session?.user && factInput.length > 0 ? (
-              <section aria-labelledby="packet-title" className="job-packet">
-                <div className="job-packet-head">
-                  <div>
-                    <h2 id="packet-title">Your application packet</h2>
-                    <p>Everything for this application in one place. You open the employer’s form and submit it yourself.</p>
-                  </div>
-                  <span>{tracked ? "Tracked" : "Not submitted"}</span>
-                </div>
-                <ol>
-                  <li className={match ? "is-done" : ""}>
-                    <span aria-hidden="true" className="job-packet-step">1</span>
-                    <div>
-                      <strong>Fit checked</strong>
-                      <p>
-                        {match
-                          ? `${match.counts.match} of ${match.requirements.length} requirements clearly met, ${match.counts.gap} gaps, ${match.counts.unknown} to check.`
-                          : "Open the match section below."}
-                      </p>
-                    </div>
-                    <a href="#match-title">Read</a>
-                  </li>
-                  <li className={resumeDoc ? "is-done" : ""}>
-                    <span aria-hidden="true" className="job-packet-step">2</span>
-                    <div>
-                      <strong>Resume</strong>
-                      <p>
-                        {resumeDoc
-                          ? "A tailored resume for this posting is ready."
-                          : letterDoc
-                            ? "A cover letter is ready; no tailored resume yet."
-                            : "Nothing built yet — the draft uses only confirmed facts."}
-                      </p>
-                    </div>
-                    {resumeDoc ? (
-                      <Link href={`/documents/${resumeDoc.id}`}>Open</Link>
-                    ) : (
-                      <Link href={`/jobs/${boardToken}/${id}/prepare`}>Build</Link>
-                    )}
-                  </li>
-                  <li className={answersMissing === 0 ? "is-done" : ""}>
-                    <span aria-hidden="true" className="job-packet-step">3</span>
-                    <div>
-                      <strong>Form answers</strong>
-                      <p>
-                        {answersReady} ready · {answersMissing} still missing. Missing ones stay blank, never guessed.
-                      </p>
-                    </div>
-                    <Link href={`/jobs/${boardToken}/${id}/answers`}>Open</Link>
-                  </li>
-                  <li>
-                    <span aria-hidden="true" className="job-packet-step">4</span>
-                    <div>
-                      <strong>Apply on the employer’s site</strong>
-                      <p>You check the form and press submit. Nothing is sent from here.</p>
-                    </div>
-                    <a href={detail.posting.url} rel="noreferrer noopener" target="_blank">
-                      Open ↗
-                    </a>
-                  </li>
-                </ol>
-              </section>
+              <ApplicationSteps
+                data={{
+                  company: detail.posting.company,
+                  role: detail.posting.title,
+                  counts: match ? match.counts : null,
+                  total: match?.requirements.length ?? 0,
+                  eligibility: eligibility ? { verdict: eligibility.verdict, reasons: eligibility.reasons } : null,
+                  trust: trust ? { risk: trust.risk, flags: trust.flags } : null,
+                  resume: resumeDoc ? { id: resumeDoc.id, kind: resumeDoc.kind } : null,
+                  letter: letterDoc ? { id: letterDoc.id } : null,
+                  answersReady,
+                  answersMissing,
+                  prepareHref: `/jobs/${boardToken}/${id}/prepare`,
+                  answersHref: `/jobs/${boardToken}/${id}/answers`,
+                  employerUrl: detail.posting.url,
+                  tracked: Boolean(tracked),
+                }}
+              />
             ) : null}
 
             {trust && trust.risk !== "low" ? (

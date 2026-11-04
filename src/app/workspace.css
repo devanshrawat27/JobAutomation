@@ -2984,6 +2984,78 @@
 .onboarding-page .job-card:hover { border-color: var(--accent-line); }
 .onboarding-page .job-card:hover h2 a { color: var(--accent-strong); }
 
+/* Step-based application flow. */
+.app-steps {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.app-steps-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+.app-steps h2 { margin: 0 0 3px; color: var(--ink); font-size: 14px; font-weight: 620; }
+.app-steps-head p { margin: 0; color: var(--muted); font-size: 11.5px; }
+.app-steps-head > span { flex: none; padding: 2px 8px; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); font-size: 9.5px; }
+.app-steps-tabs { display: flex; gap: 10px; margin: 0 0 12px; padding: 0 0 10px; border-bottom: 1px solid var(--line); list-style: none; }
+.app-steps-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.app-steps-tabs li span {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+.app-steps-tabs li.is-active button { color: var(--ink); }
+.app-steps-tabs li.is-active span { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); }
+.app-steps-tabs li.is-done span { border-color: var(--ok-line); background: var(--ok-soft); color: var(--ok); }
+.app-step-panel { min-height: 118px; }
+.app-step-fit { display: flex; align-items: center; gap: 14px; }
+.app-step-fit strong { color: var(--ink); font-size: 13px; font-weight: 620; }
+.app-step-fit p { margin: 2px 0 4px; color: var(--muted); font-size: 11.5px; }
+.app-step-link { color: var(--accent-strong); font-size: 11px; font-weight: 600; }
+.app-step-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+.app-step-facts li { display: flex; justify-content: space-between; gap: 10px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 11px; }
+.app-step-facts span { color: var(--muted); }
+.app-step-facts strong { color: var(--ink-soft); font-weight: 600; text-align: right; }
+.app-step-doclist { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.app-step-doclist li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+.app-step-doclist strong { color: var(--ink); font-size: 12px; font-weight: 620; }
+.app-step-doclist p { margin: 2px 0 0; color: var(--muted); font-size: 10.5px; }
+.app-step-doclist a { color: var(--accent-strong); font-size: 11px; font-weight: 600; }
+.app-step-answers,
+.app-step-apply { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; }
+.app-step-answers strong,
+.app-step-apply strong { color: var(--ink); font-size: 12px; font-weight: 620; }
+.app-step-answers p,
+.app-step-apply p { margin: 2px 0 0; color: var(--muted); font-size: 10.5px; }
+.app-step-answers a,
+.app-step-apply a { color: var(--accent-strong); font-size: 11px; font-weight: 600; white-space: nowrap; }
+.app-step-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.app-step-foot > span { color: var(--muted-soft); font-family: var(--font-mono); font-size: 9.5px; }
+.app-step-foot .intake-secondary,
+.app-step-foot .onboarding-submit { width: auto; }
+@media (max-width: 560px) {
+  .app-steps-tabs { flex-wrap: wrap; }
+  .app-step-facts { grid-template-columns: 1fr; }
+  .app-step-answers,
+  .app-step-apply { flex-direction: column; align-items: flex-start; }
+}
+
 /* Thin-list suggestions: a named filter and a real count. */.jobs-widen {
   display: flex;
   flex-wrap: wrap;
