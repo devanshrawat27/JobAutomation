@@ -74,26 +74,30 @@ export default async function PreferencesPage() {
   const skillValues = confirmed
     .filter((fact) => fact.groupId === "skills")
     .map((fact) => fact.value);
-  const contactValues = confirmed
-    .filter((fact) => fact.groupId === "contact")
-    .map((fact) => fact.value);
   const experience = confirmed.filter((fact) => fact.groupId === "experience");
 
-  const knownSkills = [
-    ...new Set([
-      ...listFrom(skillValues),
-      ...listFrom(contactValues.filter((value) => value.length < 50 && !/@|https?:/.test(value))),
-    ]),
-  ].slice(0, 40);
+  const knownSkills = [...new Set(listFrom(skillValues))].slice(0, 40);
 
   const roles = roleSuggestions(
     experience.map((fact) => fact.label),
     experience.map((fact) => fact.value),
   );
 
-  const location = byKey.get("contact.location") ?? "";
+  const contactValue = (pattern: RegExp): string =>
+    confirmed.find((fact) => fact.groupId === "contact" && pattern.test(fact.label))?.value ?? "";
+
+  const phone = byKey.get("contact.phone") ?? contactValue(/phone|mobile/i);
+  const linkedin = byKey.get("contact.linkedin") ?? contactValue(/linkedin/i);
+  const github = byKey.get("contact.github") ?? contactValue(/github/i);
+  const portfolio = byKey.get("contact.website") ?? contactValue(/portfolio|website/i);
+
+  const cityText = [
+    byKey.get("contact.location") ?? "",
+    byKey.get("contact.city") ?? "",
+    contactValue(/city|location|based/i),
+  ].join(" ");
   const cityFromProfile = /bengaluru|bangalore|mumbai|pune|delhi|gurugram|noida|hyderabad|chennai|kolkata|ahmedabad/i.exec(
-    `${location} ${byKey.get("contact.city") ?? ""}`,
+    cityText,
   )?.[0];
 
   // Like their step 03, prefill total years from the dates already confirmed
@@ -133,10 +137,10 @@ export default async function PreferencesPage() {
           mode: byKey.get("preferences.workMode") ?? "",
           relocate: byKey.get("preferences.relocate") ?? "",
           availability: byKey.get("preferences.availability") ?? "",
-          phone: byKey.get("contact.phone") ?? "",
-          linkedin: byKey.get("contact.linkedin") ?? "",
-          github: byKey.get("contact.github") ?? "",
-          portfolio: byKey.get("contact.website") ?? "",
+          phone,
+          linkedin,
+          github,
+          portfolio,
           gender: byKey.get("preferences.gender") ?? "",
           disability: byKey.get("preferences.disability") ?? "",
           exclude: byKey.get("preferences.exclude") ?? "",

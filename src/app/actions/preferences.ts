@@ -147,10 +147,31 @@ export async function savePreferences(formData: FormData): Promise<void> {
     select: { id: true },
   });
 
-  if (writes.length > 0 || legacy.length > 0) {
+  // Resume extraction names its own keys (`ai.phone.3`). Writing `contact.phone`
+  // would leave the same phone twice on the profile, so the older copy with the
+  // same label is removed when the wizard supplies a value for it.
+  const CONTACT_LABELS: Record<string, RegExp> = {
+    "contact.phone": /phone|mobile/i,
+    "contact.linkedin": /linkedin/i,
+    "contact.github": /github/i,
+    "contact.website": /portfolio|website/i,
+  };
+  const supplied = new Map(fields.filter((field) => field.value.trim()).map((field) => [field.key, field.value.trim()]));
+  const contactFacts = await prisma.profileFact.findMany({
+    where: { userId, groupId: "contact" },
+    select: { id: true, key: true, label: true },
+  });
+  const duplicates = contactFacts.filter((fact) =>
+    Object.entries(CONTACT_LABELS).some(
+      ([key, pattern]) => supplied.has(key) && fact.key !== key && pattern.test(fact.label),
+    ),
+  );
+
+  if (writes.length > 0 || legacy.length > 0 || duplicates.length > 0) {
     await prisma.$transaction([
       ...writes,
       ...legacy.map((fact) => prisma.profileFact.delete({ where: { id: fact.id } })),
+      ...duplicates.map((fact) => prisma.profileFact.delete({ where: { id: fact.id } })),
     ]);
   }
 

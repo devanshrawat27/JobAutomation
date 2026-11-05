@@ -81,3 +81,23 @@ What their wizard does that ours still does not: import a profile from a LinkedI
 - Step 08 also creates an **`@myjobb.in` alias** (`rawat.devansh2@myjobb.in`) and asks three declarations: criminal offence, government/public-sector employment, non-compete or service bond.
 
 Ours: the brief lives inside the wizard; the handoff is `/onboarding/first-match` (one role, score, matches/gaps, a deterministic note, open/show-more/edit). We do not generate an alias, take a board password, or submit.
+
+## Onboarding parity, end to end (5 Nov 2026)
+
+Tested on a fresh account with a real DOCX, not a sample: sign up → path → upload → Gemini extraction (13 facts) → review → save → saved screen → six preference steps → brief → first match. Also tested the merge path (same resume again: 0 new, 0 changed, 13 unchanged) and 500/768/1536px layouts.
+
+| Step | myjobb | ours | Note |
+| --- | --- | --- | --- |
+| Entry | Google only, "first 20 free" | email + password, no card | parity is the flow, not the offer |
+| 01 Story | resume **or LinkedIn URL import** | resume only (PDF/DOCX, OCR for scans) | LinkedIn import still open |
+| 02 Roles | top 3 from resume | top 3 from experience + add | same |
+| 03 Skills | up to 5 + total years prefilled | up to 5 from profile + `+N more`, years prefilled from dates | same |
+| 04 Where | cities + remote | same | same |
+| 05 Pay | current CTC, fresher, expected | same + why-we-ask | same |
+| 06 Work | mode, relocate, start | same | same |
+| 07 You | postal address, US/Canada auth + visa, phone, LinkedIn, DOB | phone/LinkedIn/GitHub/portfolio in 08 | address and work auth not collected: we never submit a form |
+| 08 Details | GitHub, portfolio, gender, disability, **ATS password**, 3 declarations | GitHub, portfolio, gender, disability, exclusions | password and declarations deliberately absent |
+| Brief | agent brief with narrative and skills by years | rows: Is / Knows / Where / Pay / Never | same job, our own wording |
+| Handoff | one job at a time, agent note, **auto-apply** | one job, score, gaps, note, open job | no submission |
+
+Bugs found and fixed during this run: new accounts skipped the path step; the post-save confirmation was replaced by the "already saved" page (now `/onboarding/saved`); that page had no route to preferences; the rules extractor lost the employer when dates sat on their own line; the preferences skill list contained contact values; city/phone/LinkedIn/GitHub prefill missed facts saved under `ai.*` keys; contact facts were duplicated after the wizard; first-save counts read "0 details" because the replace path reports additions, not "kept".

@@ -49,10 +49,9 @@ export default async function DashboardPage() {
   const data = await getDashboardData(session.user.id);
 
   // A signed-in account with no confirmed fact has nothing honest to show. Send
-  // it back to the one step that produces them instead of an empty dashboard.
+  // it to the first step of onboarding, where the candidate picks their path.
   if (data.factsCount === 0) {
-    const path = data.candidate.student ? "new-grad" : "experienced";
-    redirect(`/onboarding/resume?path=${path}&new=1`);
+    redirect("/onboarding");
   }
 
   const firstName = data.displayName || session.user.name?.trim().split(/\s+/)[0] || "there";

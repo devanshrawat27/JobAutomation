@@ -50,10 +50,11 @@ export default function OnboardingForm({
 
       <section className="wiz-main" aria-labelledby="onboarding-title">
         <p className="wiz-main-kicker">Step 1 of 8</p>
-        <h1 id="onboarding-title">Where are you in your career?</h1>
+        <h1 id="onboarding-title">{continued ? "Starting point selected." : "Where are you in your career?"}</h1>
         <p className="onboarding-intro">
-          Choose the starting point that fits today. It only decides which questions we ask first — every path ends with
-          the same reviewable profile.
+          {continued
+            ? "Next, add a resume and review every profile detail suggested from it. You can correct or skip any suggestion."
+            : "Choose the starting point that fits today. It only decides which questions we ask first — every path ends with the same reviewable profile."}
         </p>
 
         {hasProfile ? (
@@ -102,9 +103,6 @@ export default function OnboardingForm({
         ) : (
           <div className="wiz-brief" role="status" aria-live="polite">
             <h2 className="path-confirm-title">{paths[selectedPath as CandidatePath].label}</h2>
-            <p className="onboarding-intro">
-              Next, add a resume and review every profile detail suggested from it. You can correct or skip any suggestion.
-            </p>
             <div className="wiz-nav">
               <button className="wiz-back" onClick={() => setContinued(false)} type="button">← Change</button>
               <Link className="wiz-next" href={`/onboarding/resume?path=${selectedPath}`}>

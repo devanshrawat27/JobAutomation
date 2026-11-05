@@ -143,6 +143,8 @@ function splitTrailingDates(line: string): { head: string; dates: string | null 
   return { head: line, dates: null };
 }
 
+const DATE_ONLY = /^\s*(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+)?\d{4}\s*(?:[-–—]|to)\s*(?:(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?\s+)?(?:\d{4}|present|current)\s*$/i;
+
 /** Split "Company — Role" using corporate suffixes as the only strong signal. */
 function splitCompanyRole(head: string): { company: string; role: string } | null {
   const parts = head.split(/\s+[–—−-]\s+/);
@@ -282,15 +284,21 @@ export function proposeFactsFromResume(text: string, documentName: string): Resu
       });
     };
 
+    let pendingHeading: string | null = null;
+
     for (const line of experience.lines) {
       const isBullet = BULLET.test(line);
-      const looksLikeEntry = !isBullet && line.length < 170 && DATE_HINT.test(line) && DASH_SPLIT.test(line);
+      const split = !isBullet ? splitTrailingDates(line) : { head: "", dates: null };
+      const dateOnly = !isBullet && DATE_ONLY.test(line);
+      const looksLikeEntry =
+        !isBullet && !dateOnly && line.length < 170 && DATE_HINT.test(line) && DASH_SPLIT.test(line) && Boolean(split.head);
 
       if (looksLikeEntry) {
         flushHighlights();
         entryIndex += 1;
         current = { key: `experience.${entryIndex}`, bullets: [], metaAdded: false };
         lastBulletIndex = null;
+        pendingHeading = null;
 
         const { head, dates } = splitTrailingDates(line);
         const parts = splitCompanyRole(head);
@@ -305,7 +313,38 @@ export function proposeFactsFromResume(text: string, documentName: string): Resu
         continue;
       }
 
-      if (!current) continue;
+      // Resumes commonly put "Company - Role" and the dates on separate lines.
+      // The date-only line belongs to the heading just above it, not to a new
+      // employer called "Jan 2025".
+      if (dateOnly) {
+        if (pendingHeading) {
+          entryIndex += 1;
+          current = { key: `experience.${entryIndex}`, bullets: [], metaAdded: false };
+          lastBulletIndex = null;
+          const parts = splitCompanyRole(pendingHeading);
+          if (parts) {
+            push(`${current.key}.company`, "experience", "Company", parts.company, pendingHeading, "high");
+            push(`${current.key}.role`, "experience", "Role", parts.role, pendingHeading, "high");
+          } else {
+            push(current.key, "experience", "Role and company", pendingHeading, pendingHeading, "high");
+          }
+          push(`${current.key}.dates`, "experience", "Dates", line.trim(), line, "high");
+          pendingHeading = null;
+          continue;
+        }
+        if (current) {
+          // The entry already carried its dates (same line); nothing to add.
+          continue;
+        }
+        continue;
+      }
+
+      if (!current) {
+        if (!isBullet && DASH_SPLIT.test(line) && line.length < 120 && !DATE_HINT.test(line)) {
+          pendingHeading = line;
+        }
+        continue;
+      }
 
       if (isBullet) {
         current.bullets.push(line);
@@ -328,6 +367,17 @@ export function proposeFactsFromResume(text: string, documentName: string): Resu
       if (!current.metaAdded && line.length < 120 && !DATE_HINT.test(line)) {
         current.metaAdded = true;
         push(`${current.key}.meta`, "experience", "Role detail", line, line, "medium");
+      }
+    }
+
+    if (pendingHeading) {
+      entryIndex += 1;
+      const parts = splitCompanyRole(pendingHeading);
+      if (parts) {
+        push(`experience.${entryIndex}.company`, "experience", "Company", parts.company, pendingHeading, "high");
+        push(`experience.${entryIndex}.role`, "experience", "Role", parts.role, pendingHeading, "high");
+      } else {
+        push(`experience.${entryIndex}`, "experience", "Role and company", pendingHeading, pendingHeading, "high");
       }
     }
     flushHighlights();

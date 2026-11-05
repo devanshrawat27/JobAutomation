@@ -1,6 +1,7 @@
 ﻿import test from "node:test";
 import assert from "node:assert/strict";
 
+import { proposeFactsFromResume } from "../src/lib/resume/propose-facts.ts";
 import { sanitizeProposal } from "../src/lib/resume/sanitize.ts";
 import type { ResumeProposal } from "../src/lib/resume/propose-facts.ts";
 
@@ -59,4 +60,21 @@ test("extractor questions are rewritten in the second person", () => {
     assert.ok(!/candidate/i.test(question), question);
   }
   assert.equal(new Set(result.openQuestions).size, result.openQuestions.length);
+});
+
+test("a date on its own line does not become the employer", () => {
+  const text = [
+    "EXPERIENCE",
+    "Acme Labs - Backend Intern",
+    "Jan 2025 - Jul 2025",
+    "- Built REST APIs in TypeScript.",
+  ].join("\n");
+
+  const proposal = proposeFactsFromResume(text, "resume.docx");
+  const experience = proposal.facts.filter((fact) => fact.group === "experience");
+  const merged = experience.map((fact) => fact.value).join("\n");
+
+  assert.equal(experience.length, 1);
+  assert.match(merged, /^Acme Labs/);
+  assert.match(merged, /Backend Intern/);
 });

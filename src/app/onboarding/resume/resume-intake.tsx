@@ -20,7 +20,7 @@ import { factIdentity, normalizeFactValue } from "@/lib/resume/merge-profile";
 import type { MergeExistingFact } from "@/lib/resume/merge-profile";
 import type { ResumeProposal } from "@/lib/resume/propose-facts";
 
-type Phase = "intake" | "review" | "done";
+type Phase = "intake" | "review";
 type Review = { status: FactStatus; value: string };
 type ReviewMap = Record<string, Review>;
 
@@ -154,7 +154,6 @@ export default function ResumeIntake({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedStates, setSavedStates] = useState<Record<string, SavedState>>({});
-  const [saveResult, setSaveResult] = useState<{ added: number; updated: number; kept: number } | null>(null);
   const mergeMode = existingFacts.length > 0;
   const [reviews, setReviews] = useState<ReviewMap>(() => {
     const fresh = initialReviews(sample.facts);
@@ -259,23 +258,7 @@ export default function ResumeIntake({
     }));
   }
 
-  function startOver() {
-    setReviews(initialReviews(sample.facts));
-    setSavedStates({});
-    setSaveResult(null);
-    setUploaded(null);
-    setExtracting(false);
-    setFile(null);
-    setFileError(null);
-    setSaveError(null);
-    setPhase("intake");
-    router.replace(`/onboarding/resume?path=${path}`);
-    try {
-      window.sessionStorage.removeItem(storageKey);
-    } catch {
-      // Nothing to clear.
-    }
-  }
+
 
   async function saveProfile() {
     setSaving(true);
@@ -302,8 +285,18 @@ export default function ResumeIntake({
     try {
       const result = await saveProfileFacts(payload, mergeMode ? "merge" : "replace");
       if (result.ok) {
-        setSaveResult({ added: result.added, updated: result.updated, kept: result.kept });
-        setPhase("done");
+        // A server action re-renders this route, which replaces this component
+        // with the "profile already saved" view. A full navigation to a server
+        // page carries the counts and keeps the confirmation on screen.
+        const params = new URLSearchParams({
+          merge: mergeMode ? "1" : "0",
+          added: String(result.added),
+          updated: String(result.updated),
+          kept: String(mergeMode ? result.kept : result.added),
+          skipped: String(counts.skipped),
+          na: String(counts.notApplicable),
+        });
+        router.push(`/onboarding/saved?${params.toString()}`);
         return;
       }
 
@@ -342,102 +335,6 @@ export default function ResumeIntake({
           </div>
         </section>
         <StepFooter path={initialPath} />
-      </main>
-    );
-  }
-
-  if (phase === "done") {
-    return (
-      <main className="onboarding-page">
-        <StepHeader step="Step 2" />
-        <div className="wiz-shell">
-          <aside className="wiz-aside" aria-hidden="true">
-            <span className="wiz-aside-glyph">02</span>
-            <div className="wiz-aside-top">
-              <p className="wiz-aside-kicker">Your resume</p>
-              <p className="wiz-aside-line">that is on the record.</p>
-            </div>
-            <div className="wiz-aside-foot">
-              <div className="wiz-track-bar"><i style={{ width: "100%" }} /></div>
-              <p className="wiz-aside-note">Confirmed facts only · nothing else was kept</p>
-            </div>
-          </aside>
-
-          <section className="wiz-main" aria-labelledby="done-title">
-            <p className="wiz-main-kicker">Step 2 of 8 · done</p>
-            <h1 id="done-title">
-              {mergeMode ? "Your profile is up to date." : `${counts.kept} ${counts.kept === 1 ? "detail is" : "details are"} ready to reuse`}
-            </h1>
-            <p className="onboarding-intro">
-              {mergeMode
-                ? "Your earlier details are still there. This upload only added or refreshed what you confirmed — nothing was deleted."
-                : "These are the facts a job application would draw on. Everything else stays out of your profile and can still be answered per application."}
-            </p>
-
-            <dl className="review-done-counts">
-              {mergeMode && saveResult ? (
-                <>
-                  <div>
-                    <dt>Added</dt>
-                    <dd>{saveResult.added}</dd>
-                  </div>
-                  <div>
-                    <dt>Updated</dt>
-                    <dd>{saveResult.updated}</dd>
-                  </div>
-                  <div>
-                    <dt>Unchanged</dt>
-                    <dd>{saveResult.kept}</dd>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <dt>Kept</dt>
-                    <dd>{counts.kept}</dd>
-                  </div>
-                  <div>
-                    <dt>Skipped</dt>
-                    <dd>{counts.skipped}</dd>
-                  </div>
-                  <div>
-                    <dt>Not applicable</dt>
-                    <dd>{counts.notApplicable}</dd>
-                  </div>
-                </>
-              )}
-            </dl>
-
-            <div className="wiz-nav">
-              <button className="wiz-back" type="button" onClick={startOver}>
-                <span aria-hidden="true">↺</span> {mergeMode ? "Upload another" : "Review again"}
-              </button>
-              {signedIn ? (
-                <Link className="wiz-next" href="/onboarding/preferences">
-                  Set job preferences <span aria-hidden="true">→</span>
-                </Link>
-              ) : (
-                <Link className="wiz-next" href="/onboarding">
-                  Change career path <span aria-hidden="true">→</span>
-                </Link>
-              )}
-            </div>
-
-            {signedIn ? (
-              <p className="wiz-skip">
-                <Link href="/dashboard">Skip to your overview</Link>
-                <span>·</span>
-                <span>You can add a newer resume later.</span>
-              </p>
-            ) : null}
-
-            <p className="wiz-fineprint">
-              Saved to your account. Job matching, document drafts and form answers all read these confirmed facts — nothing
-              reaches an employer until you submit it yourself.
-            </p>
-          </section>
-        </div>
-        <StepFooter path={path} />
       </main>
     );
   }

@@ -49,27 +49,47 @@ export default async function ResumeIntakePage({
           <span className="onboarding-step">Step 2 of 8 · Profile ready</span>
         </header>
 
-        <section aria-labelledby="ready-title" className="onboarding-content">
-          <p className="section-kicker">Already done</p>
-          <h1 id="ready-title">Your profile is already saved.</h1>
-          <p className="onboarding-intro">
-            {facts.length} confirmed {facts.length === 1 ? "detail is" : "details are"} on this account — across{" "}
-            {new Set(facts.map((fact) => fact.groupId)).size} groups. You do not need to upload the resume again.
-          </p>
-
-          <div className="profile-exists">
-            <div className="profile-exists-actions">
-              <Link className="onboarding-submit" href="/profile">
-                Open my profile <span aria-hidden="true">→</span>
-              </Link>
-              <Link className="intake-secondary" href="/jobs">Find jobs</Link>
+        <div className="wiz-shell">
+          <aside className="wiz-aside" aria-hidden="true">
+            <span className="wiz-aside-glyph">02</span>
+            <div className="wiz-aside-top">
+              <p className="wiz-aside-kicker">Your resume</p>
+              <p className="wiz-aside-line">already on the record.</p>
             </div>
-            <p>
-              Want to add a newer resume? <Link className="text-button" href={`/onboarding/resume?path=${candidatePath || "new-grad"}&new=1`}>Upload a new version</Link>{" "}
-              — you review every change before it replaces anything.
+            <div className="wiz-aside-foot">
+              <div className="wiz-track-bar"><i style={{ width: "25%" }} /></div>
+              <p className="wiz-aside-note">No upload needed · every detail can still be edited</p>
+            </div>
+          </aside>
+
+          <section className="wiz-main" aria-labelledby="ready-title">
+            <p className="wiz-main-kicker">Step 2 of 8 · done</p>
+            <h1 id="ready-title">Your profile is already saved.</h1>
+            <p className="onboarding-intro">
+              {facts.length} confirmed {facts.length === 1 ? "detail is" : "details are"} on this account — across{" "}
+              {new Set(facts.map((fact) => fact.groupId)).size} groups. You do not need to upload the resume again.
             </p>
-          </div>
-        </section>
+
+            <div className="wiz-nav">
+              <Link className="wiz-back" href="/profile">
+                <span aria-hidden="true">←</span> Open my profile
+              </Link>
+              <Link className="wiz-next" href="/onboarding/preferences">
+                Set job preferences <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+
+            <p className="wiz-skip">
+              <Link href="/jobs">Find jobs</Link>
+              <span>·</span>
+              <span>
+                Want a newer resume?{" "}
+                <Link href={`/onboarding/resume?path=${candidatePath || "new-grad"}&new=1`}>Upload a new version</Link> — you
+                review every change first.
+              </span>
+            </p>
+          </section>
+        </div>
 
         <footer className="onboarding-footer">
           <Link href="/profile">← Your profile</Link>
